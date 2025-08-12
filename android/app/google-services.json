@@ -1,0 +1,154 @@
+{
+  "project_info": {
+    "project_number": "559230683480",
+    "project_id": "imechano-userapp",
+    "storage_bucket": "imechano-userapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:559230683480:android:88694e605804f78f01bd2d",
+        "android_client_info": {
+          "package_name": "com.hexaait.imechanoo.user"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "559230683480-eqp3ls64d4es2dqpm3fvchl8cradl7cj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBt9egDcthhaJCrck_K88ThYJwK5aib7Y4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "559230683480-eqp3ls64d4es2dqpm3fvchl8cradl7cj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "559230683480-305805keqdbcu4unmoqqqtnnvpsr1q6m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.imechano-user.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:559230683480:android:8afcbedf89efe24801bd2d",
+        "android_client_info": {
+          "package_name": "com.hexait.imechanoo.user"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "559230683480-eqp3ls64d4es2dqpm3fvchl8cradl7cj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBt9egDcthhaJCrck_K88ThYJwK5aib7Y4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "559230683480-eqp3ls64d4es2dqpm3fvchl8cradl7cj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "559230683480-305805keqdbcu4unmoqqqtnnvpsr1q6m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.imechano-user.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:559230683480:android:d57e38679a9e4e8a01bd2d",
+        "android_client_info": {
+          "package_name": "com.imechano.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "559230683480-eqp3ls64d4es2dqpm3fvchl8cradl7cj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBt9egDcthhaJCrck_K88ThYJwK5aib7Y4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "559230683480-eqp3ls64d4es2dqpm3fvchl8cradl7cj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "559230683480-305805keqdbcu4unmoqqqtnnvpsr1q6m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.imechano-user.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:559230683480:android:af4bbb89d51cdc9d01bd2d",
+        "android_client_info": {
+          "package_name": "com.imechano.user"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "559230683480-eqp3ls64d4es2dqpm3fvchl8cradl7cj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBt9egDcthhaJCrck_K88ThYJwK5aib7Y4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "559230683480-eqp3ls64d4es2dqpm3fvchl8cradl7cj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "559230683480-305805keqdbcu4unmoqqqtnnvpsr1q6m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.imechano-user.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
