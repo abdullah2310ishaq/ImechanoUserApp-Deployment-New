@@ -70,6 +70,7 @@ dependencies:
   back_button_interceptor: ^5.0.0
   flutter_image_compress: ^2.0.0
   permission_handler: ^11.0.1
+  n: ^0.1.0-nameclaim
   #firebase_crashlytics: ^2.9.0
 
 dependency_overrides:
