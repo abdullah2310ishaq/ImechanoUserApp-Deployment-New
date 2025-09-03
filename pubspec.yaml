@@ -3,7 +3,7 @@ description: A Car Service Flutter App.
 # Remove this line if you wish to publish to pub.dev
 publish_to: "none"
 # Version
-version: 9.0.0+9
+version: 9.0.1+2
 
 environment:
   sdk: ">=2.12.0 <4.0.0"
