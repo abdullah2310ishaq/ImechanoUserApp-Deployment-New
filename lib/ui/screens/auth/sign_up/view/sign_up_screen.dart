@@ -119,8 +119,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(height: 50.h),
-                    SvgPicture.asset(
-                      "assets/svg/imechano-logo.svg",
+                    Image.asset(
+                      "assets/icons/splash/logo.png",
                       width: 200.w,
                     ),
                     SizedBox(height: 10.h),
@@ -238,7 +238,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     Get.snackbar(
                                         getTranslated('tocmessage', context),
                                         "",
-                                        backgroundColor: Colors.red,
+                                      backgroundColor: Colors.red,
                                         colorText: Colors.white);
                                     return; // Stop execution here so it doesn't call onRegisterAPI()
                                   }

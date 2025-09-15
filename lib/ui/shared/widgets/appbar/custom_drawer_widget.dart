@@ -198,6 +198,7 @@ class _drawerpageState extends State<drawerpage> {
           designSize: Size(414, 896),
           builder: (context, child) => Drawer(
             key: _key,
+            backgroundColor: appModelTheme.darkTheme ? Color(0xff252525) : Colors.white,
             child: Column(
               children: [
                 userStr
@@ -399,7 +400,8 @@ class _drawerpageState extends State<drawerpage> {
                                                 child: Image(
                                                     image: AssetImage(
                                                         drawerGuestIcon[
-                                                            index])),
+                                                            index]),
+                                                    color: appModelTheme.darkTheme ? Colors.white : null),
                                               ),
                                               title: Text(
                                                 getTranslated(
@@ -410,7 +412,8 @@ class _drawerpageState extends State<drawerpage> {
                                                     context),
                                                 style: TextStyle(
                                                     fontFamily: "Poppins1",
-                                                    fontSize: 15),
+                                                    fontSize: 15,
+                                                    color: appModelTheme.darkTheme ? Colors.white : Colors.black),
                                               ),
                                             )
                                           : index == 11
@@ -424,7 +427,8 @@ class _drawerpageState extends State<drawerpage> {
                                                     child: Image(
                                                         image: AssetImage(
                                                             drawerGuestIcon[
-                                                                index])),
+                                                                index]),
+                                                        color: appModelTheme.darkTheme ? Colors.white : null),
                                                   ),
                                                   title: Text(
                                                     getTranslated(
@@ -435,7 +439,8 @@ class _drawerpageState extends State<drawerpage> {
                                                         context),
                                                     style: TextStyle(
                                                         fontFamily: "Poppins1",
-                                                        fontSize: 15),
+                                                        fontSize: 15,
+                                                        color: appModelTheme.darkTheme ? Colors.white : Colors.black),
                                                   ),
                                                 )
                                               : ListTile(
@@ -447,7 +452,8 @@ class _drawerpageState extends State<drawerpage> {
                                                     child: Image(
                                                         image: AssetImage(
                                                             drawerGuestIcon[
-                                                                index])),
+                                                                index]),
+                                                        color: appModelTheme.darkTheme ? Colors.white : null),
                                                   ),
                                                   title: Text(
                                                     getTranslated(
@@ -461,7 +467,7 @@ class _drawerpageState extends State<drawerpage> {
                                                         fontSize: 15,
                                                         color: index == 12
                                                             ? Colors.redAccent
-                                                            : null),
+                                                            : appModelTheme.darkTheme ? Colors.white : Colors.black),
                                                   ),
                                                 ))
                                       : (index == 8
@@ -475,7 +481,8 @@ class _drawerpageState extends State<drawerpage> {
                                                 child: Image(
                                                     image: AssetImage(
                                                         drawerGuestIcon[
-                                                            index])),
+                                                            index]),
+                                                    color: appModelTheme.darkTheme ? Colors.white : null),
                                               ),
                                               title: Text(
                                                 getTranslated(
@@ -486,7 +493,8 @@ class _drawerpageState extends State<drawerpage> {
                                                     context),
                                                 style: TextStyle(
                                                     fontFamily: "Poppins1",
-                                                    fontSize: 15),
+                                                    fontSize: 15,
+                                                    color: appModelTheme.darkTheme ? Colors.white : Colors.black),
                                               ),
                                             )
                                           : index == 9
@@ -500,7 +508,8 @@ class _drawerpageState extends State<drawerpage> {
                                                     child: Image(
                                                         image: AssetImage(
                                                             drawerGuestIcon[
-                                                                index])),
+                                                                index]),
+                                                        color: appModelTheme.darkTheme ? Colors.white : null),
                                                   ),
                                                   title: Text(
                                                     getTranslated(
@@ -511,7 +520,8 @@ class _drawerpageState extends State<drawerpage> {
                                                         context),
                                                     style: TextStyle(
                                                         fontFamily: "Poppins1",
-                                                        fontSize: 15),
+                                                        fontSize: 15,
+                                                        color: appModelTheme.darkTheme ? Colors.white : Colors.black),
                                                   ),
                                                 )
                                               : ListTile(
@@ -523,7 +533,8 @@ class _drawerpageState extends State<drawerpage> {
                                                     child: Image(
                                                         image: AssetImage(
                                                             drawerGuestIcon[
-                                                                index])),
+                                                                index]),
+                                                        color: appModelTheme.darkTheme ? Colors.white : null),
                                                   ),
                                                   title: Text(
                                                     getTranslated(
@@ -534,13 +545,19 @@ class _drawerpageState extends State<drawerpage> {
                                                         context),
                                                     style: TextStyle(
                                                         fontFamily: "Poppins1",
-                                                        fontSize: 15),
+                                                        fontSize: 15,
+                                                        color: appModelTheme.darkTheme ? Colors.white : Colors.black),
                                                   ),
                                                 )),
                                 );
                               },
                               separatorBuilder: (context, index) {
-                                return Container(height: 0, child: Divider());
+                                return Container(
+                                  height: 0, 
+                                  child: Divider(
+                                    color: appModelTheme.darkTheme ? Colors.grey[600] : Colors.grey[300],
+                                  ),
+                                );
                               },
                               itemCount: drawerGuestIcon.length),
                         ],
@@ -575,12 +592,12 @@ class _drawerpageState extends State<drawerpage> {
 
         // Update selected locale
         selectedLocale = newLocale;
-
-        // Force rebuild to apply language changes
-        if (mounted) {
-          setState(() {});
-        }
       },
+      activeColor: Colors.white,
+      activeTrackColor: logoBlue,
+      inactiveThumbColor: appModelTheme.darkTheme ? Colors.grey[400] : Colors.grey[600],
+      inactiveTrackColor: appModelTheme.darkTheme ? Colors.grey[700] : Colors.grey[300],
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 
@@ -588,16 +605,14 @@ class _drawerpageState extends State<drawerpage> {
     return Switch(
       value: appModelTheme.darkTheme,
       onChanged: (value) {
-        setState(() {
-          // Use the provider to change theme
-          Provider.of<AppModel>(context, listen: false).darkTheme = value;
-        });
-
-        // Force rebuild to apply theme changes
-        if (mounted) {
-          setState(() {});
-        }
+        // Use the provider to change theme
+        Provider.of<AppModel>(context, listen: false).darkTheme = value;
       },
+      activeColor: Colors.white,
+      activeTrackColor: logoBlue,
+      inactiveThumbColor: appModelTheme.darkTheme ? Colors.grey[400] : Colors.grey[600],
+      inactiveTrackColor: appModelTheme.darkTheme ? Colors.grey[700] : Colors.grey[300],
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 

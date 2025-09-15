@@ -108,8 +108,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-                    SvgPicture.asset(
-                      "assets/svg/imechano-logo.svg",
+                    Image.asset(
+                      "assets/icons/splash/logo.png",
                       height: MediaQuery.of(context).size.height * 0.11,
                       color: appModelTheme.darkTheme ? white : null,
                     ),
