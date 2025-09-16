@@ -132,17 +132,28 @@ class _IMechanoAppState extends State<IMechanoApp> {
   Box prefs;
   AppModel appModel = new AppModel();
   void notification() async {
-    NotificationSettings settings = await _firebaseMessaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
+    // First check current permission status
+    NotificationSettings currentSettings =
+        await _firebaseMessaging.getNotificationSettings();
 
-    log('User granted permission: ${settings.authorizationStatus}');
+    // Only request permission if not already granted
+    if (currentSettings.authorizationStatus ==
+        AuthorizationStatus.notDetermined) {
+      NotificationSettings settings =
+          await _firebaseMessaging.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
+      log('User granted permission: ${settings.authorizationStatus}');
+    } else {
+      log('Notification permission already determined: ${currentSettings.authorizationStatus}');
+    }
+
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 

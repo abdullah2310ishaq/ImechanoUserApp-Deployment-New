@@ -5,6 +5,7 @@ import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -105,15 +106,35 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   int? categorylength;
+  // Add this method to check permission status first
+  Future<void> _checkAndShowNotificationDialog() async {
+    // Check if we've already asked for permissions in this session
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool hasAskedThisSession =
+        prefs.getBool('notification_asked_this_session') ?? false;
+
+    if (!hasAskedThisSession) {
+      // Check current permission status
+      PermissionStatus status = await Permission.notification.status;
+
+      // Only show dialog if permission is not granted and not permanently denied
+      if (status.isDenied || status.isLimited) {
+        await prefs.setBool('notification_asked_this_session', true);
+        showNotificationPermissionDialog(context);
+      }
+    }
+  }
+
   @override
   void initState() {
     print("initializing");
     // ignore: todo
     // TODO: implement initState
     super.initState();
+    // Check notification permission status before showing dialog
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(Duration(seconds: 2), () {
-        showNotificationPermissionDialog(context);
+        _checkAndShowNotificationDialog();
       });
     });
 
@@ -2176,6 +2197,18 @@ class _HomeScreenState extends State<HomeScreen> {
 void showNotificationPermissionDialog(BuildContext context) async {
   // Show custom dialog
   PermissionStatus status = await Permission.notification.status;
+
+  // Don't show dialog if permission is already granted or permanently denied
+  if (status.isGranted) {
+    log('Notification permission already granted, skipping dialog');
+    return;
+  }
+
+  if (status.isPermanentlyDenied) {
+    log('Notification permission permanently denied, skipping dialog');
+    return;
+  }
+
   if (!status.isGranted) {
     final result = await showDialog<bool>(
       context: context,
@@ -2256,32 +2289,59 @@ Future<void> requestNotificationPermission() async {
       );
     }
   } else if (Platform.isIOS) {
-    // Request permissions for iOS
-    final plugin = FlutterLocalNotificationsPlugin();
-    bool? granted = await plugin
-        .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
-        ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
+    // For iOS, use Firebase messaging to check and request permissions
+    final messaging = FirebaseMessaging.instance;
+    NotificationSettings currentSettings =
+        await messaging.getNotificationSettings();
 
-    if (granted == false) {
+    // Only request if not already determined
+    if (currentSettings.authorizationStatus ==
+        AuthorizationStatus.notDetermined) {
+      final settings = await messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+      bool granted =
+          settings.authorizationStatus == AuthorizationStatus.authorized ||
+              settings.authorizationStatus == AuthorizationStatus.provisional;
+
+      if (granted == false) {
+        Get.snackbar(
+          'Warning!',
+          'Notification permissions are denied on iOS.',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        await openAppSettings();
+      } else {
+        Get.snackbar(
+          'Success!',
+          'Notification permissions granted on iOS.',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      }
+    } else if (currentSettings.authorizationStatus ==
+            AuthorizationStatus.authorized ||
+        currentSettings.authorizationStatus ==
+            AuthorizationStatus.provisional) {
       Get.snackbar(
-        'Warning!',
-        'Notification permissions are denied on iOS.',
+        'Info!',
+        'Notification permissions are already granted on iOS.',
+        backgroundColor: Colors.blue,
+        colorText: Colors.white,
+      );
+    } else {
+      // Permission denied or restricted
+      Get.snackbar(
+        'Error!',
+        'Notification permissions are denied. Please enable them from settings.',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
       await openAppSettings();
-    } else {
-      Get.snackbar(
-        'Success!',
-        'Notification permissions granted on iOS.',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
     }
   }
 }
