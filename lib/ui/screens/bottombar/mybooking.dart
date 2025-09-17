@@ -284,34 +284,32 @@ class _MyBookingState extends State<MyBooking> {
   }
 
   Widget card(String title, bool isselected) {
-    return Container(
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 150),
       height: double.infinity,
       width: double.infinity,
       decoration: BoxDecoration(
         color: appModelTheme.darkTheme
-            ? isselected
-                ? logoBlue
-                : Colors.transparent
-            : isselected
-                ? Colors.white
-                : Color(0xff70BDF1),
+            ? (isselected ? logoBlue : Colors.transparent)
+            : (isselected ? Colors.white : Color(0xff70BDF1)),
         borderRadius: BorderRadius.circular(8),
-        border: isselected
-            ? Border.all(color: Colors.transparent, width: 0)
-            : Border.all(
-                width: 1.5,
-                color: appModelTheme.darkTheme ? white : white,
-              ),
+        border: Border.all(
+          width: isselected ? 0 : 1.5,
+          color: isselected
+              ? Colors.transparent
+              : (appModelTheme.darkTheme ? white : white),
+        ),
       ),
       child: Center(
         child: Text(
           title,
           style: TextStyle(
-              fontSize: 13.sp,
-              fontFamily: "Poppins3",
-              color: isselected
-                  ? (appModelTheme.darkTheme ? Colors.white : Colors.black)
-                  : Colors.white),
+            fontSize: 13.sp,
+            fontFamily: "Poppins3",
+            color: isselected
+                ? (appModelTheme.darkTheme ? Colors.white : Colors.black)
+                : Colors.white,
+          ),
         ),
       ),
     );
