@@ -688,65 +688,72 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                     ),
             );
           }
-          return flag
-              ? Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: bookinglistsnapshot.data!.data!.length,
-                  itemBuilder: (context, index) {
-                    return bookinglistsnapshot.data!.data![index].items != null
-                        ? bookinglistsnapshot.data!.data![index].bookingId!
-                                    .contains(search) ||
-                                bookinglistsnapshot.data!.data![index].carName!
-                                    .toLowerCase()
-                                    .contains(search.toLowerCase()) ||
-                                bookinglistsnapshot
-                                    .data!.data![index].items![0].item!
-                                    .toLowerCase()
-                                    .contains(search.toLowerCase())
-                            ? Padding(
-                                padding: EdgeInsets.only(
-                                    left: 15, right: 15, bottom: 15, top: 15),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: appModelTheme.darkTheme
-                                          ? darkmodeColor
-                                          : white,
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                          width: 1, color: grayE6E6E5),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: appModelTheme.darkTheme
-                                              ? Colors.black45
-                                              : Colors.grey.withOpacity(0.2),
-                                          spreadRadius: 2,
-                                          blurRadius: 10,
-                                          offset: Offset(0, 3),
-                                        ),
-                                      ]),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: _infoList(
-                                            bookinglistsnapshot
-                                                .data!.data![index],
-                                            bookinglistsnapshot
-                                                .data!.data![index].timeDate
-                                                .toString()),
-                                      ),
-                                      SizedBox(width: 8),
-                                      _infoButton(bookinglistsnapshot
-                                          .data!.data![index])
-                                    ],
+          final bookings = bookinglistsnapshot.data!.data ?? [];
+          if (flag) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (bookings.isEmpty) {
+            return Center(
+              child: Text(
+                'No Data Found',
+                style: TextStyle(fontFamily: 'Poppins1', fontSize: 12),
+              ),
+            );
+          }
+          return ListView.builder(
+            shrinkWrap: true,
+            itemCount: bookings.length,
+            itemBuilder: (context, index) {
+              return bookings[index].items != null
+                  ? bookinglistsnapshot.data!.data![index].bookingId!
+                              .contains(search) ||
+                          bookinglistsnapshot.data!.data![index].carName!
+                              .toLowerCase()
+                              .contains(search.toLowerCase()) ||
+                          bookinglistsnapshot.data!.data![index].items![0].item!
+                              .toLowerCase()
+                              .contains(search.toLowerCase())
+                      ? Padding(
+                          padding: EdgeInsets.only(
+                              left: 15, right: 15, bottom: 15, top: 15),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: appModelTheme.darkTheme
+                                    ? darkmodeColor
+                                    : white,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(width: 1, color: grayE6E6E5),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: appModelTheme.darkTheme
+                                        ? Colors.black45
+                                        : Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 2,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 3),
                                   ),
+                                ]),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: _infoList(
+                                      bookinglistsnapshot.data!.data![index],
+                                      bookinglistsnapshot
+                                          .data!.data![index].timeDate
+                                          .toString()),
                                 ),
-                              )
-                            : SizedBox.shrink()
-                        : SizedBox.shrink();
-                  },
-                );
+                                SizedBox(width: 8),
+                                _infoButton(
+                                    bookinglistsnapshot.data!.data![index])
+                              ],
+                            ),
+                          ),
+                        )
+                      : SizedBox.shrink()
+                  : SizedBox.shrink();
+            },
+          );
         });
   }
 
