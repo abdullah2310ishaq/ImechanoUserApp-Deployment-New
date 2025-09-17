@@ -399,27 +399,26 @@ class _MyJobCardState extends State<MyJobCard>
         children: [
           Container(
             margin: EdgeInsets.only(right: 10.w),
-            height: 35,
+            height: 40,
             child: TabBar(
               controller: _tabController,
-              indicator: BoxDecoration(
-                border: Border.all(color: Colors.transparent),
-                borderRadius: BorderRadius.circular(5.0),
-                // color: appModelTheme.darkTheme ? Colors.grey : Colors.white,
+              isScrollable: false,
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: ShapeDecoration(
                 color: appModelTheme.darkTheme ? logoBlue : Colors.white,
-                // color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
               ),
               labelColor: appModelTheme.darkTheme ? Colors.white : logoBlue,
-              // labelColor: Colors.black,
               labelStyle: TextStyle(
-                color: Colors.red,
                 fontSize: 13,
                 fontFamily: "Poppins3",
               ),
-              indicatorPadding: EdgeInsets.only(left: 10),
-              labelPadding: EdgeInsets.only(left: 10),
+              indicatorPadding: EdgeInsets.symmetric(horizontal: 5),
+              labelPadding: EdgeInsets.zero,
               unselectedLabelColor:
-                  appModelTheme.darkTheme ? Colors.white : Colors.grey[100],
+                  appModelTheme.darkTheme ? Colors.white70 : Colors.white,
               onTap: (index) {
                 selectTab = index;
                 flag = true;
@@ -480,58 +479,80 @@ class _MyJobCardState extends State<MyJobCard>
               tabs: [
                 Tab(
                   child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                            color: Colors.white,
-                            width: selectTab == 0 ? 0 : 1)),
-                    child: Align(
-                      alignment: Alignment.center,
+                      borderRadius: BorderRadius.circular(6),
+                      border: selectTab == 0
+                          ? Border.all(color: Colors.transparent, width: 0)
+                          : Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
                       child: Text(
                         getTranslated("Pending", context),
-                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                   ),
                 ),
                 Tab(
                   child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.white, width: 1)),
-                    child: Align(
-                      alignment: Alignment.center,
+                      borderRadius: BorderRadius.circular(6),
+                      border: selectTab == 1
+                          ? Border.all(color: Colors.transparent, width: 0)
+                          : Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
                       child: Text(
                         getTranslated("Completed", context),
-                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                   ),
                 ),
                 Tab(
                   child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.white, width: 1)),
-                    child: Align(
-                      alignment: Alignment.center,
+                      borderRadius: BorderRadius.circular(6),
+                      border: selectTab == 2
+                          ? Border.all(color: Colors.transparent, width: 0)
+                          : Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
                       child: Text(
                         getTranslated("Canceled", context),
-                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                   ),
                 ),
                 Tab(
                   child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.white, width: 1)),
-                    child: Align(
-                      alignment: Alignment.center,
+                      borderRadius: BorderRadius.circular(6),
+                      border: selectTab == 3
+                          ? Border.all(color: Colors.transparent, width: 0)
+                          : Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
                       child: Text(
                         getTranslated("Approved", context),
-                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                   ),

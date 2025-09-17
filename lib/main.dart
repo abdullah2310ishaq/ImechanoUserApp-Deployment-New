@@ -140,7 +140,8 @@ class _IMechanoAppState extends State<IMechanoApp> {
     final NotificationSettings currentSettings =
         await _firebaseMessaging.getNotificationSettings();
 
-    if (!askedAlready &&
+    if (Platform.isIOS &&
+        !askedAlready &&
         currentSettings.authorizationStatus ==
             AuthorizationStatus.notDetermined) {
       final NotificationSettings settings =
@@ -168,6 +169,14 @@ class _IMechanoAppState extends State<IMechanoApp> {
     );
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+    // Fetch token after permission flow is settled
+    try {
+      final token = await _firebaseMessaging.getToken();
+      log('FCM token: $token');
+    } catch (e) {
+      log('Failed to get FCM token: $e');
+    }
   }
 
   @override
@@ -175,8 +184,7 @@ class _IMechanoAppState extends State<IMechanoApp> {
     super.initState();
     // Remove the _initAppTheme call since it's now handled by AppModel.initializeApp()
 
-    log("Printing TOKEN");
-    _firebaseMessaging.getToken().then((value) => log(value.toString()));
+    // Ask for notification permissions first (iOS), then fetch token
     notification();
 
     // Handle Firebase messaging here

@@ -735,13 +735,14 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                                           )),
                                       margin: EdgeInsets.only(
                                           left: 10.w, right: 10.w),
-                                      child: Container(
-                                        width: double.infinity,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 8.w),
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            CRNo(),
+                                            Flexible(child: CRNo()),
                                             Column(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
@@ -763,7 +764,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                                                 )
                                               ],
                                             ),
-                                            mobileNumber(),
+                                            Flexible(child: mobileNumber()),
                                           ],
                                         ),
                                       ),
@@ -1357,19 +1358,19 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                 ),
               ),
               SizedBox(height: 5.h),
-              Row(
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                spacing: 16,
+                runSpacing: 10,
                 children: [
                   Image(
                       image:
                           AssetImage("assets/icons/My Vehicle/Group 9254.png"),
                       height: 50.h),
-                  Spacer(),
                   carddivider(
                       getTranslated("CXname", context), profileData["name"]),
-                  Spacer(),
                   carddivider(getTranslated("Address", context),
                       widget.invoiceData!.address!.substring(0, 20)),
-                  Spacer(),
                   carddivider(getTranslated("mobileno.", context),
                       profileData['mobile_number']),
                 ],
@@ -1382,44 +1383,36 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                 style: TextStyle(fontFamily: "Poppins2", fontSize: 10.sp),
               ),
               SizedBox(height: 10.h),
-              Row(
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                spacing: 16,
+                runSpacing: 10,
                 children: [
                   Image(
                       image:
                           AssetImage("assets/icons/My Vehicle/Group 9253.png"),
                       height: 50.h),
-                  Spacer(),
                   carddivider(getTranslated("Make", context),
                       widget.invoiceData!.car!.carBrand!),
-                  Spacer(),
                   carddivider(getTranslated("Model", context),
                       widget.invoiceData!.car!.carModel!),
-                  Spacer(),
                   carddivider(getTranslated("Year", context),
                       widget.invoiceData!.car!.carYear!),
                 ],
               ),
               SizedBox(height: 10.h),
-              Row(
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                spacing: 16,
+                runSpacing: 10,
                 children: [
-                  carddivider(
-                      getTranslated("Mileage", context),
-                      //"Milage",
+                  carddivider(getTranslated("Mileage", context),
                       widget.invoiceData!.car!.carMileage!),
-                  Spacer(),
-                  carddivider(
-                      getTranslated("cylindertype", context),
-                      // "Cylinder",
+                  carddivider(getTranslated("cylindertype", context),
                       widget.invoiceData!.car!.carCylinder!),
-                  Spacer(),
-                  carddivider(
-                      getTranslated("carplateno", context),
-                      //"Car Plate",
+                  carddivider(getTranslated("carplateno", context),
                       widget.invoiceData!.car!.plateNo!),
-                  Spacer(),
-                  carddivider(
-                      getTranslated("ChasisNo", context),
-                      //"Chasis No (Optional)",
+                  carddivider(getTranslated("ChasisNo", context),
                       widget.invoiceData!.car!.carChasis!)
                 ],
               ),

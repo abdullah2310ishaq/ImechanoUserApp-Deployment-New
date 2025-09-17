@@ -464,9 +464,11 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
       context: context,
       builder: (_) => Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding: EdgeInsets.all(20.h),
-        child: Container(
-          height: hh * 0.43,
+        insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: hh * 0.65,
+          ),
           child: _DateTime(),
         ),
       ),
@@ -847,6 +849,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
         elevation: 10,
         color: appModelTheme.darkTheme ? darkmodeColor : Colors.white,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
               width: double.infinity,
@@ -890,7 +893,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
               ),
             ),
             _dateAndTime(),
-            Spacer(),
+            SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -1014,10 +1017,10 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
                     ),
                   ),
                 ),
-                SizedBox(height: 30.h),
+                SizedBox(height: 20),
               ],
             ),
-            SizedBox(height: 50.h)
+            SizedBox(height: 10)
           ],
         ),
       ),
@@ -1026,7 +1029,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
 
   Widget _dateAndTime() {
     return Container(
-      height: hh * 0.25,
+      height: hh * 0.28,
       child: CupertinoDatePicker(
         minimumDate: DateTime.now(),
         mode: CupertinoDatePickerMode.dateAndTime,

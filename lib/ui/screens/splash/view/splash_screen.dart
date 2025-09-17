@@ -89,23 +89,40 @@ class _SplashScreenState extends State<SplashScreen> {
                   children: [
                     // Logo with subtle elevation effect
                     Container(
-                      width: 96.w,
-                      height: 96.w,
+                      width: 110.w,
+                      height: 110.w,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
+                        gradient: LinearGradient(
+                          colors: [
+                            Theme.of(context).colorScheme.primary,
+                            Theme.of(context).colorScheme.secondary,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 16,
-                            offset: Offset(0, 8),
+                            color: Colors.black.withOpacity(0.10),
+                            blurRadius: 22,
+                            offset: Offset(0, 10),
                           ),
                         ],
                       ),
-                      padding: EdgeInsets.all(16.w),
-                      child: Image.asset(
-                        'assets/icons/splash/logo.png',
-                        fit: BoxFit.contain,
+                      child: Center(
+                        child: Container(
+                          width: 92.w,
+                          height: 92.w,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          padding: EdgeInsets.all(16.w),
+                          child: Image.asset(
+                            'assets/icons/splash/logo.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(height: 18.h),
@@ -123,7 +140,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     SizedBox(height: 26.h),
                     // Illustration scaled by screen width
                     SizedBox(
-                      width: 0.62.sw,
+                      width: 0.70.sw,
                       child: Image.asset(
                         'assets/icons/splash/splash.png',
                         fit: BoxFit.contain,
@@ -132,8 +149,8 @@ class _SplashScreenState extends State<SplashScreen> {
                     SizedBox(height: 36.h),
                     // Loading indicator (animated gif)
                     SizedBox(
-                      width: 72.w,
-                      height: 72.w,
+                      width: 60.w,
+                      height: 60.w,
                       child: Image.asset(
                         'assets/meter.gif',
                         fit: BoxFit.contain,
