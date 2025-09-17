@@ -950,21 +950,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontSize: 13.sp),
                           )
                         : Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Container(
-                                height: 40.h,
-                                margin: EdgeInsets.only(
-                                    left: 5.w, top: 5.h, right: 5.w),
-                                child: Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              SizedBox(width: 5.w),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(0, 4, 0, 0),
+                              Icon(Icons.add, color: Colors.white, size: 18.sp),
+                              SizedBox(width: 6.w),
+                              Flexible(
                                 child: Text(
                                   getTranslated('AddCar', context),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontFamily: "Poppins1",

@@ -149,11 +149,13 @@ class _oil_ChangeState extends State<oil_Change>
                                 // EdgeInsets.only(top: 15.h, bottom: 15.h),
                                 // textColor: Colors.white,
                                 child: Container(
-                                  alignment: Alignment.topLeft,
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 16.w),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Container(
+                                      Flexible(
                                         child: Text(
                                           globals.currentCount.toString() +
                                               " " +
@@ -161,20 +163,25 @@ class _oil_ChangeState extends State<oil_Change>
                                                   'Selected', context) +
                                               " " +
                                               getTranslated('Service', context),
-                                          style: TextStyle(fontSize: 14.sp),
+                                          style: TextStyle(
+                                            fontSize: 12.sp,
+                                            color: Colors.white,
+                                            fontFamily: "Poppins1",
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        margin: EdgeInsets.only(left: 20.w),
                                       ),
-                                      SizedBox(
-                                        width: 60.w,
-                                      ),
-                                      Container(
-                                          child: Text(
+                                      SizedBox(width: 8.w),
+                                      Text(
                                         getTranslated(
                                             'Viewselections', context),
-                                        style:
-                                            TextStyle(fontFamily: "Poppins2"),
-                                      ))
+                                        style: TextStyle(
+                                          fontFamily: "Poppins2",
+                                          fontSize: 13.sp,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),

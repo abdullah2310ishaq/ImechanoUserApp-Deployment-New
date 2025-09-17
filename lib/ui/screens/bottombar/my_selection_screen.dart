@@ -945,35 +945,44 @@ class _MySelectionPageState extends State<MySelectionPage>
           }
         },
         child: Container(
-          height: 48,
-          width: 380.w,
+          height: 48.h,
+          width: double.infinity,
+          margin: EdgeInsets.symmetric(horizontal: 16.w),
           decoration: BoxDecoration(
             color: logoBlue,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Text(
-                "${globals.currentCount} " +
-                    getTranslated("Selected", context) +
-                    " " +
-                    getTranslated('Service', context),
-                style: TextStyle(
-                  fontFamily: 'Poppins1',
-                  color: white,
-                  fontSize: 10,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    "${globals.currentCount} " +
+                        getTranslated("Selected", context) +
+                        " " +
+                        getTranslated('Service', context),
+                    style: TextStyle(
+                      fontFamily: 'Poppins1',
+                      color: Colors.white,
+                      fontSize: 12.sp,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-              Text(
-                getTranslated('BookApointment', context),
-                style: TextStyle(
-                  fontFamily: 'Poppins1',
-                  color: white,
-                  fontSize: 15,
+                SizedBox(width: 8.w),
+                Text(
+                  getTranslated('BookApointment', context),
+                  style: TextStyle(
+                    fontFamily: 'Poppins1',
+                    color: Colors.white,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

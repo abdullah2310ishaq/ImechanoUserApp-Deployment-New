@@ -121,8 +121,6 @@ class _MyBookingsPageState extends State<MyBookingsPage>
   void _runFilter(String enteredKeyword) {
     print("Search keyword");
     print(enteredKeyword);
-
-    // Only perform search if user is logged in
     if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
       if (enteredKeyword.length < 2) {
         bookingListbloc.bookinglistsink(
@@ -145,7 +143,6 @@ class _MyBookingsPageState extends State<MyBookingsPage>
   @override
   void initState() {
     super.initState();
-    // null safetissue resolved
     WidgetsBinding.instance.addObserver(this);
 
     _tabController = TabController(length: 4, vsync: this);
@@ -155,18 +152,20 @@ class _MyBookingsPageState extends State<MyBookingsPage>
     _tabController?.animateTo(currentBookingTab);
 
     // Only fetch bookings if user is logged in
-    if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
-      bookingListbloc
-          .bookinglistsink(PrefObj.preferences!.get(PrefKeys.USER_ID),
-              currentBookingTab.toString())
-          .then((value) {
-        flag = false;
-        showFilter = false;
-        setState(() {
-          selectTab = currentBookingTab;
+    if (userStr && PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+      final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+      if (userId != null) {
+        bookingListbloc
+            .bookinglistsink(userId, currentBookingTab.toString())
+            .then((value) {
+          flag = false;
+          showFilter = false;
+          setState(() {
+            selectTab = currentBookingTab;
+          });
+          log('Approved Booking Value = $value');
         });
-        log('Approved Booking Value = $value');
-      });
+      }
     } else {
       // Guest mode - no bookings to fetch
       flag = false;
@@ -199,7 +198,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
         onDetached();
         break;
       case AppLifecycleState.hidden:
-        // Handle hidden state
+        // TODO: Handle this case.
         break;
     }
   }
@@ -208,24 +207,25 @@ class _MyBookingsPageState extends State<MyBookingsPage>
 
   @override
   Widget build(BuildContext context) {
+    // var size = MediaQuery.of(context).size; // unused
     print("I m builddddd Shoaib TAriq");
     print(PrefObj.preferences!.get(PrefKeys.CARID));
     final appModel = Provider.of<AppModel>(context);
     appModelTheme = appModel;
     return WillPopScope(
-      onWillPop: () async {
-        if (!Navigator.of(context).canPop()) {
-          // If there's no screen in the stack, navigate to home screen
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => BottomBarPage(2)),
-          );
-          return false; // Return false to prevent the app from closing
-        } else {
-          return true; // Return true to allow the app to close
-        }
-      },
-      child: Scaffold(
+        onWillPop: () async {
+          if (!Navigator.of(context).canPop()) {
+            // If there's no screen in the stack, navigate to home screen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => BottomBarPage(2)),
+            );
+            return false; // Return false to prevent the app from closing
+          } else {
+            return true; // Return true to allow the app to close
+          }
+        },
+        child: Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: WidgetAppBar(
             title: getTranslated('MyBookings', context),
@@ -235,126 +235,122 @@ class _MyBookingsPageState extends State<MyBookingsPage>
           ),
           drawer: drawerpage(),
           backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
-          body: ScreenUtilInit(
-            designSize: Size(414, 896),
-            builder: (context, child) => SafeArea(
-              child: Column(children: [
-                Row(
+          body: SafeArea(
+            child: Column(children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: screenSize!.height * 0.05,
+                      margin: EdgeInsets.symmetric(horizontal: 10.w),
+                      child: TextField(
+                        keyboardType: TextInputType.text,
+                        onChanged: (value) {
+                          setState(() {
+                            search = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: SvgPicture.asset(
+                              "assets/svg/serch.svg",
+                              placeholderBuilder: (context) =>
+                                  const SizedBox.shrink(),
+                            ),
+                          ),
+                          hintText:
+                              getTranslated('SearchwithBookingID', context),
+                          hintStyle: TextStyle(
+                              fontSize: 12,
+                              fontFamily: "Poppins3",
+                              color: appModelTheme.darkTheme
+                                  ? Colors.grey
+                                  : Colors.black),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              width: 0,
+                              style: BorderStyle.none,
+                            ),
+                          ),
+                          filled: true,
+                          contentPadding: EdgeInsets.only(bottom: 2),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: screenSize!.height * 0.05,
+                    margin: appModelTheme.appLocal == Locale("en")
+                        ? EdgeInsets.only(right: 10.w)
+                        : EdgeInsets.only(left: 10.w),
+                    padding: EdgeInsets.fromLTRB(1.w, 8.w, 10.w, 8.w),
+                    decoration: BoxDecoration(
+                        color: white, borderRadius: BorderRadius.circular(10)),
+                    child: GestureDetector(
+                      onTap: () {
+                        showFilter = !showFilter;
+                        // Refresh the UI
+                        setState(() {});
+                        print("Container was tapped");
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(left: 10.w, right: 10.w),
+                        child: Row(
+                          children: [
+                            Icon(
+                                showFilter
+                                    ? Icons.filter_alt_outlined
+                                    : Icons.filter_alt_off_outlined,
+                                color: Colors.black,
+                                size: 20.w),
+                            SizedBox(width: 8.w),
+                            Text(
+                              getTranslated('filter', context),
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins3'),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (showFilter) ...[
+                // These children are only visible if condition is true
+                SizedBox(height: 15.h),
+                _filterwidget(),
+              ],
+              SizedBox(height: 15),
+              requestTab(),
+              SizedBox(height: 15),
+              Expanded(
+                child: Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        height: screenSize!.height * 0.05,
-                        margin: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: TextField(
-                          keyboardType: TextInputType.text,
-                          onChanged: (value) {
-                            setState(() {
-                              search = value;
-                            });
-                          },
-                          decoration: InputDecoration(
-                            fillColor: Colors.white,
-                            prefixIcon: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: SvgPicture.asset(
-                                "assets/svg/serch.svg",
-                                placeholderBuilder: (context) =>
-                                    const SizedBox.shrink(),
-                              ),
-                            ),
-                            hintText:
-                                getTranslated('SearchwithBookingID', context),
-                            hintStyle: TextStyle(
-                                fontSize: 12,
-                                fontFamily: "Poppins3",
-                                color: appModelTheme.darkTheme
-                                    ? Colors.grey
-                                    : Colors.black),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(
-                                width: 0,
-                                style: BorderStyle.none,
-                              ),
-                            ),
-                            filled: true,
-                            contentPadding: EdgeInsets.only(bottom: 2),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: screenSize!.height * 0.05,
-                      margin: appModelTheme.appLocal == Locale("en")
-                          ? EdgeInsets.only(right: 10.w)
-                          : EdgeInsets.only(left: 10.w),
-                      padding: EdgeInsets.fromLTRB(1.w, 8.w, 10.w, 8.w),
-                      decoration: BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: GestureDetector(
-                        onTap: () {
-                          showFilter = !showFilter;
-                          // Refresh the UI
-                          setState(() {});
-                          print("Container was tapped");
-                        },
                         child: Container(
-                          margin: EdgeInsets.only(left: 10.w, right: 10.w),
-                          child: Row(
-                            children: [
-                              Icon(
-                                  showFilter
-                                      ? Icons.filter_alt_outlined
-                                      : Icons.filter_alt_off_outlined,
-                                  color: Colors.black,
-                                  size: 20.w),
-                              SizedBox(width: 8.w),
-                              Text(
-                                getTranslated('filter', context),
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins3'),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                      padding: EdgeInsets.only(top: 5),
+                      height: double.infinity,
+                      decoration: BoxDecoration(
+                          color: appModelTheme.darkTheme
+                              ? Color(0xff252525)
+                              : white,
+                          borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(25.0),
+                              topLeft: Radius.circular(25.0))),
+                      child: _BookingDetails(),
+                    )),
                   ],
                 ),
-                if (showFilter) ...[
-                  // These children are only visible if condition is true
-                  SizedBox(height: 15.h),
-                  _filterwidget(),
-                ],
-                SizedBox(height: 15),
-                requestTab(),
-                SizedBox(height: 15),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: Container(
-                        padding: EdgeInsets.only(top: 5),
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                            color: appModelTheme.darkTheme
-                                ? Color(0xff252525)
-                                : white,
-                            borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(25.0),
-                                topLeft: Radius.circular(25.0))),
-                        child: _BookingDetails(),
-                      )),
-                    ],
-                  ),
-                ),
-              ]),
-            ),
-          )),
-    );
+              ),
+            ]),
+          ),
+        ));
   }
 
   Widget _filterwidget() {
@@ -432,12 +428,10 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                     DateTime.now().day);
                 searchString = "";
 
-                // Only fetch bookings if user is logged in
-                if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+                final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+                if (userId != null) {
                   bookingListbloc
-                      .bookinglistsink(
-                          PrefObj.preferences!.get(PrefKeys.USER_ID),
-                          currentBookingTab.toString())
+                      .bookinglistsink(userId, currentBookingTab.toString())
                       .then((value) {
                     flag = false;
                     showFilter = false;
@@ -446,10 +440,6 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                     });
                     print('Approved Booking Value = $value');
                   });
-                } else {
-                  // Guest mode - just update UI
-                  flag = false;
-                  showFilter = false;
                 }
               });
             },
@@ -497,52 +487,56 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                   appModelTheme.darkTheme ? Colors.white : Colors.grey[100],
               onTap: (index) {
                 selectTab = index;
+                // selectTab = 3;
                 flag = true;
                 setState(() {});
+                if (selectTab == 0) {
+                  currentBookingTab = 0;
+                  bookingListbloc
+                      .bookinglistsink(
+                          PrefObj.preferences!.get(PrefKeys.USER_ID), '0')
+                      .then((value) {
+                    setState(() {
+                      showFilter = false;
+                      flag = false;
+                    });
+                    log('Pending Booking Value = $value');
+                  });
+                } else if (selectTab == 1) {
+                  currentBookingTab = 1;
+                  bookingListbloc
+                      .bookinglistsink(
+                          PrefObj.preferences!.get(PrefKeys.USER_ID), '1')
+                      .then((value) {
+                    flag = false;
+                    showFilter = false;
+                    setState(() {});
 
-                // Only fetch bookings if user is logged in
-                if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
-                  final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
-                  if (selectTab == 0) {
-                    currentBookingTab = 0;
-                    bookingListbloc.bookinglistsink(userId, '0').then((value) {
-                      setState(() {
-                        showFilter = false;
-                        flag = false;
-                      });
-                      log('Pending Booking Value = $value');
-                    });
-                  } else if (selectTab == 1) {
-                    currentBookingTab = 1;
-                    bookingListbloc.bookinglistsink(userId, '1').then((value) {
-                      flag = false;
-                      showFilter = false;
-                      setState(() {});
-                      log('Complete Booking Value = $value');
-                    });
-                  } else if (selectTab == 2) {
-                    currentBookingTab = 2;
-                    bookingListbloc.bookinglistsink(userId, '2').then((value) {
-                      flag = false;
-                      showFilter = false;
-                      setState(() {});
-                      log('Canceled Booking Value = $value');
-                    });
-                  } else {
-                    currentBookingTab = 3;
-                    bookingListbloc.bookinglistsink(userId, '3').then((value) {
-                      flag = false;
-                      showFilter = false;
-                      setState(() {});
-                      log('Approved Booking Value = $value');
-                    });
-                  }
+                    log('Complete Booking Value = $value');
+                  });
+                } else if (selectTab == 2) {
+                  currentBookingTab = 2;
+                  bookingListbloc
+                      .bookinglistsink(
+                          PrefObj.preferences!.get(PrefKeys.USER_ID), '2')
+                      .then((value) {
+                    flag = false;
+                    showFilter = false;
+                    setState(() {});
+
+                    log('Canceled Booking Value = $value');
+                  });
                 } else {
-                  // Guest mode - just update the tab without fetching data
-                  currentBookingTab = index;
-                  flag = false;
-                  showFilter = false;
-                  setState(() {});
+                  currentBookingTab = 3;
+                  bookingListbloc
+                      .bookinglistsink(
+                          PrefObj.preferences!.get(PrefKeys.USER_ID), '3')
+                      .then((value) {
+                    flag = false;
+                    showFilter = false;
+                    setState(() {});
+                    log('Approved Booking Value = $value');
+                  });
                 }
               },
               tabs: [
@@ -621,34 +615,32 @@ class _MyBookingsPageState extends State<MyBookingsPage>
     log('Inside booking details');
 
     // If user is not logged in (guest mode), show appropriate message
-    if (!PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+    if (!userStr || !PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.calendar_today,
-              size: 64,
+              size: 64.sp,
               color: Colors.grey,
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Text(
               'Please sign in to view your bookings',
               style: TextStyle(
                 fontFamily: 'Poppins1',
-                fontSize: 16,
+                fontSize: 16.sp,
                 color: Colors.grey,
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 16.h),
             ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(logoBlue),
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                  ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: logoBlue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18.0),
                 ),
               ),
               child: Text(
@@ -717,15 +709,17 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                                         ),
                                       ]),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      _infoList(
-                                          bookinglistsnapshot
-                                              .data!.data![index],
-                                          bookinglistsnapshot
-                                              .data!.data![index].timeDate
-                                              .toString()),
+                                      Expanded(
+                                        child: _infoList(
+                                            bookinglistsnapshot
+                                                .data!.data![index],
+                                            bookinglistsnapshot
+                                                .data!.data![index].timeDate
+                                                .toString()),
+                                      ),
+                                      SizedBox(width: 8),
                                       _infoButton(bookinglistsnapshot
                                           .data!.data![index])
                                     ],
@@ -859,53 +853,54 @@ class _MyBookingsPageState extends State<MyBookingsPage>
           SizedBox(height: 10),
           Row(
             children: [
-              Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
+              Expanded(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Booking Time',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontFamily: 'Poppins1',
+                        ),
+                      ),
+                      Text(
+                        data.bookingTime!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontFamily: 'Poppins1',
+                        ),
+                      ),
+                    ]),
+              ),
+              SizedBox(width: 7),
+              Container(color: Colors.black45, height: 25, width: 1),
+              SizedBox(width: 7),
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Booking Time',
+                      'Appointment Time',
                       style: TextStyle(
                         fontSize: 9,
                         fontFamily: 'Poppins1',
                       ),
                     ),
                     Text(
-                      data.bookingTime!,
+                      data.timeDate!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 9,
                         fontFamily: 'Poppins1',
                       ),
                     ),
-                  ]),
-              SizedBox(width: 7),
-              Column(
-                children: [
-                  Container(
-                    color: Colors.black45,
-                    height: 25,
-                    width: 1,
-                  )
-                ],
-              ),
-              SizedBox(width: 7),
-              Column(
-                children: [
-                  Text(
-                    'Appointment Time',
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontFamily: 'Poppins1',
-                    ),
-                  ),
-                  Text(
-                    data.timeDate!,
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontFamily: 'Poppins1',
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               )
             ],
           ),
@@ -1125,7 +1120,17 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                                   style: TextStyle(
                                       fontSize: 9,
                                       fontFamily: 'Poppins1',
-                                      color: Colors.white),
+                                      color: (data.paymentStatus != "1")
+                                          ? appModelTheme.darkTheme
+                                              ? currentBookingTab == 2
+                                                  ? Colors.white
+                                                  : Colors.white
+                                              : currentBookingTab == 2
+                                                  ? Colors.white
+                                                  : Colors.white
+                                          : appModelTheme.darkTheme
+                                              ? white
+                                              : Colors.white),
                                 ),
                               ),
                               decoration: BoxDecoration(
@@ -1466,11 +1471,10 @@ class _MyBookingsPageState extends State<MyBookingsPage>
     print("~~~~~~~ resumed");
     _tabController?.animateTo(currentBookingTab);
 
-    // Only fetch bookings if user is logged in
-    if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+    final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+    if (userId != null) {
       bookingListbloc
-          .bookinglistsink(PrefObj.preferences!.get(PrefKeys.USER_ID),
-              currentBookingTab.toString())
+          .bookinglistsink(userId, currentBookingTab.toString())
           .then((value) {
         flag = false;
         showFilter = false;
@@ -1984,6 +1988,7 @@ Widget carImage(String images) {
     final Map<int, String> values = {
       for (int i = 0; i < split.length; i++) i: split[i]
     };
+    // var containers = ""; // unused
 
     return Row(children: [
       for (int i = 0; i < values.length - 1; i++)
