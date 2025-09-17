@@ -8,7 +8,6 @@ import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:imechano/localization/language_constrants.dart';
@@ -100,35 +99,35 @@ class _SignInScreenState extends State<SignInScreen> {
         child: SingleChildScrollView(
           child: Center(
             child: Container(
-              height: MediaQuery.of(context).size.height,
-              padding: EdgeInsets.only(left: 25, right: 25),
+              height: 1.sh,
+              padding: EdgeInsets.symmetric(horizontal: 25.w),
               child: Form(
                 key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                    SizedBox(height: 0.1.sh),
                     Image.asset(
                       "assets/icons/splash/logo.png",
-                      height: MediaQuery.of(context).size.height * 0.11,
+                      height: 0.11.sh,
                       color: appModelTheme.darkTheme ? white : null,
                     ),
-                    SizedBox(height: 35),
+                    SizedBox(height: 35.h),
                     Text(
                       getTranslated("loginaccount", context),
                       style: TextStyle(
                           fontFamily: "poppins2",
-                          fontSize: 21,
+                          fontSize: 21.sp,
                           color: logoBlue),
                     ),
                     Text(
                       getTranslated("withyourphonenumber", context),
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         fontFamily: "Poppins3",
                       ),
                     ),
-                    SizedBox(height: 35),
+                    SizedBox(height: 35.h),
                     CustomForm(
                       fillColor:
                           appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
@@ -142,7 +141,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       imagePath: 'assets/icons/auth/sign_up/mobile-number.png',
                       hintText: getTranslated('mobileno.orEmail', context),
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     _textfiled(),
                     Container(
                       width: MediaQuery.of(context).size.width,
@@ -167,7 +166,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                     },
                                     child: Container(
                                       margin: EdgeInsets.only(
-                                          left: 25, right: 25, top: 5),
+                                          left: 25.w, right: 25.w, top: 5.h),
                                       height:
                                           MediaQuery.of(context).size.height *
                                               0.6,
@@ -184,14 +183,14 @@ class _SignInScreenState extends State<SignInScreen> {
                                                 "Forgot Password",
                                                 style: TextStyle(
                                                     fontFamily: "Poppins3",
-                                                    fontSize: 26,
+                                                    fontSize: 26.sp,
                                                     fontWeight: FontWeight.bold,
                                                     color:
                                                         appModelTheme.darkTheme
                                                             ? logoBlue
                                                             : logoBlue),
                                               ),
-                                              SizedBox(height: 10),
+                                              SizedBox(height: 10.h),
                                               Text(
                                                 "ENTER YOUR REGISTERED email FOR THE \n VERIFICATION PROCESS, WE WILL SEND \n  4 DIGITS CODE TO YOUR EMAIL.",
                                                 textAlign: TextAlign.center,
@@ -199,7 +198,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                                     decoration: TextDecoration
                                                         .underline,
                                                     fontFamily: "Poppins3",
-                                                    fontSize: 13),
+                                                    fontSize: 13.sp),
                                               ),
                                               SizedBox(height: 35.h),
                                               CustomForm(
@@ -232,7 +231,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                                                 .darkTheme
                                                             ? white
                                                             : Color(0xffBFBFBF),
-                                                        height: 36,
+                                                        height: 36.h,
                                                       )),
                                                 ),
                                                 Text(
@@ -251,7 +250,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                                                 .darkTheme
                                                             ? white
                                                             : Color(0xffBFBFBF),
-                                                        height: 36,
+                                                        height: 36.h,
                                                       )),
                                                 ),
                                               ]),
@@ -279,7 +278,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                               CustomButton(
                                                 title:
                                                     Regular20White('Continue'),
-                                                width: 0.9.w,
+                                                width: 0.9.sw,
                                                 bgColor: logoBlue,
                                                 borderColor: logoBlue,
                                                 callBackFunction: () {
@@ -328,14 +327,16 @@ class _SignInScreenState extends State<SignInScreen> {
                         ],
                       ),
                     ),
-                    Spacer(),
+                    SizedBox(height: 20.h),
                     CustomButton(
                       title: Text(
                         getTranslated('signin', context),
-                        style:
-                            TextStyle(fontSize: 18.sp, fontFamily: "Poppins1"),
+                        style: TextStyle(
+                            fontSize: 18.sp,
+                            fontFamily: "Poppins1",
+                            color: Colors.white),
                       ),
-                      width: 0.9.w,
+                      width: 0.9,
                       bgColor: logoBlue,
                       borderColor: logoBlue,
                       callBackFunction: () {
@@ -348,14 +349,16 @@ class _SignInScreenState extends State<SignInScreen> {
                         }
                       },
                     ),
-                    Spacer(),
+                    SizedBox(height: 16.h),
                     CustomButton(
                       title: Text(
                         getTranslated('guest', context),
-                        style:
-                            TextStyle(fontSize: 18.sp, fontFamily: "Poppins1"),
+                        style: TextStyle(
+                            fontSize: 18.sp,
+                            fontFamily: "Poppins1",
+                            color: Colors.white),
                       ),
-                      width: 0.9.w,
+                      width: 0.9,
                       bgColor: logoBlue,
                       borderColor: logoBlue,
                       callBackFunction: () {
@@ -466,21 +469,21 @@ class _SignInScreenState extends State<SignInScreen> {
             return true;
           },
           child: Container(
-            margin: EdgeInsets.only(left: 25, right: 25),
-            height: MediaQuery.of(context).size.height * 0.6,
+            margin: EdgeInsets.only(left: 25.w, right: 25.w),
+            height: 0.6.sh,
             child: Padding(
               padding: MediaQuery.of(context).viewInsets,
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    SizedBox(height: 40),
+                    SizedBox(height: 40.h),
                     Text("Enter 4 Digits Code",
                         style: TextStyle(
                             fontFamily: "Poppins3",
-                            fontSize: 26,
+                            fontSize: 26.sp,
                             fontWeight: FontWeight.bold,
                             color: logoBlue)),
-                    SizedBox(height: 20),
+                    SizedBox(height: 20.h),
                     Column(
                       children: [
                         Text(
@@ -488,10 +491,10 @@ class _SignInScreenState extends State<SignInScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontFamily: "Poppins1",
-                              fontSize: 14,
+                              fontSize: 14.sp,
                             )),
                         SizedBox(
-                          height: 30,
+                          height: 30.h,
                         ),
                         OtpTextField(
                           numberOfFields: 4,
@@ -521,7 +524,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           }, // end onSubmit
                         ),
                         SizedBox(
-                          height: 45,
+                          height: 45.h,
                         ),
                         // CustomButton(
                         //   title: Text(
@@ -549,7 +552,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         //     }
                         //   },
                         // ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 20.h),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -559,7 +562,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               style: TextStyle(
                                   fontFamily: "Poppins1",
                                   height: 1.8,
-                                  fontSize: 14),
+                                  fontSize: 14.sp),
                             ),
                             TextButton(
                               onPressed: () {
@@ -574,7 +577,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                     fontFamily: "Poppins1",
                                     color: Colors.red,
                                     height: 1.8,
-                                    fontSize: 14),
+                                    fontSize: 14.sp),
                               ),
                             ),
                           ],

@@ -9,7 +9,6 @@ import 'package:imechano/ui/screens/auth/landing/view/sign_in_sign_up_landing_sc
 import 'package:imechano/ui/screens/bottombar/bottom_bar.dart';
 import 'package:imechano/ui/share_preferences/pref_key.dart';
 import 'package:imechano/ui/share_preferences/preference.dart';
-import 'package:imechano/ui/shared/widgets/text_widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../../../common/globals.dart';
@@ -23,6 +22,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  Timer? _timer;
   @override
   void initState() {
     super.initState();
@@ -34,27 +34,29 @@ class _SplashScreenState extends State<SplashScreen> {
       Provider.of<NotificationCountProvider>(context, listen: false)
           .setNotifications();
     }
-    Timer(const Duration(seconds: 7), () async {
-      log('Inside timer');
-
+    // Auto-navigate after 6 seconds based on app state
+    _timer = Timer(const Duration(seconds: 6), () async {
+      log('Splash timeout, deciding next route');
       final appStart =
           PrefObj.preferences!.containsKey(PrefKeys.APPSTARTED) ? true : false;
-      log("appStart");
-      log(appStart.toString());
-      log('user str: $userStr');
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              // LanguageChooseScreen(),
-              !appStart && !userStr
-                  ? LanguageChooseScreen()
-                  : !userStr
-                      ? SignInSignUpLandingScreen()
-                      : BottomBarPage(2),
+          builder: (context) => !appStart && !userStr
+              ? LanguageChooseScreen()
+              : !userStr
+                  ? SignInSignUpLandingScreen()
+                  : BottomBarPage(2),
         ),
       );
     });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -64,24 +66,82 @@ class _SplashScreenState extends State<SplashScreen> {
     setScreenSize(size);
     return ScreenUtilInit(
       builder: (context, child) => Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                SizedBox(height: 20),
-                Image(image: AssetImage('assets/icons/splash/logo.png')),
-                Regular20Black(
-                    getTranslated('welcometoiFixcarservice', context)),
-                Image(image: AssetImage('assets/icons/splash/splash.png')),
-                Image.asset(
-                  'assets/meter.gif',
-                  height: 120,
-                  width: 120,
-                ),
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Theme.of(context).colorScheme.primary.withOpacity(0.10),
+                Theme.of(context).colorScheme.secondary.withOpacity(0.10),
               ],
+            ),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Logo with subtle elevation effect
+                    Container(
+                      width: 96.w,
+                      height: 96.w,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 16,
+                            offset: Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      padding: EdgeInsets.all(16.w),
+                      child: Image.asset(
+                        'assets/icons/splash/logo.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    SizedBox(height: 18.h),
+                    // Welcome text, themed and centered
+                    Text(
+                      getTranslated('welcometoiFixcarservice', context),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.primary,
+                            letterSpacing: 0.2,
+                          ),
+                    ),
+                    SizedBox(height: 26.h),
+                    // Illustration scaled by screen width
+                    SizedBox(
+                      width: 0.62.sw,
+                      child: Image.asset(
+                        'assets/icons/splash/splash.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    SizedBox(height: 36.h),
+                    // Loading indicator (animated gif)
+                    SizedBox(
+                      width: 72.w,
+                      height: 72.w,
+                      child: Image.asset(
+                        'assets/meter.gif',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

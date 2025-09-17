@@ -132,14 +132,18 @@ class _IMechanoAppState extends State<IMechanoApp> {
   Box prefs;
   AppModel appModel = new AppModel();
   void notification() async {
-    // First check current permission status
-    NotificationSettings currentSettings =
+    // Guard: ensure we only ever ask once per install on iOS
+    final prefs = await SharedPreferences.getInstance();
+    final bool askedAlready = prefs.getBool('ios_notifications_asked') ?? false;
+
+    // Check current permission before requesting
+    final NotificationSettings currentSettings =
         await _firebaseMessaging.getNotificationSettings();
 
-    // Only request permission if not already granted
-    if (currentSettings.authorizationStatus ==
-        AuthorizationStatus.notDetermined) {
-      NotificationSettings settings =
+    if (!askedAlready &&
+        currentSettings.authorizationStatus ==
+            AuthorizationStatus.notDetermined) {
+      final NotificationSettings settings =
           await _firebaseMessaging.requestPermission(
         alert: true,
         announcement: false,
@@ -149,10 +153,19 @@ class _IMechanoAppState extends State<IMechanoApp> {
         provisional: false,
         sound: true,
       );
-      log('User granted permission: ${settings.authorizationStatus}');
+      await prefs.setBool('ios_notifications_asked', true);
+      log('Requested notifications. Status: ${settings.authorizationStatus}');
     } else {
-      log('Notification permission already determined: ${currentSettings.authorizationStatus}');
+      log('Skip requesting notifications. Asked: $askedAlready, Status: ${currentSettings.authorizationStatus}');
     }
+
+    // Ensure notifications show while app is in foreground on iOS without extra prompts
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }

@@ -49,7 +49,8 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
                       ),
                       child: IntrinsicHeight(
                         child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20.w, vertical: 10.h),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -70,10 +71,12 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
                                     ),
                                     SizedBox(height: 20.h),
                                     Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 10.w),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w),
                                       child: Center(
                                         child: Text(
-                                            getTranslated("welcomemsg", context),
+                                            getTranslated(
+                                                "welcomemsg", context),
                                             textAlign: TextAlign.center,
                                             style: TextStyle(fontSize: 14.sp)),
                                       ),
@@ -93,18 +96,22 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
                               Flexible(
                                 flex: 2,
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     buttonsSection(),
+                                    SizedBox(height: 12),
                                     CustomButton(
                                       title: Text(
                                         getTranslated("guest", context),
                                         style: TextStyle(
-                                            fontSize: 16.sp, fontFamily: 'Poppins1'),
+                                            fontSize: 16.sp,
+                                            fontFamily: 'Poppins1'),
                                       ),
-                                      width: 0.8,
+                                      width: 0.85,
+                                      height: 44,
                                       callBackFunction: () {
-                                        Navigator.push(context, MaterialPageRoute(
+                                        Navigator.push(context,
+                                            MaterialPageRoute(
                                           builder: (context) {
                                             return BottomBarPage(2);
                                           },
@@ -113,7 +120,8 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
                                       bgColor: logoBlue,
                                       borderColor: logoBlue,
                                     ),
-                                    TermsOfUse(),
+                                    SizedBox(height: 8),
+                                    FittedBox(child: TermsOfUse()),
                                   ],
                                 ),
                               ),

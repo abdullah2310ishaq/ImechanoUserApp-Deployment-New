@@ -38,6 +38,7 @@ class CustomButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
+          minimumSize: Size.fromHeight(height ?? 48),
         ),
         child: title,
       ),

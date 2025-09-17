@@ -377,7 +377,11 @@ class _MapLocationState extends State<MapLocation> {
                   width: 250.w,
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(logoBlue),
+                      foregroundColor:
+                          MaterialStateProperty.all<Color>(Colors.white),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
                           side: BorderSide(

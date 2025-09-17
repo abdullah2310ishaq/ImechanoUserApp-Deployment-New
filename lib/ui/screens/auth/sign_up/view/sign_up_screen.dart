@@ -10,7 +10,6 @@ import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:imechano/localization/language_constrants.dart';
@@ -118,10 +117,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(height: 50.h),
+                    SizedBox(height: 30.h),
                     Image.asset(
                       "assets/icons/splash/logo.png",
-                      width: 200.w,
+                      width: 140.w,
                     ),
                     SizedBox(height: 10.h),
                     Text(getTranslated('createanaccount', context),
@@ -139,17 +138,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       child: Column(
                         children: [
                           SizedBox(height: 20.h),
-                          emailForm(),
+                          SizedBox(height: 56.h, child: emailForm()),
                           SizedBox(height: 15.h),
-                          mobileForm(),
+                          SizedBox(height: 56.h, child: mobileForm()),
                           SizedBox(height: 15.h),
-                          nameForm(),
+                          SizedBox(height: 56.h, child: nameForm()),
                           SizedBox(height: 15.h),
-                          _textfiled(creatpassword,
-                              getTranslated('Createpassword', context)),
+                          SizedBox(
+                            height: 56.h,
+                            child: _textfiled(
+                              creatpassword,
+                              getTranslated('Createpassword', context),
+                            ),
+                          ),
                           SizedBox(height: 15.h),
-                          _confirmPassfiled(Confirmpassword,
-                              getTranslated('confirmPassword', context)),
+                          SizedBox(
+                            height: 56.h,
+                            child: _confirmPassfiled(
+                              Confirmpassword,
+                              getTranslated('confirmPassword', context),
+                            ),
+                          ),
                           SizedBox(height: 15.h),
                           SizedBox(
                             height: 66.h,
@@ -194,40 +203,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           ),
                           SizedBox(height: 15.h),
-                          SizedBox(
-                            height: 66.h,
-                            child: CustomButton(
-                              title: Row(
-                                children: [
-                                  Image.asset("assets/images/car.png",
-                                      scale: 4),
-                                  SizedBox(width: 10.w),
-                                  Regular16Black(
-                                    getTranslated(
-                                        'Addmycar(optional)', context),
-                                    textAlign: TextAlign.start,
-                                  ),
-                                ],
-                              ),
-                              width: 0.9,
-                              callBackFunction: () {
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-
-                                Get.toNamed('/select-your-car');
-                              },
-                              bgColor: grayE6E6E5,
-                              borderColor: buttonGrayE8E8E7Border,
-                            ),
-                          ),
-                          SizedBox(height: 25.h),
+                          SizedBox(height: 15.h),
                           SizedBox(
                             height: 58.h,
                             child: CustomButton(
                               title: Text(
                                 getTranslated('Signup', context),
                                 style: TextStyle(
-                                    fontSize: 18.sp, fontFamily: "poppins1"),
+                                    fontSize: 18.sp,
+                                    fontFamily: "poppins1",
+                                    color: Colors.white),
                               ),
                               width: 0.9,
                               callBackFunction: () {
@@ -238,7 +223,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     Get.snackbar(
                                         getTranslated('tocmessage', context),
                                         "",
-                                      backgroundColor: Colors.red,
+                                        backgroundColor: Colors.red,
                                         colorText: Colors.white);
                                     return; // Stop execution here so it doesn't call onRegisterAPI()
                                   }

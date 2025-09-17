@@ -13,6 +13,7 @@ class CustomFormMobile extends StatelessWidget {
   final bool readOnly;
   final bool ObscureText;
   final Color fillColor;
+  final Color? hintColor;
   final TextEditingController controller;
   final dynamic validationform;
   const CustomFormMobile({
@@ -26,6 +27,7 @@ class CustomFormMobile extends StatelessWidget {
     required this.controller,
     required this.validationform,
     required this.fillColor,
+    this.hintColor,
   }) : super(key: key);
 
   @override
@@ -47,6 +49,7 @@ class CustomFormMobile extends StatelessWidget {
             prefixText: "+974-",
             prefixIconColor: Color.fromRGBO(0, 0, 0, 1),
             filled: true,
+            fillColor: fillColor,
             labelText: "Mobile No.",
             floatingLabelBehavior: FloatingLabelBehavior.never,
             border: const OutlineInputBorder(
@@ -71,7 +74,8 @@ class CustomFormMobile extends StatelessWidget {
               ),
             ),
             hintText: hintText,
-            hintStyle: TextStyle(fontFamily: 'Poppins3', color: black),
+            hintStyle:
+                TextStyle(fontFamily: 'Poppins3', color: hintColor ?? black),
             prefixIconConstraints: BoxConstraints(minWidth: 40),
             suffixIcon: isSuffix
                 ? Icon(
