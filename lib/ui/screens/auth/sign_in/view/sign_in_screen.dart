@@ -98,10 +98,12 @@ class _SignInScreenState extends State<SignInScreen> {
         },
         child: SingleChildScrollView(
           child: Center(
-            child: Container(
-              height: 1.sh,
-              padding: EdgeInsets.symmetric(horizontal: 25.w),
-              child: Form(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 700),
+              child: Container(
+                height: 1.sh,
+                padding: EdgeInsets.symmetric(horizontal: 25.w),
+                child: Form(
                 key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -308,7 +310,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                                 height: 10.h,
                                               ),
                                             ],
-                                          ),
+                ),
                                         ),
                                       ),
                                     ),
@@ -406,7 +408,9 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
       ),
-    ));
+    ),
+    ),
+    );
   }
 
   Widget _textfiled() {

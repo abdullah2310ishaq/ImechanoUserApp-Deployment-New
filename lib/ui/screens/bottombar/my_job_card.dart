@@ -204,7 +204,10 @@ class _MyJobCardState extends State<MyJobCard>
           body: ScreenUtilInit(
             designSize: Size(414, 896),
             builder: (context, child) => SafeArea(
-              child: Column(children: [
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 720),
+                  child: Column(children: [
                 Row(
                   children: [
                     Expanded(
@@ -317,6 +320,8 @@ class _MyJobCardState extends State<MyJobCard>
               ]),
             ),
           )),
+    ),
+    ),
     );
   }
 

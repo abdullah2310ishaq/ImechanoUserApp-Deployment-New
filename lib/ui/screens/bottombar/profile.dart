@@ -134,16 +134,21 @@ class _ProfilePageState extends State<ProfilePage> {
               builder: (context, child) => SafeArea(
                 child: Column(children: [
                   Expanded(
-                    child: Container(
-                      padding: EdgeInsets.only(top: 5),
-                      decoration: BoxDecoration(
-                          color: appModelTheme.darkTheme
-                              ? Color(0xff252525)
-                              : white,
-                          borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(25.0),
-                              topLeft: Radius.circular(25.0))),
-                      child: userStr ? _body() : _body2(),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: 720),
+                        child: Container(
+                          padding: EdgeInsets.only(top: 5),
+                          decoration: BoxDecoration(
+                              color: appModelTheme.darkTheme
+                                  ? Color(0xff252525)
+                                  : white,
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(25.0),
+                                  topLeft: Radius.circular(25.0))),
+                          child: userStr ? _body() : _body2(),
+                        ),
+                      ),
                     ),
                   ),
                 ]),

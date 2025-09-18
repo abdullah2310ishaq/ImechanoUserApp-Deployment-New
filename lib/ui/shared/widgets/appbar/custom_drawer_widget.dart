@@ -164,6 +164,7 @@ class _drawerpageState extends State<drawerpage> {
       key: _key,
       backgroundColor:
           appModelTheme.darkTheme ? const Color(0xFF252525) : Colors.white,
+      width: 320,
       child: Column(
         children: [
           userStr

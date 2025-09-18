@@ -236,119 +236,125 @@ class _MyBookingsPageState extends State<MyBookingsPage>
           drawer: drawerpage(),
           backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
           body: SafeArea(
-            child: Column(children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: screenSize!.height * 0.05,
-                      margin: EdgeInsets.symmetric(horizontal: 10.w),
-                      child: TextField(
-                        keyboardType: TextInputType.text,
-                        onChanged: (value) {
-                          setState(() {
-                            search = value;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          prefixIcon: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: SvgPicture.asset(
-                              "assets/svg/serch.svg",
-                              placeholderBuilder: (context) =>
-                                  const SizedBox.shrink(),
-                            ),
-                          ),
-                          hintText:
-                              getTranslated('SearchwithBookingID', context),
-                          hintStyle: TextStyle(
-                              fontSize: 12,
-                              fontFamily: "Poppins3",
-                              color: appModelTheme.darkTheme
-                                  ? Colors.grey
-                                  : Colors.black),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              width: 0,
-                              style: BorderStyle.none,
-                            ),
-                          ),
-                          filled: true,
-                          contentPadding: EdgeInsets.only(bottom: 2),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: screenSize!.height * 0.05,
-                    margin: appModelTheme.appLocal == Locale("en")
-                        ? EdgeInsets.only(right: 10.w)
-                        : EdgeInsets.only(left: 10.w),
-                    padding: EdgeInsets.fromLTRB(1.w, 8.w, 10.w, 8.w),
-                    decoration: BoxDecoration(
-                        color: white, borderRadius: BorderRadius.circular(10)),
-                    child: GestureDetector(
-                      onTap: () {
-                        showFilter = !showFilter;
-                        // Refresh the UI
-                        setState(() {});
-                        print("Container was tapped");
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(left: 10.w, right: 10.w),
-                        child: Row(
-                          children: [
-                            Icon(
-                                showFilter
-                                    ? Icons.filter_alt_outlined
-                                    : Icons.filter_alt_off_outlined,
-                                color: Colors.black,
-                                size: 20.w),
-                            SizedBox(width: 8.w),
-                            Text(
-                              getTranslated('filter', context),
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 12,
-                                  fontFamily: 'Poppins3'),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              if (showFilter) ...[
-                // These children are only visible if condition is true
-                SizedBox(height: 15.h),
-                _filterwidget(),
-              ],
-              SizedBox(height: 15),
-              requestTab(),
-              SizedBox(height: 15),
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 720),
+                child: Column(children: [
+                  Row(
+                    children: [
+                      Expanded(
                         child: Container(
-                      padding: EdgeInsets.only(top: 5),
-                      height: double.infinity,
-                      decoration: BoxDecoration(
-                          color: appModelTheme.darkTheme
-                              ? Color(0xff252525)
-                              : white,
-                          borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(25.0),
-                              topLeft: Radius.circular(25.0))),
-                      child: _BookingDetails(),
-                    )),
+                          height: screenSize!.height * 0.05,
+                          margin: EdgeInsets.symmetric(horizontal: 10.w),
+                          child: TextField(
+                            keyboardType: TextInputType.text,
+                            onChanged: (value) {
+                              setState(() {
+                                search = value;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              fillColor: Colors.white,
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: SvgPicture.asset(
+                                  "assets/svg/serch.svg",
+                                  placeholderBuilder: (context) =>
+                                      const SizedBox.shrink(),
+                                ),
+                              ),
+                              hintText:
+                                  getTranslated('SearchwithBookingID', context),
+                              hintStyle: TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: "Poppins3",
+                                  color: appModelTheme.darkTheme
+                                      ? Colors.grey
+                                      : Colors.black),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  width: 0,
+                                  style: BorderStyle.none,
+                                ),
+                              ),
+                              filled: true,
+                              contentPadding: EdgeInsets.only(bottom: 2),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: screenSize!.height * 0.05,
+                        margin: appModelTheme.appLocal == Locale("en")
+                            ? EdgeInsets.only(right: 10.w)
+                            : EdgeInsets.only(left: 10.w),
+                        padding: EdgeInsets.fromLTRB(1.w, 8.w, 10.w, 8.w),
+                        decoration: BoxDecoration(
+                            color: white,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: GestureDetector(
+                          onTap: () {
+                            showFilter = !showFilter;
+                            // Refresh the UI
+                            setState(() {});
+                            print("Container was tapped");
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(left: 10.w, right: 10.w),
+                            child: Row(
+                              children: [
+                                Icon(
+                                    showFilter
+                                        ? Icons.filter_alt_outlined
+                                        : Icons.filter_alt_off_outlined,
+                                    color: Colors.black,
+                                    size: 20.w),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  getTranslated('filter', context),
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                      fontFamily: 'Poppins3'),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (showFilter) ...[
+                    // These children are only visible if condition is true
+                    SizedBox(height: 15.h),
+                    _filterwidget(),
                   ],
-                ),
+                  SizedBox(height: 15),
+                  requestTab(),
+                  SizedBox(height: 15),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Container(
+                          padding: EdgeInsets.only(top: 5),
+                          height: double.infinity,
+                          decoration: BoxDecoration(
+                              color: appModelTheme.darkTheme
+                                  ? Color(0xff252525)
+                                  : white,
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(25.0),
+                                  topLeft: Radius.circular(25.0))),
+                          child: _BookingDetails(),
+                        )),
+                      ],
+                    ),
+                  ),
+                ]),
               ),
-            ]),
+            ),
           ),
         ));
   }

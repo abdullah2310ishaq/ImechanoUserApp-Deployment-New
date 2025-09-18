@@ -293,7 +293,10 @@ class _HomeScreenState extends State<HomeScreen> {
             return true;
           },
           child: SafeArea(
-            child: Column(children: [
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 720),
+                child: Column(children: [
               appBarWidget(),
               SizedBox(height: 20.h),
               // ElevatedButton(
@@ -693,7 +696,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+    ),
+    ),
     );
+    
   }
 
   Widget appBarWidget() {

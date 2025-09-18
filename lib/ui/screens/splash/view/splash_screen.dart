@@ -83,80 +83,84 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Logo with subtle elevation effect
-                    Container(
-                      width: 110.w,
-                      height: 110.w,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Theme.of(context).colorScheme.primary,
-                            Theme.of(context).colorScheme.secondary,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 720),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Logo with subtle elevation effect
+                      Container(
+                        width: 110.w,
+                        height: 110.w,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Theme.of(context).colorScheme.primary,
+                              Theme.of(context).colorScheme.secondary,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.10),
+                              blurRadius: 22,
+                              offset: Offset(0, 10),
+                            ),
                           ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
                         ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.10),
-                            blurRadius: 22,
-                            offset: Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: 92.w,
-                          height: 92.w,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          padding: EdgeInsets.all(16.w),
-                          child: Image.asset(
-                            'assets/icons/splash/logo.png',
-                            fit: BoxFit.contain,
+                        child: Center(
+                          child: Container(
+                            width: 92.w,
+                            height: 92.w,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: EdgeInsets.all(16.w),
+                            child: Image.asset(
+                              'assets/icons/splash/logo.png',
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 18.h),
-                    // Welcome text, themed and centered
-                    Text(
-                      getTranslated('welcometoiFixcarservice', context),
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.primary,
-                            letterSpacing: 0.2,
-                          ),
-                    ),
-                    SizedBox(height: 26.h),
-                    // Illustration scaled by screen width
-                    SizedBox(
-                      width: 0.70.sw,
-                      child: Image.asset(
-                        'assets/icons/splash/splash.png',
-                        fit: BoxFit.contain,
+                      SizedBox(height: 18.h),
+                      // Welcome text, themed and centered
+                      Text(
+                        getTranslated('welcometoiFixcarservice', context),
+                        textAlign: TextAlign.center,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  letterSpacing: 0.2,
+                                ),
                       ),
-                    ),
-                    SizedBox(height: 36.h),
-                    // Loading indicator (animated gif)
-                    SizedBox(
-                      width: 60.w,
-                      height: 60.w,
-                      child: Image.asset(
-                        'assets/meter.gif',
-                        fit: BoxFit.contain,
+                      SizedBox(height: 26.h),
+                      // Illustration scaled by screen width
+                      SizedBox(
+                        width: 0.70.sw,
+                        child: Image.asset(
+                          'assets/icons/splash/splash.png',
+                          fit: BoxFit.contain,
+                        ),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 36.h),
+                      // Loading indicator (animated gif)
+                      SizedBox(
+                        width: 60.w,
+                        height: 60.w,
+                        child: Image.asset(
+                          'assets/meter.gif',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
