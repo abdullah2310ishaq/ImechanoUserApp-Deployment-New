@@ -161,46 +161,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           SizedBox(height: 15.h),
                           SizedBox(
-                            height: 66.h,
-                            child: CustomButton(
-                              title: Row(
-                                children: [
-                                  Image.asset("assets/images/Location.png",
-                                      scale: 4),
-                                  SizedBox(width: 10.w),
-                                  Regular16Black(
-                                    addressBtn,
-                                    textAlign: TextAlign.start,
-                                  ),
-                                ],
-                              ),
-                              width: 0.9,
-                              callBackFunction: () async {
-                                final result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => MapLocation()),
-                                );
-                                latitude = result.toString().split('/')[0];
-                                longitude = result.toString().split('/')[1];
-                                address = result.split('/')[2];
-                                var addressTxt = "";
-                                if (address.length > 30)
-                                  for (int i = 0; i < 28; i++) {
-                                    addressTxt += address[i];
-                                  }
-                                addressTxt += ".....";
-                                print(result);
-                                addressIsChanged = !addressIsChanged;
-                                setState(() {
-                                  addressIsChanged == true
-                                      ? addressBtn = "Save My Location"
-                                      : addressBtn = addressTxt;
-                                });
-                              },
-                              bgColor: grayE6E6E5,
-                              borderColor: buttonGrayE8E8E7Border,
-                            ),
+                            height: 56.h,
+                            child: _locationField(),
                           ),
                           SizedBox(height: 15.h),
                           SizedBox(height: 15.h),
@@ -360,12 +322,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _textfiled(TextEditingController controller, String title) {
     return Container(
       child: TextFormField(
-        style: TextStyle(fontFamily: "Poppins3"),
+        style: TextStyle(fontFamily: "Poppins3", color: black),
         validator: validatePassword,
         controller: controller,
         obscureText: showPassword,
         decoration: InputDecoration(
-          fillColor: grayE6E6E5,
+          fillColor: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
           filled: true,
           border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent),
@@ -404,12 +366,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _confirmPassfiled(TextEditingController controller, String title) {
     return Container(
       child: TextFormField(
-        style: TextStyle(fontFamily: "Poppins3"),
+        style: TextStyle(fontFamily: "Poppins3", color: black),
         validator: validateConfirmPassword,
         controller: controller,
         obscureText: showPassword,
         decoration: InputDecoration(
-          fillColor: grayE6E6E5,
+          fillColor: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
           filled: true,
           border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent),
@@ -439,6 +401,61 @@ class _SignUpScreenState extends State<SignUpScreen> {
             },
             icon: Icon(showPassword ? Icons.visibility_off : Icons.visibility,
                 color: Colors.grey),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _locationField() {
+    return Container(
+      child: InkWell(
+        onTap: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MapLocation()),
+          );
+          latitude = result.toString().split('/')[0];
+          longitude = result.toString().split('/')[1];
+          address = result.split('/')[2];
+          var addressTxt = "";
+          if (address.length > 30)
+            for (int i = 0; i < 28; i++) {
+              addressTxt += address[i];
+            }
+          addressTxt += ".....";
+          print(result);
+          addressIsChanged = !addressIsChanged;
+          setState(() {
+            addressIsChanged == true
+                ? addressBtn = "Save My Location"
+                : addressBtn = addressTxt;
+          });
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.transparent),
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
+            child: Row(
+              children: [
+                Image.asset("assets/images/Location.png", scale: 4),
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: Text(
+                    addressBtn,
+                    style: TextStyle(
+                      fontFamily: "Poppins3",
+                      color: black,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

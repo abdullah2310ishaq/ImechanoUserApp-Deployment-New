@@ -353,6 +353,16 @@ class _ProfilePageState extends State<ProfilePage> {
             callBackFunction: () => logOutDialog(),
             bgColor: red,
             borderColor: red),
+        SizedBox(height: 8.h),
+        CustomButton(
+            title: Text(
+              'Delete Account',
+              style: TextStyle(color: Colors.redAccent),
+            ),
+            width: 0.5,
+            callBackFunction: () => deleteAccountDialog(),
+            bgColor: Colors.white,
+            borderColor: Colors.redAccent),
       ],
     );
   }
@@ -520,6 +530,8 @@ class _ProfilePageState extends State<ProfilePage> {
       width: 370.w,
       child: ElevatedButton(
         style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(logoBlue),
+          foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
@@ -637,6 +649,90 @@ class _ProfilePageState extends State<ProfilePage> {
                             color: Colors.redAccent, fontFamily: "Poppins1")),
                     onPressed: () {
                       PrefObj.preferences?.clear();
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          '/sign-in-sign-up-landing', (Route route) => false);
+                    })
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteAccountDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          contentPadding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 8.h),
+          titlePadding: EdgeInsets.only(top: 16.h),
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.warning_amber_rounded,
+                  color: Colors.redAccent, size: 36.sp),
+              SizedBox(height: 8.h),
+              Text(
+                'Delete account?',
+                style: TextStyle(fontFamily: 'Poppins2', fontSize: 18.sp),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Your account will be scheduled for deletion in 7 days.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14.sp, fontFamily: 'Poppins1'),
+              ),
+              SizedBox(height: 6.h),
+              Text(
+                'If you log in within 7 days, your account will be restored.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 12.sp,
+                    fontFamily: 'Poppins1',
+                    color: Colors.grey),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                TextButton(
+                    child: Text('Cancel',
+                        style:
+                            TextStyle(color: logoBlue, fontFamily: 'Poppins1')),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    }),
+                TextButton(
+                    child: Text('Delete & Log out',
+                        style: TextStyle(
+                            color: Colors.redAccent, fontFamily: 'Poppins1')),
+                    onPressed: () async {
+                      // Set deletion flags for 7 days from now
+                      final DateTime deletionDate =
+                          DateTime.now().add(Duration(days: 7));
+                      PrefObj.preferences!
+                          .put(PrefKeys.ACCOUNT_DELETION_REQUESTED, true);
+                      PrefObj.preferences!.put(PrefKeys.ACCOUNT_DELETION_DATE,
+                          deletionDate.millisecondsSinceEpoch);
+
+                      // Log out while keeping app-started flag
+                      PrefObj.preferences!.delete(PrefKeys.USER_DATA);
+                      PrefObj.preferences!.delete(PrefKeys.PROFILE_DATA);
+                      PrefObj.preferences!.delete(PrefKeys.USER_ID);
+                      PrefObj.preferences!.put(PrefKeys.APPSTARTED, true);
+
+                      Navigator.of(context).pop();
                       Navigator.of(context).pushNamedAndRemoveUntil(
                           '/sign-in-sign-up-landing', (Route route) => false);
                     })

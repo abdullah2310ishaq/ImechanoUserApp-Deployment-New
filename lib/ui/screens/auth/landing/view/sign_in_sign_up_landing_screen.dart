@@ -105,7 +105,8 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
                                         getTranslated("guest", context),
                                         style: TextStyle(
                                             fontSize: 16.sp,
-                                            fontFamily: 'Poppins1'),
+                                            fontFamily: 'Poppins1',
+                                            color: Colors.white),
                                       ),
                                       width: 0.85,
                                       height: 44,
@@ -148,7 +149,10 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
             child: CustomButton(
               title: Text(
                 getTranslated('signin', context),
-                style: TextStyle(fontSize: 14.sp, fontFamily: 'Poppins1'),
+                style: TextStyle(
+                    fontSize: 14.sp,
+                    fontFamily: 'Poppins1',
+                    color: Colors.white),
               ),
               width: 1.0, // Use full width of expanded
               callBackFunction: () {
@@ -173,7 +177,10 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
             child: CustomButton(
               title: Text(
                 getTranslated('Signup', context),
-                style: TextStyle(fontSize: 14.sp, fontFamily: 'Poppins1'),
+                style: TextStyle(
+                    fontSize: 14.sp,
+                    fontFamily: 'Poppins1',
+                    color: Colors.white),
               ),
               width: 1.0, // Use full width of expanded
               callBackFunction: () {

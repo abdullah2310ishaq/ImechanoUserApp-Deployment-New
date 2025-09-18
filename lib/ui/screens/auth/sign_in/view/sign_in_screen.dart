@@ -412,12 +412,12 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget _textfiled() {
     return Container(
       child: TextFormField(
-        style: TextStyle(fontFamily: "Poppins3"),
+        style: TextStyle(fontFamily: "Poppins3", color: Colors.white),
         validator: validatePassword,
         controller: password,
         obscureText: showPassword,
         decoration: InputDecoration(
-          fillColor: grayE6E6E5,
+          fillColor: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
           filled: true,
           border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent),
