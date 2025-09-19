@@ -90,7 +90,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                   width: MediaQuery.of(context).size.width - 10,
                   height: MediaQuery.of(context).size.height - 100,
                   padding: EdgeInsets.all(20),
-                  color: Colors.white,
+                  color: appModelTheme.darkTheme ? darkmodeColor : Colors.white,
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,11 +134,13 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
               const EdgeInsets.only(left: 26, right: 20, bottom: 15, top: 15),
           child: Container(
             decoration: BoxDecoration(
-                color: Colors.white,
+                color: appModelTheme.darkTheme ? darkmodeColor : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
+                    color: appModelTheme.darkTheme
+                        ? Colors.black45
+                        : Colors.grey.withOpacity(0.2),
                     spreadRadius: 2,
                     blurRadius: 10,
                     offset: Offset(0, 3), // changes position of shadow
@@ -156,7 +158,8 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                           style: TextStyle(
                             fontSize: 11,
                             fontFamily: 'Poppins1',
-                            color: Colors.grey,
+                            color:
+                                appModelTheme.darkTheme ? white : Colors.grey,
                           ),
                         )
                       : Text(
@@ -168,7 +171,8 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                           style: TextStyle(
                             fontSize: 11,
                             fontFamily: 'Poppins1',
-                            color: Colors.grey,
+                            color:
+                                appModelTheme.darkTheme ? white : Colors.grey,
                           ),
                         ),
                 ),
@@ -187,7 +191,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                         style: TextStyle(
                           fontSize: 10,
                           fontFamily: 'Poppins1',
-                          color: Colors.grey,
+                          color: appModelTheme.darkTheme ? white : Colors.grey,
                         ),
                       ),
                       SizedBox(
@@ -198,7 +202,9 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                         style: TextStyle(
                           fontSize: 10,
                           fontFamily: 'Poppins3',
-                          color: Colors.black38,
+                          color: appModelTheme.darkTheme
+                              ? Colors.white70
+                              : Colors.black38,
                         ),
                       ),
                     ],
@@ -212,7 +218,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                     style: TextStyle(
                       fontSize: 9,
                       fontFamily: 'Poppins1',
-                      color: Colors.grey,
+                      color: appModelTheme.darkTheme ? white : Colors.grey,
                     ),
                   ),
                 ),
@@ -239,6 +245,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             style: TextStyle(
               fontSize: 10,
               fontFamily: 'Poppins1',
+              color: appModelTheme.darkTheme ? white : Colors.black,
             ),
           ),
           // ========================by jenish==========================
@@ -268,8 +275,8 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
         right: 20,
       ),
       child: Divider(
-          // color: appModelTheme.darkTheme ? white : Colors.black38,
-          ),
+        color: appModelTheme.darkTheme ? white : Colors.black38,
+      ),
     );
   }
 
@@ -286,6 +293,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Poppins1',
+              color: appModelTheme.darkTheme ? white : Colors.black,
             ),
           ),
           Text(
@@ -549,7 +557,9 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                 margin: EdgeInsets.only(top: 5),
                 child: Text("$carCondition",
                     style: TextStyle(
-                        color: Colors.black,
+                        color: appModelTheme.darkTheme
+                            ? Colors.white
+                            : Colors.black,
                         fontSize: 11,
                         fontFamily: "Poppins3")),
               ),
@@ -573,7 +583,9 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                 margin: EdgeInsets.only(top: 5),
                 child: Text("$workNeeded",
                     style: TextStyle(
-                        color: Colors.black,
+                        color: appModelTheme.darkTheme
+                            ? Colors.white
+                            : Colors.black,
                         fontSize: 11,
                         fontFamily: "Poppins3")),
               ),

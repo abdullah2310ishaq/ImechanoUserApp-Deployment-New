@@ -399,7 +399,6 @@ class _MyInvoiceState extends State<MyInvoice>
   }
 
   Widget requestTab() {
-    var size = MediaQuery.of(context).size;
     return Column(
       children: [
         Container(
@@ -1143,7 +1142,6 @@ class _MyInvoiceState extends State<MyInvoice>
                               ),
                             )
                           : Text(
-                              //TODO
                               getTranslated(
                                   invoiceData
                                       .items![i].itemName!.removeAllWhitespace,
@@ -1189,7 +1187,6 @@ class _MyInvoiceState extends State<MyInvoice>
                           ),
                         )
                       : Text(
-                          //TODO
                           getTranslated(
                               invoiceData
                                   .items![i].itemName!.removeAllWhitespace,
@@ -1227,36 +1224,6 @@ class _MyInvoiceState extends State<MyInvoice>
             color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600),
       ),
       margin: EdgeInsets.only(left: 10.w),
-    );
-  }
-
-  Widget _infoButton1(ItemData data) {
-    return GestureDetector(
-      onTap: () {
-        onotpAPI(data.bookingId);
-        print('Booking Id =  ${data.bookingId}');
-      },
-      child: Padding(
-        padding: EdgeInsets.only(right: 17.w, bottom: 25),
-        child: Container(
-          height: 32.h,
-          width: 88.w,
-          child: Center(
-            child: Text(
-              'Cancel Order',
-              style: TextStyle(
-                  fontSize: 10.h,
-                  fontFamily: 'Poppins1',
-                  color: appModelTheme.darkTheme ? white : Colors.black26),
-            ),
-          ),
-          decoration: BoxDecoration(
-            border: Border.all(
-                color: appModelTheme.darkTheme ? white : Colors.black38),
-            borderRadius: BorderRadius.circular(5),
-          ),
-        ),
-      ),
     );
   }
 
@@ -1538,8 +1505,6 @@ class _MyInvoiceState extends State<MyInvoice>
                             textColor: Colors.white,
                             fontSize: 16.0);
                       } else if (data.pickupStatus == "3") {
-                        // TODO WORK HERE
-
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -1698,25 +1663,6 @@ class _MyInvoiceState extends State<MyInvoice>
     }
   }
 
-  Widget _RatingStar() {
-    return RatingBar.builder(
-      initialRating: 4,
-      minRating: 1,
-      direction: Axis.horizontal,
-      allowHalfRating: true,
-      itemCount: 5,
-      // itemPadding: EdgeInsets.symmetric(horizontal: 1.0),
-      itemSize: 18.sp,
-      itemBuilder: (context, _) => Icon(
-        Icons.star,
-        color: Color(0xff35C648),
-      ),
-      onRatingUpdate: (rating) {
-        print(rating);
-      },
-    );
-  }
-
   Widget card(String title, bool isselected) {
     return Card(
       elevation: 0,
@@ -1740,24 +1686,6 @@ class _MyInvoiceState extends State<MyInvoice>
               color: isselected ? Colors.black : Colors.white),
         ),
       ),
-    );
-  }
-
-  Widget _body2() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: appModelTheme.darkTheme ? Color(0xff252525) : white,
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(25),
-          topLeft: Radius.circular(25),
-        ),
-      ),
-      child: Center(
-          child: Text(
-        'Data Not Found',
-        style: TextStyle(fontFamily: 'Poppins1', fontSize: 18.sp),
-      )),
     );
   }
 
@@ -1813,7 +1741,7 @@ class _MyInvoiceState extends State<MyInvoice>
             width: MediaQuery.of(context).size.width - 10,
             height: MediaQuery.of(context).size.height - 100,
             padding: EdgeInsets.all(20),
-            color: Colors.white,
+            color: appModelTheme.darkTheme ? darkmodeColor : Colors.white,
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1847,16 +1775,19 @@ Widget _cardList(ItemData data) {
     shrinkWrap: true,
     itemCount: data.items?.length,
     itemBuilder: (context, index) {
+      final appModel = Provider.of<AppModel>(context);
       return Padding(
         padding:
             const EdgeInsets.only(left: 26, right: 20, bottom: 15, top: 15),
         child: Container(
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: appModel.darkTheme ? darkmodeColor : Colors.white,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
+                  color: appModel.darkTheme
+                      ? Colors.black45
+                      : Colors.grey.withOpacity(0.2),
                   spreadRadius: 2,
                   blurRadius: 10,
                   offset: Offset(0, 3), // changes position of shadow
@@ -1875,7 +1806,7 @@ Widget _cardList(ItemData data) {
                   style: TextStyle(
                     fontSize: 11.sp,
                     fontFamily: 'Poppins1',
-                    color: Colors.grey,
+                    color: appModel.darkTheme ? white : Colors.grey,
                   ),
                 ),
               ),
@@ -2287,7 +2218,6 @@ Widget carImage(String images) {
     final Map<int, String> values = {
       for (int i = 0; i < split.length; i++) i: split[i]
     };
-    var containers = "";
 
     return Row(children: [
       for (int i = 0; i < values.length - 1; i++)

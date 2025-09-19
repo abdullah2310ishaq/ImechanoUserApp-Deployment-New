@@ -118,24 +118,6 @@ class _MyBookingsPageState extends State<MyBookingsPage>
     return _date;
   }
 
-  void _runFilter(String enteredKeyword) {
-    print("Search keyword");
-    print(enteredKeyword);
-    if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
-      if (enteredKeyword.length < 2) {
-        bookingListbloc.bookinglistsink(
-            PrefObj.preferences!.get(PrefKeys.USER_ID), selectTab.toString());
-      } else {
-        bookingListbloc.bookinglistsink(
-            PrefObj.preferences!.get(PrefKeys.USER_ID), selectTab.toString(),
-            search: enteredKeyword);
-      }
-    }
-
-    // Refresh the UI
-    setState(() {});
-  }
-
   Repository repository = Repository();
 
   bool flag = false;
@@ -198,7 +180,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
         onDetached();
         break;
       case AppLifecycleState.hidden:
-        // TODO: Handle this case.
+        onPaused();
         break;
     }
   }
@@ -304,7 +286,9 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                                 showFilter
                                     ? Icons.filter_alt_outlined
                                     : Icons.filter_alt_off_outlined,
-                                color: Colors.black,
+                                color: appModelTheme.darkTheme
+                                    ? Colors.black
+                                    : Colors.black,
                                 size: 20.w),
                             SizedBox(width: 8.w),
                             Text(
@@ -863,7 +847,6 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                           ),
                         )
                       : Text(
-                          //TODO
                           getTranslated(
                               data.items![i].item!.removeAllWhitespace,
                               context),
@@ -881,7 +864,8 @@ class _MyBookingsPageState extends State<MyBookingsPage>
             style: TextStyle(
               fontSize: 8,
               fontFamily: "Poppins1",
-              color: Color(0xff35C648),
+              color:
+                  appModelTheme.darkTheme ? Colors.white70 : Color(0xff35C648),
             ),
           ),
           SizedBox(height: 10),
@@ -911,7 +895,11 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                     ]),
               ),
               SizedBox(width: 7),
-              Container(color: Colors.black45, height: 25, width: 1),
+              Container(
+                  color:
+                      appModelTheme.darkTheme ? Colors.white70 : Colors.black45,
+                  height: 25,
+                  width: 1),
               SizedBox(width: 7),
               Expanded(
                 child: Column(
@@ -1483,24 +1471,6 @@ class _MyBookingsPageState extends State<MyBookingsPage>
     );
   }
 
-  Widget _body2() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: appModelTheme.darkTheme ? Color(0xff252525) : white,
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(25),
-          topLeft: Radius.circular(25),
-        ),
-      ),
-      child: Center(
-          child: Text(
-        'Data Not Found',
-        style: TextStyle(fontFamily: 'Poppins1', fontSize: 18.sp),
-      )),
-    );
-  }
-
   void onResumed() {
     print("~~~~~~~ resumed");
     _tabController?.animateTo(currentBookingTab);
@@ -1552,7 +1522,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
             width: MediaQuery.of(context).size.width - 10,
             height: MediaQuery.of(context).size.height - 100,
             padding: EdgeInsets.all(20),
-            color: Colors.white,
+            color: appModelTheme.darkTheme ? darkmodeColor : Colors.white,
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1586,16 +1556,19 @@ Widget _cardList(ItemData data) {
     shrinkWrap: true,
     itemCount: data.items?.length,
     itemBuilder: (context, index) {
+      final appModel = Provider.of<AppModel>(context);
       return Padding(
         padding:
             const EdgeInsets.only(left: 26, right: 20, bottom: 15, top: 15),
         child: Container(
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: appModel.darkTheme ? darkmodeColor : Colors.white,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
+                  color: appModel.darkTheme
+                      ? Colors.black45
+                      : Colors.grey.withOpacity(0.2),
                   spreadRadius: 2,
                   blurRadius: 10,
                   offset: Offset(0, 3), // changes position of shadow
@@ -1614,7 +1587,7 @@ Widget _cardList(ItemData data) {
                   style: TextStyle(
                     fontSize: 11.sp,
                     fontFamily: 'Poppins1',
-                    color: Colors.grey,
+                    color: appModel.darkTheme ? white : Colors.grey,
                   ),
                 ),
               ),
