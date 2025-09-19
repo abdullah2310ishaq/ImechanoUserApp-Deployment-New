@@ -377,14 +377,14 @@ class _MapLocationState extends State<MapLocation> {
                   height: 42.h,
                   width: 250.w,
                   child: ElevatedButton(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          side: BorderSide(
-                            color: Color(0xff70bdf1),
-                            width: 2.0,
-                          ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: logoBlue,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        side: BorderSide(
+                          color: Color(0xff70bdf1),
+                          width: 2.0,
                         ),
                       ),
                     ),

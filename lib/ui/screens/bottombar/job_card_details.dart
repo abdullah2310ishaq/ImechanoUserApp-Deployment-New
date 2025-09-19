@@ -139,7 +139,7 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
         onDetached();
         break;
       case AppLifecycleState.hidden:
-        onPaused();
+        // TODO: Handle this case.
         break;
     }
   }
@@ -404,8 +404,9 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                                       fontFamily: "Poppins1")),
                                               style: TextButton.styleFrom(
                                                 foregroundColor: Colors.black,
-                                                disabledForegroundColor:
-                                                    Colors.yellow,
+                                                disabledForegroundColor: Colors
+                                                    .yellow
+                                                    .withOpacity(0.38),
                                                 side: BorderSide(
                                                     color: Color(0xff374049),
                                                     width: 2),
@@ -492,40 +493,6 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
           ),
         ]),
       ),
-    );
-  }
-
-  Future _asyncConfirmDialog(BuildContext context, String jobnumber) async {
-    return showDialog(
-      context: context,
-      barrierDismissible: false, // user must tap button for close dialog!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Payment Gateway'),
-          content: const Text(
-              'You will be asked to pay via Card at this page. Please Click on Pay & Confirm for sandbox test. Thanks'),
-          actions: [
-            // FlatButton(
-            //   child: const Text('CANCEL'),
-            //   onPressed: () {
-            //     Navigator.of(context).pop();
-            //   },
-            // ),
-            TextButton(
-              child: const Text('Pay & Confirm'),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                onSendNotificationAdminAPI();
-                acceptbookingApiCall(jobnumber);
-
-                setState(() {
-                  print("I m rebuild");
-                });
-              },
-            )
-          ],
-        );
-      },
     );
   }
 
@@ -906,54 +873,6 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
             ],
           );
         });
-  }
-
-  Widget _customDivider() {
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: 20,
-        right: 20,
-      ),
-      child: Divider(
-        color: appModelTheme.darkTheme ? white : Colors.black38,
-      ),
-    );
-  }
-
-  Widget _delTotal() {
-    return Padding(
-      // ========================by jenish==========================
-      padding: const EdgeInsets.only(left: 27, right: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            // ========================by jenish==========================
-            getTranslated('total', context),
-            style: TextStyle(
-              fontSize: 13,
-              fontFamily: 'Poppins1',
-            ),
-          ),
-          Text(
-            '',
-            // // ========================by jenish==========================
-            // // 'KWD ${widget.selectedService['total']}',
-            // widget.data.total == null
-            //     ? getTranslated("qr", context)! + ' 0.00'
-            //     : widget.data.total!.isEmpty
-            //         ? getTranslated("qr", context)! + ' 0.00'
-            //         : getTranslated("qr", context)! + '$formattedGrossTotal',
-            textAlign: TextAlign.end,
-            style: TextStyle(
-              fontSize: 13,
-              fontFamily: 'Poppins2',
-              color: black,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   acceptbookingApiCall(String jobNumber) async {

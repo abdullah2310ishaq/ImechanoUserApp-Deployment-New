@@ -121,13 +121,11 @@ class _MyBookingsPageState extends State<MyBookingsPage>
   void _runFilter(String enteredKeyword) {
     print("Search keyword");
     print(enteredKeyword);
-    if (enteredKeyword.length > 1) {
-      if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+    if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+      if (enteredKeyword.length < 2) {
         bookingListbloc.bookinglistsink(
             PrefObj.preferences!.get(PrefKeys.USER_ID), selectTab.toString());
-      }
-    } else if (enteredKeyword.length > 1) {
-      if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+      } else {
         bookingListbloc.bookinglistsink(
             PrefObj.preferences!.get(PrefKeys.USER_ID), selectTab.toString(),
             search: enteredKeyword);
@@ -153,17 +151,29 @@ class _MyBookingsPageState extends State<MyBookingsPage>
 
     _tabController?.animateTo(currentBookingTab);
 
-    bookingListbloc
-        .bookinglistsink(PrefObj.preferences!.get(PrefKeys.USER_ID),
-            currentBookingTab.toString())
-        .then((value) {
+    // Only fetch bookings if user is logged in
+    if (userStr && PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+      final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+      if (userId != null) {
+        bookingListbloc
+            .bookinglistsink(userId, currentBookingTab.toString())
+            .then((value) {
+          flag = false;
+          showFilter = false;
+          setState(() {
+            selectTab = currentBookingTab;
+          });
+          log('Approved Booking Value = $value');
+        });
+      }
+    } else {
+      // Guest mode - no bookings to fetch
       flag = false;
       showFilter = false;
       setState(() {
         selectTab = currentBookingTab;
       });
-      log('Approved Booking Value = $value');
-    });
+    }
   }
 
   @override
@@ -188,7 +198,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
         onDetached();
         break;
       case AppLifecycleState.hidden:
-        onPaused();
+        // TODO: Handle this case.
         break;
     }
   }
@@ -197,25 +207,25 @@ class _MyBookingsPageState extends State<MyBookingsPage>
 
   @override
   Widget build(BuildContext context) {
-    final _ = MediaQuery.of(context).size; // keep for future layout if needed
+    // var size = MediaQuery.of(context).size; // unused
     print("I m builddddd Shoaib TAriq");
     print(PrefObj.preferences!.get(PrefKeys.CARID));
     final appModel = Provider.of<AppModel>(context);
     appModelTheme = appModel;
     return WillPopScope(
-      onWillPop: () async {
-        if (!Navigator.of(context).canPop()) {
-          // If there's no screen in the stack, navigate to home screen
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => BottomBarPage(2)),
-          );
-          return false; // Return false to prevent the app from closing
-        } else {
-          return true; // Return true to allow the app to close
-        }
-      },
-      child: Scaffold(
+        onWillPop: () async {
+          if (!Navigator.of(context).canPop()) {
+            // If there's no screen in the stack, navigate to home screen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => BottomBarPage(2)),
+            );
+            return false; // Return false to prevent the app from closing
+          } else {
+            return true; // Return true to allow the app to close
+          }
+        },
+        child: Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: WidgetAppBar(
             title: getTranslated('MyBookings', context),
@@ -225,126 +235,122 @@ class _MyBookingsPageState extends State<MyBookingsPage>
           ),
           drawer: drawerpage(),
           backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
-          body: ScreenUtilInit(
-            designSize: Size(414, 896),
-            builder: (context, child) => SafeArea(
-              child: Column(children: [
-                Row(
+          body: SafeArea(
+            child: Column(children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: screenSize!.height * 0.05,
+                      margin: EdgeInsets.symmetric(horizontal: 10.w),
+                      child: TextField(
+                        keyboardType: TextInputType.text,
+                        onChanged: (value) {
+                          setState(() {
+                            search = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: SvgPicture.asset(
+                              "assets/svg/serch.svg",
+                              placeholderBuilder: (context) =>
+                                  const SizedBox.shrink(),
+                            ),
+                          ),
+                          hintText:
+                              getTranslated('SearchwithBookingID', context),
+                          hintStyle: TextStyle(
+                              fontSize: 12,
+                              fontFamily: "Poppins3",
+                              color: appModelTheme.darkTheme
+                                  ? Colors.grey
+                                  : Colors.black),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              width: 0,
+                              style: BorderStyle.none,
+                            ),
+                          ),
+                          filled: true,
+                          contentPadding: EdgeInsets.only(bottom: 2),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: screenSize!.height * 0.05,
+                    margin: appModelTheme.appLocal == Locale("en")
+                        ? EdgeInsets.only(right: 10.w)
+                        : EdgeInsets.only(left: 10.w),
+                    padding: EdgeInsets.fromLTRB(1.w, 8.w, 10.w, 8.w),
+                    decoration: BoxDecoration(
+                        color: white, borderRadius: BorderRadius.circular(10)),
+                    child: GestureDetector(
+                      onTap: () {
+                        showFilter = !showFilter;
+                        // Refresh the UI
+                        setState(() {});
+                        print("Container was tapped");
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(left: 10.w, right: 10.w),
+                        child: Row(
+                          children: [
+                            Icon(
+                                showFilter
+                                    ? Icons.filter_alt_outlined
+                                    : Icons.filter_alt_off_outlined,
+                                color: Colors.black,
+                                size: 20.w),
+                            SizedBox(width: 8.w),
+                            Text(
+                              getTranslated('filter', context),
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins3'),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (showFilter) ...[
+                // These children are only visible if condition is true
+                SizedBox(height: 15.h),
+                _filterwidget(),
+              ],
+              SizedBox(height: 15),
+              requestTab(),
+              SizedBox(height: 15),
+              Expanded(
+                child: Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        height: screenSize!.height * 0.05,
-                        margin: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: TextField(
-                          keyboardType: TextInputType.text,
-                          onChanged: (value) {
-                            setState(() {
-                              search = value;
-                            });
-                          },
-                          decoration: InputDecoration(
-                            fillColor: Colors.white,
-                            prefixIcon: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: SvgPicture.asset(
-                                "assets/svg/serch.svg",
-                                placeholderBuilder: (context) =>
-                                    const SizedBox.shrink(),
-                              ),
-                            ),
-                            hintText:
-                                getTranslated('SearchwithBookingID', context),
-                            hintStyle: TextStyle(
-                                fontSize: 12,
-                                fontFamily: "Poppins3",
-                                color: appModelTheme.darkTheme
-                                    ? Colors.grey
-                                    : Colors.black),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(
-                                width: 0,
-                                style: BorderStyle.none,
-                              ),
-                            ),
-                            filled: true,
-                            contentPadding: EdgeInsets.only(bottom: 2),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: screenSize!.height * 0.05,
-                      margin: appModelTheme.appLocal == Locale("en")
-                          ? EdgeInsets.only(right: 10.w)
-                          : EdgeInsets.only(left: 10.w),
-                      padding: EdgeInsets.fromLTRB(1.w, 8.w, 10.w, 8.w),
-                      decoration: BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: GestureDetector(
-                        onTap: () {
-                          showFilter = !showFilter;
-                          // Refresh the UI
-                          setState(() {});
-                          print("Container was tapped");
-                        },
                         child: Container(
-                          margin: EdgeInsets.only(left: 10.w, right: 10.w),
-                          child: Row(
-                            children: [
-                              Icon(
-                                  showFilter
-                                      ? Icons.filter_alt_outlined
-                                      : Icons.filter_alt_off_outlined,
-                                  color: Colors.black,
-                                  size: 20.w),
-                              SizedBox(width: 8.w),
-                              Text(
-                                getTranslated('filter', context),
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins3'),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                      padding: EdgeInsets.only(top: 5),
+                      height: double.infinity,
+                      decoration: BoxDecoration(
+                          color: appModelTheme.darkTheme
+                              ? Color(0xff252525)
+                              : white,
+                          borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(25.0),
+                              topLeft: Radius.circular(25.0))),
+                      child: _BookingDetails(),
+                    )),
                   ],
                 ),
-                if (showFilter) ...[
-                  // These children are only visible if condition is true
-                  SizedBox(height: 15.h),
-                  _filterwidget(),
-                ],
-                SizedBox(height: 15),
-                requestTab(),
-                SizedBox(height: 15),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: Container(
-                        padding: EdgeInsets.only(top: 5),
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                            color: appModelTheme.darkTheme
-                                ? Color(0xff252525)
-                                : white,
-                            borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(25.0),
-                                topLeft: Radius.circular(25.0))),
-                        child: _BookingDetails(),
-                      )),
-                    ],
-                  ),
-                ),
-              ]),
-            ),
-          )),
-    );
+              ),
+            ]),
+          ),
+        ));
   }
 
   Widget _filterwidget() {
@@ -422,17 +428,19 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                     DateTime.now().day);
                 searchString = "";
 
-                bookingListbloc
-                    .bookinglistsink(PrefObj.preferences!.get(PrefKeys.USER_ID),
-                        currentBookingTab.toString())
-                    .then((value) {
-                  flag = false;
-                  showFilter = false;
-                  setState(() {
-                    selectTab = currentBookingTab;
+                final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+                if (userId != null) {
+                  bookingListbloc
+                      .bookinglistsink(userId, currentBookingTab.toString())
+                      .then((value) {
+                    flag = false;
+                    showFilter = false;
+                    setState(() {
+                      selectTab = currentBookingTab;
+                    });
+                    print('Approved Booking Value = $value');
                   });
-                  print('Approved Booking Value = $value');
-                });
+                }
               });
             },
             child: Container(
@@ -456,27 +464,24 @@ class _MyBookingsPageState extends State<MyBookingsPage>
         children: [
           Container(
             margin: EdgeInsets.only(right: 10.w),
-            height: 35,
+            height: 40,
             child: TabBar(
               controller: _tabController,
-              indicator: BoxDecoration(
-                border: Border.all(color: Colors.transparent),
-                borderRadius: BorderRadius.circular(5.0),
-                // color: appModelTheme.darkTheme ? Colors.grey : Colors.white,
-                color: appModelTheme.darkTheme ? logoBlue : Colors.white,
-                // color: Colors.white,
-              ),
+              isScrollable: false,
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              // Use transparent indicator so selection is shown only inside each tab's container
+              indicatorColor: Colors.transparent,
+              indicator: BoxDecoration(color: Colors.transparent),
               labelColor: appModelTheme.darkTheme ? Colors.white : logoBlue,
-              // labelColor: Colors.black,
               labelStyle: TextStyle(
-                color: Colors.red,
                 fontSize: 13,
                 fontFamily: "Poppins3",
               ),
-              indicatorPadding: EdgeInsets.only(left: 10),
-              labelPadding: EdgeInsets.only(left: 10),
+              indicatorPadding: EdgeInsets.zero,
+              labelPadding: EdgeInsets.zero,
               unselectedLabelColor:
-                  appModelTheme.darkTheme ? Colors.white : Colors.grey[100],
+                  appModelTheme.darkTheme ? Colors.white70 : Colors.white,
               onTap: (index) {
                 selectTab = index;
                 // selectTab = 3;
@@ -534,62 +539,92 @@ class _MyBookingsPageState extends State<MyBookingsPage>
               tabs: [
                 Tab(
                   child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                        // color: appModelTheme.darkTheme
-                        //     ? Colors.grey
-                        //     : Colors.white,
-                        // color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                            color: Colors.white,
-                            width: selectTab == 0 ? 0 : 1)),
-                    child: Align(
-                      alignment: Alignment.center,
+                      color: selectTab == 0
+                          ? (appModelTheme.darkTheme ? logoBlue : Colors.white)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(6),
+                      border: selectTab == 0
+                          ? Border.all(color: Colors.transparent, width: 0)
+                          : Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
                       child: Text(
                         getTranslated("Pending", context),
-                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 10),
                       ),
                     ),
                   ),
                 ),
                 Tab(
                   child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.white, width: 1)),
-                    child: Align(
-                      alignment: Alignment.center,
+                      color: selectTab == 1
+                          ? (appModelTheme.darkTheme ? logoBlue : Colors.white)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(6),
+                      border: selectTab == 1
+                          ? Border.all(color: Colors.transparent, width: 0)
+                          : Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
                       child: Text(
                         getTranslated('Completed', context),
-                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                   ),
                 ),
                 Tab(
                   child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.white, width: 1)),
-                    child: Align(
-                      alignment: Alignment.center,
+                      color: selectTab == 2
+                          ? (appModelTheme.darkTheme ? logoBlue : Colors.white)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(6),
+                      border: selectTab == 2
+                          ? Border.all(color: Colors.transparent, width: 0)
+                          : Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
                       child: Text(
                         getTranslated('Canceled', context),
-                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                   ),
                 ),
                 Tab(
                   child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.white, width: 1)),
-                    child: Align(
-                      alignment: Alignment.center,
+                      color: selectTab == 3
+                          ? (appModelTheme.darkTheme ? logoBlue : Colors.white)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(6),
+                      border: selectTab == 3
+                          ? Border.all(color: Colors.transparent, width: 0)
+                          : Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
                       child: Text(
                         getTranslated('Approved', context),
-                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                   ),
@@ -605,6 +640,50 @@ class _MyBookingsPageState extends State<MyBookingsPage>
 //Shoaib work here
   Widget _BookingDetails() {
     log('Inside booking details');
+
+    // If user is not logged in (guest mode), show appropriate message
+    if (!userStr || !PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.calendar_today,
+              size: 64.sp,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              'Please sign in to view your bookings',
+              style: TextStyle(
+                fontFamily: 'Poppins1',
+                fontSize: 16.sp,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16.h),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: logoBlue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18.0),
+                ),
+              ),
+              child: Text(
+                'Sign In',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/sign-in-sign-up-landing', (Route route) => false);
+              },
+            ),
+          ],
+        ),
+      );
+    }
+
     return StreamBuilder<BookingListModel>(
         stream: bookingListbloc.bookingliststream,
         builder:
@@ -619,63 +698,72 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                     ),
             );
           }
-          return flag
-              ? Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: bookinglistsnapshot.data!.data!.length,
-                  itemBuilder: (context, index) {
-                    return bookinglistsnapshot.data!.data![index].items != null
-                        ? bookinglistsnapshot.data!.data![index].bookingId!
-                                    .contains(search) ||
-                                bookinglistsnapshot.data!.data![index].carName!
-                                    .toLowerCase()
-                                    .contains(search.toLowerCase()) ||
-                                bookinglistsnapshot
-                                    .data!.data![index].items![0].item!
-                                    .toLowerCase()
-                                    .contains(search.toLowerCase())
-                            ? Padding(
-                                padding: EdgeInsets.only(
-                                    left: 15, right: 15, bottom: 15, top: 15),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: appModelTheme.darkTheme
-                                          ? darkmodeColor
-                                          : white,
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                          width: 1, color: grayE6E6E5),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: appModelTheme.darkTheme
-                                              ? Colors.black45
-                                              : Colors.grey.withOpacity(0.2),
-                                          spreadRadius: 2,
-                                          blurRadius: 10,
-                                          offset: Offset(0, 3),
-                                        ),
-                                      ]),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      _infoList(
-                                          bookinglistsnapshot
-                                              .data!.data![index],
-                                          bookinglistsnapshot
-                                              .data!.data![index].timeDate
-                                              .toString()),
-                                      _infoButton(bookinglistsnapshot
-                                          .data!.data![index])
-                                    ],
+          final bookings = bookinglistsnapshot.data!.data ?? [];
+          if (flag) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (bookings.isEmpty) {
+            return Center(
+              child: Text(
+                'No Data Found',
+                style: TextStyle(fontFamily: 'Poppins1', fontSize: 12),
+              ),
+            );
+          }
+          return ListView.builder(
+            shrinkWrap: true,
+            itemCount: bookings.length,
+            itemBuilder: (context, index) {
+              return bookings[index].items != null
+                  ? bookinglistsnapshot.data!.data![index].bookingId!
+                              .contains(search) ||
+                          bookinglistsnapshot.data!.data![index].carName!
+                              .toLowerCase()
+                              .contains(search.toLowerCase()) ||
+                          bookinglistsnapshot.data!.data![index].items![0].item!
+                              .toLowerCase()
+                              .contains(search.toLowerCase())
+                      ? Padding(
+                          padding: EdgeInsets.only(
+                              left: 15, right: 15, bottom: 15, top: 15),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: appModelTheme.darkTheme
+                                    ? darkmodeColor
+                                    : white,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(width: 1, color: grayE6E6E5),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: appModelTheme.darkTheme
+                                        ? Colors.black45
+                                        : Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 2,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 3),
                                   ),
+                                ]),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: _infoList(
+                                      bookinglistsnapshot.data!.data![index],
+                                      bookinglistsnapshot
+                                          .data!.data![index].timeDate
+                                          .toString()),
                                 ),
-                              )
-                            : SizedBox.shrink()
-                        : SizedBox.shrink();
-                  },
-                );
+                                SizedBox(width: 8),
+                                _infoButton(
+                                    bookinglistsnapshot.data!.data![index])
+                              ],
+                            ),
+                          ),
+                        )
+                      : SizedBox.shrink()
+                  : SizedBox.shrink();
+            },
+          );
         });
   }
 
@@ -799,53 +887,54 @@ class _MyBookingsPageState extends State<MyBookingsPage>
           SizedBox(height: 10),
           Row(
             children: [
-              Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
+              Expanded(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Booking Time',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontFamily: 'Poppins1',
+                        ),
+                      ),
+                      Text(
+                        data.bookingTime!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontFamily: 'Poppins1',
+                        ),
+                      ),
+                    ]),
+              ),
+              SizedBox(width: 7),
+              Container(color: Colors.black45, height: 25, width: 1),
+              SizedBox(width: 7),
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Booking Time',
+                      'Appointment Time',
                       style: TextStyle(
                         fontSize: 9,
                         fontFamily: 'Poppins1',
                       ),
                     ),
                     Text(
-                      data.bookingTime!,
+                      data.timeDate!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 9,
                         fontFamily: 'Poppins1',
                       ),
                     ),
-                  ]),
-              SizedBox(width: 7),
-              Column(
-                children: [
-                  Container(
-                    color: Colors.black45,
-                    height: 25,
-                    width: 1,
-                  )
-                ],
-              ),
-              SizedBox(width: 7),
-              Column(
-                children: [
-                  Text(
-                    'Appointment Time',
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontFamily: 'Poppins1',
-                    ),
-                  ),
-                  Text(
-                    data.timeDate!,
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontFamily: 'Poppins1',
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               )
             ],
           ),
@@ -1416,20 +1505,19 @@ class _MyBookingsPageState extends State<MyBookingsPage>
     print("~~~~~~~ resumed");
     _tabController?.animateTo(currentBookingTab);
 
-    bookingListbloc
-        .bookinglistsink(PrefObj.preferences!.get(PrefKeys.USER_ID),
-            currentBookingTab.toString())
-        .then((value) {
-      flag = false;
-      showFilter = false;
-      setState(() {
-        // payconfirmKey = true;
-        // confirmKey = true;
-        // payconfirmKey =true;
-        selectTab = currentBookingTab;
+    final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+    if (userId != null) {
+      bookingListbloc
+          .bookinglistsink(userId, currentBookingTab.toString())
+          .then((value) {
+        flag = false;
+        showFilter = false;
+        setState(() {
+          selectTab = currentBookingTab;
+        });
+        print('Approved Booking Value = $value');
       });
-      print('Approved Booking Value = $value');
-    });
+    }
   }
 
   void onPaused() {
@@ -1771,7 +1859,8 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(right: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.lightBlueAccent,
+                backgroundColor:
+                    Colors.lightBlueAccent, // This is what you need!
               ),
               child: Text(
                 'Approve',
@@ -1799,7 +1888,7 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(left: 6.0, right: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey,
+                backgroundColor: Colors.grey, // This is what you need!
               ),
               child: Text(
                 'Reject',
@@ -1819,7 +1908,7 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(left: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: Colors.red, // This is what you need!
               ),
               child: Text(
                 'Close',
@@ -1933,6 +2022,7 @@ Widget carImage(String images) {
     final Map<int, String> values = {
       for (int i = 0; i < split.length; i++) i: split[i]
     };
+    // var containers = ""; // unused
 
     return Row(children: [
       for (int i = 0; i < values.length - 1; i++)

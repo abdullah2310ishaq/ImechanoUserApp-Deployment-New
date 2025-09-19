@@ -8,7 +8,6 @@ import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:imechano/localization/language_constrants.dart';
@@ -100,20 +99,21 @@ class _SignInScreenState extends State<SignInScreen> {
         child: SingleChildScrollView(
           child: Center(
             child: Container(
-              height: MediaQuery.of(context).size.height,
+              height: 1.0.sh,
               padding: EdgeInsets.only(left: 25, right: 25),
               child: Form(
                 key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-                    SvgPicture.asset(
-                      "assets/svg/imechano-logo.svg",
-                      height: MediaQuery.of(context).size.height * 0.11,
-                      color: appModelTheme.darkTheme ? white : null,
+                    SizedBox(height: 30.h),
+                    Image(
+                      image: AssetImage('assets/icons/splash/logo.png'),
+                      width: 180.w,
+                      height: 60.h,
+                      fit: BoxFit.contain,
                     ),
-                    SizedBox(height: 35),
+                    SizedBox(height: 16.h),
                     Text(
                       getTranslated("loginaccount", context),
                       style: TextStyle(
@@ -128,7 +128,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         fontFamily: "Poppins3",
                       ),
                     ),
-                    SizedBox(height: 35),
+                    SizedBox(height: 16.h),
                     CustomForm(
                       fillColor:
                           appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
@@ -193,7 +193,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                               ),
                                               SizedBox(height: 10),
                                               Text(
-                                                "ENTER YOUR REGISTERED email FOR THE \n VERIFICATION PROCESS, WE WILL SEND \n  4 DIGITS CODE TO YOUR EMAIL.",
+                                                "Enter your registered email for the \n verification process, we will send \n  4 digits to the email.",
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                     decoration: TextDecoration
@@ -328,12 +328,14 @@ class _SignInScreenState extends State<SignInScreen> {
                         ],
                       ),
                     ),
-                    Spacer(),
+                    SizedBox(height: 20.h),
                     CustomButton(
                       title: Text(
                         getTranslated('signin', context),
-                        style:
-                            TextStyle(fontSize: 18.sp, fontFamily: "Poppins1"),
+                        style: TextStyle(
+                            fontSize: 18.sp,
+                            fontFamily: "Poppins1",
+                            color: Colors.white),
                       ),
                       width: 0.9.w,
                       bgColor: logoBlue,
@@ -348,12 +350,14 @@ class _SignInScreenState extends State<SignInScreen> {
                         }
                       },
                     ),
-                    Spacer(),
+                    SizedBox(height: 16.h),
                     CustomButton(
                       title: Text(
                         getTranslated('guest', context),
-                        style:
-                            TextStyle(fontSize: 18.sp, fontFamily: "Poppins1"),
+                        style: TextStyle(
+                            fontSize: 18.sp,
+                            fontFamily: "Poppins1",
+                            color: Colors.white),
                       ),
                       width: 0.9.w,
                       bgColor: logoBlue,

@@ -345,7 +345,8 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         SizedBox(height: 10.h),
         CustomButton(
-            title: Text(getTranslated('Signout', context)),
+            title: Text(getTranslated('Signout', context),
+                style: TextStyle(color: Colors.white)),
             width: 0.3,
             callBackFunction: () => logOutDialog(),
             bgColor: red,
@@ -517,6 +518,7 @@ class _ProfilePageState extends State<ProfilePage> {
       width: 370.w,
       child: ElevatedButton(
         style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(logoBlue),
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),

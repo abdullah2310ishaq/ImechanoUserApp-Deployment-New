@@ -149,8 +149,8 @@ class _MyvehicalscreenState extends State<Myvehicalscreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset(
-            "assets/svg/imechano-logo.svg",
+          Image.asset(
+            "assets/icons/splash/logo.png",
             height: MediaQuery.of(context).size.height * 0.11,
             color: appModelTheme.darkTheme ? white : null,
           ),

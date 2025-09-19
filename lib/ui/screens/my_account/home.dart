@@ -127,6 +127,20 @@ class _HomeScreenState extends State<HomeScreen> {
     oilchnageListBloc.oilChnageSinck('1');
   }
 
+  void refreshCarStatus() {
+    setState(() {
+      isCarAdded =
+          PrefObj.preferences!.containsKey(PrefKeys.CARNAME) ? true : false;
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh car status when screen comes back into focus
+    refreshCarStatus();
+  }
+
   @override
   void dispose() {
     print("disposing");
@@ -928,6 +942,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontSize: 13.sp),
                           )
                         : Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Container(
                                 height: 40.h,
@@ -936,17 +951,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Icon(
                                   Icons.add,
                                   color: Colors.white,
+                                  size: 16.sp,
                                 ),
                               ),
-                              SizedBox(width: 5.w),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(0, 4, 0, 0),
-                                child: Text(
-                                  getTranslated('AddCar', context),
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: "Poppins1",
-                                      fontSize: 13.sp),
+                              SizedBox(width: 3.w),
+                              Flexible(
+                                child: Container(
+                                  margin: EdgeInsets.fromLTRB(0, 4, 0, 0),
+                                  child: Text(
+                                    getTranslated('AddCar', context),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: "Poppins1",
+                                        fontSize: 12.sp),
+                                  ),
                                 ),
                               ),
                             ],
@@ -1484,7 +1504,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: EdgeInsets.zero,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
-            childAspectRatio: (118.w / 110.h),
+            childAspectRatio: (118.w / 118.h),
             crossAxisSpacing: 14.w,
             mainAxisSpacing: 14.h),
         itemCount: categoriesSnapshot.data!.data!.length - 2,
@@ -1508,7 +1528,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: 10.h,
+                          height: 8.h,
                         ),
                         Text(
                           getTranslated(
@@ -1518,15 +1538,18 @@ class _HomeScreenState extends State<HomeScreen> {
                               context),
                           style: TextStyle(
                               fontSize: 12.sp, fontFamily: 'Poppins1'),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(
-                          height: 10.h,
+                          height: 6.h,
                         ),
                         Image(
                           // fit: BoxFit.contain,
                           image: NetworkImage(
                               "${categoriesSnapshot.data!.data![index + 2].icon}"),
-                          height: 60.h,
+                          height: 50.h,
                         ),
                       ],
                     ),

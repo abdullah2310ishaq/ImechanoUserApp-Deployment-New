@@ -55,7 +55,6 @@ class _oil_ChangeState extends State<oil_Change>
   int total = 0;
   String subCatogory = "";
 
-  // ignore: unused_field
   bool _isTextFieldEnable = true;
   List<bool> s = [];
   List<int> indexed = [];
@@ -78,7 +77,6 @@ class _oil_ChangeState extends State<oil_Change>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     // log('Main Category: ${widget.mainCatogory}');
     //log('Category name: ${widget.categoryName}');
     globals.sselected.add({
@@ -109,149 +107,108 @@ class _oil_ChangeState extends State<oil_Change>
           child: Column(
             children: [
               Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                        child: Container(
-                      height: double.infinity,
-                      decoration: BoxDecoration(
-                          color: appModelTheme.darkTheme
-                              ? Color(0xff252525)
-                              : Colors.white,
-                          borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(30.0),
-                              topLeft: Radius.circular(30.0))),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              children: [
-                                SizedBox(height: 15.h),
-                                selectedcCard(),
-                                SizedBox(height: 60.h),
-                              ],
-                            ),
-                            Container(
-                              // height: 58.h,
-                              // width: 354.w,
-                              margin: EdgeInsets.only(
-                                  left: 20.w, right: 20.w, bottom: 20.h),
-                              child: ElevatedButton(
-                                style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            Color(0xff70bdf1)),
-                                    shape: MaterialStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                        RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ))),
-                                // padding:
-                                // EdgeInsets.only(top: 15.h, bottom: 15.h),
-                                // textColor: Colors.white,
-                                child: Container(
-                                  alignment: Alignment.topLeft,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        child: Text(
-                                          globals.currentCount.toString() +
-                                              " " +
-                                              getTranslated(
-                                                  'Selected', context) +
-                                              " " +
-                                              getTranslated('Service', context),
-                                          style: TextStyle(fontSize: 14.sp),
-                                        ),
-                                        margin: EdgeInsets.only(left: 20.w),
-                                      ),
-                                      SizedBox(
-                                        width: 60.w,
-                                      ),
-                                      Container(
-                                          child: Text(
-                                        getTranslated(
-                                            'Viewselections', context),
-                                        style:
-                                            TextStyle(fontFamily: "Poppins2"),
-                                      ))
-                                    ],
-                                  ),
-                                ),
-                                // color: Color(0xff70bdf1),
-                                onPressed: () async {
-                                  // if (_isNavigating) {
-                                  //   return; // Navigation is already in progress
-                                  // }
-                                  // _isNavigating = true;
-
-                                  if (globals.cart.isEmpty &&
-                                      _others.text.isEmpty) {
-                                    Fluttertoast.showToast(
-                                        msg:
-                                            "Please Select Service or Enter Query",
-                                        toastLength: Toast.LENGTH_SHORT,
-                                        gravity: ToastGravity.CENTER,
-                                        timeInSecForIosWeb: 1,
-                                        backgroundColor: Colors.black,
-                                        textColor: Colors.white,
-                                        fontSize: 16.0);
-                                  } else {
-                                    if (_others.text.isEmpty ||
-                                        _others.text == "") {
-                                      print("We were in this sectgion");
-                                      print(widget.data.categoryId);
-                                      globals.screenstack++;
-                                      // Get.to(MySelectionPage(
-                                      //     selectedService:
-                                      //         widget.data.selectedService!,
-                                      //     categoryName: widget.categoryName,
-                                      //     categoryId: widget.categoryId,
-                                      //     currentCount:
-                                      //         globals.currentCount));
-                                    } else {
-                                      log("OTHER SELEC");
-                                      print(widget.data.selectedService);
-                                    }
-                                    globals.screenstack++;
-                                    // final refresh = await Get.to(
-                                    //     MySelectionPage(
-                                    //         selectedService:
-                                    //             widget.data.selectedService!,
-                                    //         categoryName: widget.categoryName,
-                                    //         categoryId: widget.categoryId,
-                                    //         currentCount:
-                                    //             globals.currentCount));
-                                    log('Refresh: $refresh');
-
-                                    refresh = await Navigator.push(context,
-                                        MaterialPageRoute(builder: (context) {
-                                      return BottomBarPage(4);
-                                      // return MySelectionPage(
-                                      //     selectedService:
-                                      //         widget.data.selectedService!,
-                                      //     categoryName: widget.categoryName,
-                                      //     categoryId: widget.categoryId,
-                                      //     currentCount: globals.currentCount);
-                                    }));
-
-                                    if (refresh == "refresh") {
-                                      setState(() {});
-                                    }
-                                    // _isNavigating = false; // Reset the flag
-
-                                    // setState(() {});
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
+                child: Container(
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                      color: appModelTheme.darkTheme
+                          ? Color(0xff252525)
+                          : Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(30.0),
+                          topLeft: Radius.circular(30.0))),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              SizedBox(height: 15.h),
+                              selectedcCard(),
+                              SizedBox(height: 20.h),
+                            ],
+                          ),
                         ),
                       ),
-                    )),
-                  ],
+                      Container(
+                        margin: EdgeInsets.only(
+                            left: 20.w, right: 20.w, bottom: 20.h),
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Color(0xff70bdf1)),
+                              shape: MaterialStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ))),
+                          child: Container(
+                            alignment: Alignment.centerLeft,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    globals.currentCount.toString() +
+                                        " " +
+                                        getTranslated('Selected', context) +
+                                        " " +
+                                        getTranslated('Service', context),
+                                    style: TextStyle(
+                                      fontSize: 12.sp,
+                                      color: Colors.white,
+                                      fontFamily: "Poppins2",
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Text(
+                                  getTranslated('Viewselections', context),
+                                  style: TextStyle(
+                                    fontFamily: "Poppins2",
+                                    color: Colors.white,
+                                    fontSize: 12.sp,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          onPressed: () async {
+                            if (globals.cart.isEmpty && _others.text.isEmpty) {
+                              Fluttertoast.showToast(
+                                  msg: "Please Select Service or Enter Query",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.CENTER,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.black,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0);
+                            } else {
+                              if (_others.text.isEmpty || _others.text == "") {
+                                print("We were in this sectgion");
+                                print(widget.data.categoryId);
+                                globals.screenstack++;
+                              } else {
+                                log("OTHER SELEC");
+                                print(widget.data.selectedService);
+                              }
+                              globals.screenstack++;
+                              log('Refresh: $refresh');
+
+                              refresh = await Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) {
+                                return BottomBarPage(4);
+                              }));
+
+                              if (refresh == "refresh") {
+                                setState(() {});
+                              }
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

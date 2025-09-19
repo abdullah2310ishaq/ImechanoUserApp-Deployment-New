@@ -325,18 +325,30 @@ class _FordScreenState extends State<FordScreen> {
                             decoration: BoxDecoration(
                                 color: !isPetrol
                                     ? Colors.transparent
-                                    : Color(0xffDEEFFC),
+                                    : appModelTheme.darkTheme
+                                        ? Color(0xff2A3A4A)
+                                        : Color(0xffDEEFFC),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                     color: !isPetrol
-                                        ? Colors.black12
+                                        ? appModelTheme.darkTheme
+                                            ? Colors.grey[600]!
+                                            : Colors.black12
                                         : Color(0xff70BDF1))),
                             height: 30.h,
                             width: 120.w,
                             child: Text(
                               getTranslated('Petrol', context),
                               style: TextStyle(
-                                  fontSize: 13.sp, fontFamily: "Poppins1"),
+                                  fontSize: 13.sp,
+                                  fontFamily: "Poppins1",
+                                  color: appModelTheme.darkTheme
+                                      ? (!isPetrol
+                                          ? Colors.grey[400]
+                                          : Colors.white)
+                                      : (!isPetrol
+                                          ? Colors.black
+                                          : Colors.black)),
                             ),
                           ),
                         ),
@@ -352,18 +364,30 @@ class _FordScreenState extends State<FordScreen> {
                             decoration: BoxDecoration(
                                 color: isPetrol
                                     ? Colors.transparent
-                                    : Color(0xffDEEFFC),
+                                    : appModelTheme.darkTheme
+                                        ? Color(0xff2A3A4A)
+                                        : Color(0xffDEEFFC),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                     color: isPetrol
-                                        ? Colors.black12
+                                        ? appModelTheme.darkTheme
+                                            ? Colors.grey[600]!
+                                            : Colors.black12
                                         : Color(0xff70BDF1))),
                             height: 30.h,
                             width: 120.w,
                             child: Text(
                               getTranslated('Diesel', context),
                               style: TextStyle(
-                                  fontSize: 13.sp, fontFamily: "Poppins1"),
+                                  fontSize: 13.sp,
+                                  fontFamily: "Poppins1",
+                                  color: appModelTheme.darkTheme
+                                      ? (isPetrol
+                                          ? Colors.grey[400]
+                                          : Colors.white)
+                                      : (isPetrol
+                                          ? Colors.black
+                                          : Colors.black)),
                             ),
                           ),
                         ),
@@ -615,7 +639,8 @@ class _FordScreenState extends State<FordScreen> {
                       focusNode: mileageFocusNode,
                       textInputAction: TextInputAction.next,
                       inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                        LengthLimitingTextInputFormatter(7),
                       ],
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
@@ -689,7 +714,7 @@ class _FordScreenState extends State<FordScreen> {
                       textInputAction: TextInputAction.next,
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                        LengthLimitingTextInputFormatter(9),
+                        LengthLimitingTextInputFormatter(6),
                       ],
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
@@ -727,6 +752,9 @@ class _FordScreenState extends State<FordScreen> {
                       controller: ChesesNumberControler,
                       focusNode: chesesNumberFocusNode,
                       textInputAction: TextInputAction.done,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(15),
+                      ],
                       decoration: InputDecoration(
                           prefixIcon: Padding(
                             padding:
@@ -750,6 +778,10 @@ class _FordScreenState extends State<FordScreen> {
                     height: 20,
                   ),
                   ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: logoBlue,
+                        foregroundColor: Colors.white,
+                      ),
                       onPressed: () {
                         FocusScope.of(context).requestFocus(FocusNode());
                         // print('carData');
@@ -773,7 +805,10 @@ class _FordScreenState extends State<FordScreen> {
                                   widget.type != AddCarType.edit
                                       ? getTranslated('AddCar', context)
                                       : "Save Car",
-                                  style: TextStyle(fontFamily: "Poppins1"))))),
+                                  style: TextStyle(
+                                    fontFamily: "Poppins1",
+                                    color: Colors.white,
+                                  ))))),
                   SizedBox(
                     height: 20.h,
                   )

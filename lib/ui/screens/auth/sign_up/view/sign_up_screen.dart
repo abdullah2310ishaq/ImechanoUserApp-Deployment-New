@@ -10,7 +10,6 @@ import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:imechano/localization/language_constrants.dart';
@@ -25,7 +24,6 @@ import 'package:imechano/ui/share_preferences/pref_key.dart';
 import 'package:imechano/ui/share_preferences/preference.dart';
 import 'package:imechano/ui/shared/widgets/buttons/custom_button.dart';
 import 'package:imechano/ui/shared/widgets/form/custom_form.dart';
-import 'package:imechano/ui/shared/widgets/text_widgets.dart';
 import 'package:imechano/ui/styling/colors.dart';
 import 'package:imechano/ui/styling/global.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -118,15 +116,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(height: 50),
-                    SvgPicture.asset(
-                      "assets/svg/imechano-logo.svg",
-                      width: 200,
+                    Image(
+                      image: AssetImage('assets/icons/splash/logo.png'),
+                      width: 180,
+                      height: 60,
+                      fit: BoxFit.contain,
                     ),
                     SizedBox(height: 10),
                     Text(getTranslated('createanaccount', context),
                         style: TextStyle(
                             fontFamily: "Poppins3",
                             fontSize: 20,
+                            fontWeight: FontWeight.bold,
                             color: Colors.black)),
                     SizedBox(height: 10),
                   ],
@@ -150,16 +151,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               getTranslated('confirmPassword', context)),
                           SizedBox(height: 20),
                           SizedBox(
-                            height: 66,
+                            height: 60,
                             child: CustomButton(
                               title: Row(
                                 children: [
-                                  Image.asset("assets/images/Location.png",
-                                      scale: 4),
+                                  SizedBox(
+                                    width: 20,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Image.asset(
+                                        "assets/images/Location.png",
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                                    ),
+                                  ),
                                   SizedBox(width: 10),
-                                  Regular16Black(
-                                    addressBtn,
-                                    textAlign: TextAlign.start,
+                                  Expanded(
+                                    child: Text(
+                                      addressBtn,
+                                      textAlign: TextAlign.start,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins3',
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -193,17 +212,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           SizedBox(height: 20),
                           SizedBox(
-                            height: 66,
+                            height: 60,
                             child: CustomButton(
                               title: Row(
                                 children: [
-                                  Image.asset("assets/images/car.png",
-                                      scale: 4),
-                                  SizedBox(width: 10.w),
-                                  Regular16Black(
-                                    getTranslated(
-                                        'Addmycar(optional)', context),
-                                    textAlign: TextAlign.start,
+                                  SizedBox(
+                                    width: 20,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Image.asset(
+                                        "assets/images/car.png",
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      getTranslated(
+                                          'Addmycar(optional)', context),
+                                      textAlign: TextAlign.start,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins3',
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -225,7 +262,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               title: Text(
                                 getTranslated('Signup', context),
                                 style: TextStyle(
-                                    fontSize: 18.sp, fontFamily: "poppins1"),
+                                    fontSize: 18.sp,
+                                    fontFamily: "poppins1",
+                                    color: Colors.white),
                               ),
                               width: 0.9,
                               callBackFunction: () {
@@ -241,7 +280,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     return; // Stop execution here so it doesn't call onRegisterAPI()
                                   }
                                   onRegisterAPI();
-                                  // showOtpModelsheet();
                                 }
                               },
                               bgColor: logoBlue,
@@ -266,11 +304,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   },
                                   child: Text(getTranslated('signin', context),
                                       style: TextStyle(
-                                          fontFamily: 'poppins1',
-                                          fontSize: 15.sp,
-                                          color: appModelTheme.darkTheme
-                                              ? logoBlue
-                                              : red))),
+                                        fontFamily: 'poppins1',
+                                        fontSize: 15.sp,
+                                        color: Colors.red,
+                                      ))),
                             ],
                           ),
                           Padding(

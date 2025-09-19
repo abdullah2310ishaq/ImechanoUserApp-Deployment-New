@@ -140,29 +140,28 @@ class _drawerpageState extends State<drawerpage> {
         "assets/icons/My Account/Sign_in.png",
       ];
     } else {
+      // Guest mode: Only show Home, FAQs, Privacy Policy, Change Language, Dark Theme
       drawerTitle = [
         "Home",
-        "My Vehicle",
-        "My Bookings",
-        "My Location",
-        "My Invoices",
-        "Notification",
         "FAQs",
         "Privacy Policy",
-        "Dark Theme"
+        "Dark Theme",
       ];
 
       drawerGuestIcon = [
         "assets/icons/My Account/noun_Home_4334361.png",
-        "assets/icons/My Account/Path 8567.png",
-        "assets/icons/My Account/noun_calender_2189968.png",
-        "assets/icons/My Account/locatiorn.png",
-        "assets/icons/My Account/file-text.png",
-        "assets/icons/My Account/Desk_alt_fill.png",
-        "assets/icons/My Account/notifications_black_24dp.png",
         "assets/icons/My Account/Desk_alt_fill.png",
         "assets/icons/My Account/Chield_check_fill.png",
-        "assets/icons/My Account/Path 131.png"
+        "assets/icons/My Account/Path 131.png",
+      ];
+
+      // Align navigation targets with the guest list (last two are switches, no navigation)
+      pageDrawer = [
+        HomeScreen(),
+        FAQsPage(),
+        PolicyScreen(mdFileName: 'term_privacy.md'),
+        null,
+        null,
       ];
     }
   }
@@ -290,33 +289,48 @@ class _drawerpageState extends State<drawerpage> {
                           padding: EdgeInsets.zero,
                           physics: const NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
+                            // Compute actual indices for special rows
+                            final int changeLangIndex =
+                                drawerTitle.indexOf("Change Language");
+                            final int darkThemeIndex =
+                                drawerTitle.indexOf("Dark Theme");
                             return GestureDetector(
                               onTap: () {
-                                if (userStr ? index == 11 : index == 12) {
-                                  Container();
-                                } else {
-                                  if (index == 12) {
-                                    logOutDialog();
-                                  } else if (index == 10) {
-                                    Container();
-                                  } else if (index == 0) {
+                                // Logged-in: handle logout item safely
+                                if (userStr &&
+                                    index == drawerGuestIcon.length - 1) {
+                                  logOutDialog();
+                                  return;
+                                }
+
+                                // Language or Dark Theme rows: no navigation
+                                if (index == changeLangIndex ||
+                                    index == darkThemeIndex) {
+                                  return;
+                                }
+
+                                // Navigate if target exists
+                                final list =
+                                    userStr ? pageMyAccount : pageDrawer;
+                                final target =
+                                    (index >= 0 && index < list.length)
+                                        ? list[index]
+                                        : null;
+                                if (target != null) {
+                                  if (index == 0) {
                                     Navigator.of(context).pushAndRemoveUntil(
                                         MaterialPageRoute(
-                                            builder: (context) => userStr
-                                                ? pageMyAccount[index]
-                                                : pageDrawer[index]),
+                                            builder: (context) => target),
                                         (Route<dynamic> route) => false);
                                   } else {
                                     Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => userStr
-                                                ? pageMyAccount[index]
-                                                : pageDrawer[index]));
+                                            builder: (context) => target));
                                   }
                                 }
                               },
-                              child: index == drawerGuestIcon.length - 3
+                              child: index == changeLangIndex
                                   ? ListTile(
                                       trailing: Switch(
                                         value: langSwitch,
@@ -362,13 +376,9 @@ class _drawerpageState extends State<drawerpage> {
                                       ),
                                     )
                                   : ListTile(
-                                      trailing: userStr
-                                          ? index == drawerGuestIcon.length - 2
-                                              ? switchButton()
-                                              : Text("")
-                                          : index == drawerGuestIcon.length - 1
-                                              ? switchButton()
-                                              : Text(""),
+                                      trailing: (index == darkThemeIndex)
+                                          ? switchButton()
+                                          : Text(""),
                                       contentPadding:
                                           EdgeInsets.fromLTRB(30.w, 0, 30.w, 0),
                                       leading: SizedBox(
