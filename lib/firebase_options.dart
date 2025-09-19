@@ -51,19 +51,19 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBt9egDcthhaJCrck_K88ThYJwK5aib7Y4',
-    appId: '1:559230683480:android:af4bbb89d51cdc9d01bd2d',
+    appId: '1:559230683480:android:88694e605804f78f01bd2d',
     messagingSenderId: '559230683480',
     projectId: 'imechano-userapp',
+    storageBucket: 'imechano-userapp.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCBjmQ8RImXfsxjGqxfcXAU5biXUGO2Ano',
-    appId: '1:795233269846:ios:9e59b5a50345890f66e3f7',
-    messagingSenderId: '795233269846',
-    projectId: 'imechano',
-    storageBucket: 'imechano.appspot.com',
-    iosClientId:
-        '795233269846-m85skh75b7id0dido0c28apelfkevl5q.apps.googleusercontent.com',
-    iosBundleId: 'com.example.imechano',
+    apiKey: 'AIzaSyDx3BFhusvPEFSbiKdUsLaZUZaU8b0hRLM',
+    appId: '1:559230683480:ios:be45114da786aa7001bd2d',
+    messagingSenderId: '559230683480',
+    projectId: 'imechano-userapp',
+    storageBucket: 'imechano-userapp.firebasestorage.app',
+    iosBundleId: 'com.imehcanoo.user',
   );
+
 }
