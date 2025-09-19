@@ -420,7 +420,9 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                         Container(
                           // height: double.infinity,
                           decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: appModelTheme.darkTheme
+                                  ? darkmodeColor
+                                  : Colors.white,
                               borderRadius: BorderRadius.only(
                                   topRight: Radius.circular(25.0),
                                   topLeft: Radius.circular(25.0))),
@@ -444,7 +446,9 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
       width: double.infinity,
       margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
       decoration: BoxDecoration(
-          border: Border.all(color: Color(0xffa9d7f7)),
+          border: Border.all(
+              color:
+                  appModelTheme.darkTheme ? Colors.white30 : Color(0xffa9d7f7)),
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -454,7 +458,11 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             padding: const EdgeInsets.only(top: 7, bottom: 7, left: 10),
             child: Text(
               "$label",
-              style: TextStyle(fontFamily: "Poppins1", fontSize: 15),
+              style: TextStyle(
+                fontFamily: "Poppins1",
+                fontSize: 15,
+                color: appModelTheme.darkTheme ? Colors.white : Colors.black,
+              ),
             ),
           ),
           Padding(
@@ -545,13 +553,16 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             margin: EdgeInsets.all(10),
             padding: EdgeInsets.only(top: 10, bottom: 10),
             decoration: BoxDecoration(
-                color: cardgreycolor2,
+                color: appModelTheme.darkTheme ? darkmodeColor : cardgreycolor2,
                 borderRadius: BorderRadius.all(Radius.circular(10))),
             child: ListTile(
               title: Text(
                 getTranslated("pickupcondition", context),
                 style: TextStyle(
-                    color: greycolorfont, fontSize: 9, fontFamily: "Poppins3"),
+                    color:
+                        appModelTheme.darkTheme ? Colors.white : greycolorfont,
+                    fontSize: 9,
+                    fontFamily: "Poppins3"),
               ),
               subtitle: Container(
                 margin: EdgeInsets.only(top: 5),
@@ -571,13 +582,16 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             margin: EdgeInsets.all(10),
             padding: EdgeInsets.only(top: 10, bottom: 10),
             decoration: BoxDecoration(
-                color: cardgreycolor2,
+                color: appModelTheme.darkTheme ? darkmodeColor : cardgreycolor2,
                 borderRadius: BorderRadius.all(Radius.circular(10))),
             child: ListTile(
               title: Text(
                 getTranslated('typeofworkneeded', context),
                 style: TextStyle(
-                    color: greycolorfont, fontSize: 9, fontFamily: "Poppins3"),
+                    color:
+                        appModelTheme.darkTheme ? Colors.white : greycolorfont,
+                    fontSize: 9,
+                    fontFamily: "Poppins3"),
               ),
               subtitle: Container(
                 margin: EdgeInsets.only(top: 5),
