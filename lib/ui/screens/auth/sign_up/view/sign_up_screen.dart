@@ -155,39 +155,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           SizedBox(
                             height: 60,
                             child: CustomButton(
-                              title: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 40,
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Image.asset(
-                                        "assets/images/Location.png",
-                                        width: 20,
-                                        height: 20,
-                                        color: appModelTheme.darkTheme
-                                            ? Colors.white
-                                            : null,
+                              title: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 30,
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Image.asset(
+                                          "assets/images/Location.png",
+                                          width: 20,
+                                          height: 20,
+                                          color: appModelTheme.darkTheme
+                                              ? Colors.white
+                                              : null,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      addressBtn,
-                                      textAlign: TextAlign.start,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      style: TextStyle(
-                                        fontFamily: 'Poppins3',
-                                        fontSize: 16,
-                                        color: appModelTheme.darkTheme
-                                            ? Colors.white
-                                            : Colors.black,
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        addressBtn,
+                                        textAlign: TextAlign.start,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontFamily: 'Poppins3',
+                                          fontSize: 16,
+                                          color: appModelTheme.darkTheme
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                               width: 0.9,
                               callBackFunction: () async {
@@ -223,40 +226,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           SizedBox(
                             height: 60,
                             child: CustomButton(
-                              title: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 40,
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Image.asset(
-                                        "assets/images/car.png",
-                                        width: 20,
-                                        height: 20,
-                                        color: appModelTheme.darkTheme
-                                            ? Colors.white
-                                            : null,
+                              title: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 30,
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Image.asset(
+                                          "assets/images/car.png",
+                                          width: 20,
+                                          height: 20,
+                                          color: appModelTheme.darkTheme
+                                              ? Colors.white
+                                              : null,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      getTranslated(
-                                          'Addmycar(optional)', context),
-                                      textAlign: TextAlign.start,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      style: TextStyle(
-                                        fontFamily: 'Poppins3',
-                                        fontSize: 16,
-                                        color: appModelTheme.darkTheme
-                                            ? Colors.white
-                                            : Colors.black,
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        getTranslated(
+                                            'Addmycar(optional)', context),
+                                        textAlign: TextAlign.start,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontFamily: 'Poppins3',
+                                          fontSize: 16,
+                                          color: appModelTheme.darkTheme
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                               width: 0.9,
                               callBackFunction: () {

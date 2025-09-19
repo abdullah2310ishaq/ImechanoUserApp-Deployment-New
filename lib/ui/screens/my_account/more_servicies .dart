@@ -266,12 +266,14 @@ class _MoreServiciesState extends State<MoreServicies> {
                                   // EdgeInsets.only(top: 15.h, bottom: 15.h),
                                   // textColor: Colors.white,
                                   child: Container(
-                                    alignment: Alignment.topLeft,
+                                    alignment: Alignment.centerLeft,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 16),
                                     child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Container(
+                                        Expanded(
                                           child: Text(
                                             globals.currentCount.toString() +
                                                 " " +
@@ -281,19 +283,15 @@ class _MoreServiciesState extends State<MoreServicies> {
                                                 getTranslated(
                                                     'Service', context),
                                             style: TextStyle(fontSize: 12),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          margin: EdgeInsets.only(left: 20),
                                         ),
-                                        SizedBox(
-                                          width: 40,
-                                        ),
-                                        Container(
-                                            child: Text(
+                                        Text(
                                           getTranslated(
                                               'Viewselections', context),
                                           style:
                                               TextStyle(fontFamily: "Poppins2"),
-                                        ))
+                                        ),
                                       ],
                                     ),
                                   ),

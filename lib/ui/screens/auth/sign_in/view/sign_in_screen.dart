@@ -413,12 +413,14 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget _textfiled() {
     return Container(
       child: TextFormField(
-        style: TextStyle(fontFamily: "Poppins3"),
+        style: TextStyle(
+            fontFamily: "Poppins3",
+            color: appModelTheme.darkTheme ? white : black),
         validator: validatePassword,
         controller: password,
         obscureText: showPassword,
         decoration: InputDecoration(
-          fillColor: grayE6E6E5,
+          fillColor: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
           filled: true,
           border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent),
@@ -438,7 +440,9 @@ class _SignInScreenState extends State<SignInScreen> {
           prefixIcon:
               Image.asset('assets/icons/auth/sign_up/create-password.png'),
           hintText: getTranslated('password', context),
-          hintStyle: TextStyle(fontFamily: "Poppins3", color: black),
+          hintStyle: TextStyle(
+              fontFamily: "Poppins3",
+              color: appModelTheme.darkTheme ? white : black),
           prefixIconConstraints: BoxConstraints(minWidth: 40),
           suffixIcon: IconButton(
             onPressed: () {

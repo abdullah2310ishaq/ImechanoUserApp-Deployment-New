@@ -77,14 +77,12 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
                                 ),
                                 Center(
                                   child: Image(
-                                      height: 350.h,
-                                      width: 0.99.sw,
-                                      fit: BoxFit.contain,
-                                      image: AssetImage(
-                                          'assets/icons/auth/landing.png'),
-                                      color: appModelTheme.darkTheme
-                                          ? transparent
-                                          : null),
+                                    height: 350.h,
+                                    width: 0.99.sw,
+                                    fit: BoxFit.contain,
+                                    image: AssetImage(
+                                        'assets/icons/auth/landing.png'),
+                                  ),
                                 ),
                               ],
                             ),

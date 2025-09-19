@@ -253,7 +253,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Poppins2',
-              color: Colors.black,
+              color: appModelTheme.darkTheme ? Colors.white : Colors.black,
             ),
           ),
         ],
@@ -300,7 +300,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Poppins2',
-              color: black,
+              color: appModelTheme.darkTheme ? Colors.white : black,
             ),
           ),
         ],

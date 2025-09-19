@@ -841,7 +841,9 @@ class _MySelectionPageState extends State<MySelectionPage>
                           style: TextStyle(
                             fontSize: 10,
                             fontFamily: 'Poppins3',
-                            color: Colors.black38,
+                            color: appModelTheme.darkTheme
+                                ? Colors.white70
+                                : Colors.black38,
                           ),
                         ),
                       ],
@@ -897,7 +899,7 @@ class _MySelectionPageState extends State<MySelectionPage>
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Poppins2',
-              color: Colors.black,
+              color: appModelTheme.darkTheme ? Colors.white : Colors.black,
             ),
           ),
         ],
