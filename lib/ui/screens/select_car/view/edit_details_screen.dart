@@ -40,7 +40,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
       ),
       body: ScreenUtilInit(
         designSize: Size(414, 896),
-        builder: (context, child) => StreamBuilder<CarDetailsModel>(
+        builder: () => StreamBuilder<CarDetailsModel>(
             stream: carDetailsBloc.carDetailsstream,
             builder:
                 (context, AsyncSnapshot<CarDetailsModel> carDetailsnapshort) {
@@ -49,7 +49,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
               }
               return NotificationListener<OverscrollIndicatorNotification>(
                 onNotification: (notification) {
-                  notification.disallowIndicator();
+                  notification.disallowGlow();
                   return true;
                 },
                 child: SingleChildScrollView(

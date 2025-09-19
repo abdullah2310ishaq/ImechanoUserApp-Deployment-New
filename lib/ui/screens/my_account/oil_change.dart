@@ -103,7 +103,7 @@ class _oil_ChangeState extends State<oil_Change>
       backgroundColor: appModelTheme.darkTheme ? black : Color(0xff70bdf1),
       body: ScreenUtilInit(
         designSize: Size(414, 896),
-        builder: (context, child) => SafeArea(
+        builder: () => SafeArea(
           child: Column(
             children: [
               Expanded(
@@ -149,13 +149,11 @@ class _oil_ChangeState extends State<oil_Change>
                                 // EdgeInsets.only(top: 15.h, bottom: 15.h),
                                 // textColor: Colors.white,
                                 child: Container(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 16.w),
+                                  alignment: Alignment.topLeft,
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Flexible(
+                                      Container(
                                         child: Text(
                                           globals.currentCount.toString() +
                                               " " +
@@ -163,25 +161,20 @@ class _oil_ChangeState extends State<oil_Change>
                                                   'Selected', context) +
                                               " " +
                                               getTranslated('Service', context),
-                                          style: TextStyle(
-                                            fontSize: 12.sp,
-                                            color: Colors.white,
-                                            fontFamily: "Poppins1",
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(fontSize: 14.sp),
                                         ),
+                                        margin: EdgeInsets.only(left: 20.w),
                                       ),
-                                      SizedBox(width: 8.w),
-                                      Text(
+                                      SizedBox(
+                                        width: 60.w,
+                                      ),
+                                      Container(
+                                          child: Text(
                                         getTranslated(
                                             'Viewselections', context),
-                                        style: TextStyle(
-                                          fontFamily: "Poppins2",
-                                          fontSize: 13.sp,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
+                                        style:
+                                            TextStyle(fontFamily: "Poppins2"),
+                                      ))
                                     ],
                                   ),
                                 ),

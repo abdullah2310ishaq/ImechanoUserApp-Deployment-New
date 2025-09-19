@@ -2,10 +2,9 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:back_button_interceptor/back_button_interceptor.dart';
-import 'package:badges/badges.dart' as badges;
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -106,35 +105,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   int? categorylength;
-  // Add this method to check permission status first
-  Future<void> _checkAndShowNotificationDialog() async {
-    // Check if we've already asked for permissions in this session
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool hasAskedThisSession =
-        prefs.getBool('notification_asked_this_session') ?? false;
-
-    if (!hasAskedThisSession) {
-      // Check current permission status
-      PermissionStatus status = await Permission.notification.status;
-
-      // Only show dialog if permission is not granted and not permanently denied
-      if (status.isDenied || status.isLimited) {
-        await prefs.setBool('notification_asked_this_session', true);
-        showNotificationPermissionDialog(context);
-      }
-    }
-  }
-
   @override
   void initState() {
     print("initializing");
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    // Check notification permission status before showing dialog
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       Future.delayed(Duration(seconds: 2), () {
-        _checkAndShowNotificationDialog();
+        showNotificationPermissionDialog(context);
       });
     });
 
@@ -287,16 +266,13 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: appModelTheme.darkTheme ? black : Color(0xff70bdf1),
       body: ScreenUtilInit(
         designSize: Size(414, 896),
-        child: NotificationListener<OverscrollIndicatorNotification>(
+        builder: () => NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (notification) {
             notification.disallowIndicator();
             return true;
           },
           child: SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 720),
-                child: Column(children: [
+            child: Column(children: [
               appBarWidget(),
               SizedBox(height: 20.h),
               // ElevatedButton(
@@ -696,10 +672,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-    ),
-    ),
     );
-    
   }
 
   Widget appBarWidget() {
@@ -799,7 +772,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   top: 20, bottom: 20, left: 1.w, right: 15.w),
                           child: SvgPicture.asset("assets/svg/ball.svg",
                               height: 20.h, width: 20.w))
-                      : badges.Badge(
+                      : Badge(
                           // toAnimate: false,
                           badgeContent: Text(
                             value.notifications > 99
@@ -807,11 +780,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 : '${value.notifications}',
                             style: TextStyle(color: Colors.white),
                           ),
-                          position:
-                              badges.BadgePosition.topEnd(top: 5, end: -8),
-                          badgeStyle: badges.BadgeStyle(
-                            padding: EdgeInsets.all(4),
-                          ),
+                          position: BadgePosition.topEnd(top: 5, end: -8),
+                          animationType: BadgeAnimationType.fade,
+                          padding: EdgeInsets.all(4),
                           child: Container(
                               padding: appModelTheme.appLocal == Locale("en")
                                   ? EdgeInsets.only(
@@ -956,15 +927,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontSize: 13.sp),
                           )
                         : Row(
-                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.add, color: Colors.white, size: 18.sp),
-                              SizedBox(width: 6.w),
-                              Flexible(
+                              Container(
+                                height: 40.h,
+                                margin: EdgeInsets.only(
+                                    left: 5.w, top: 5.h, right: 5.w),
+                                child: Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(width: 5.w),
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 4, 0, 0),
                                 child: Text(
                                   getTranslated('AddCar', context),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontFamily: "Poppins1",
@@ -1050,12 +1027,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 129.w,
                   child: ElevatedButton(
                     style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all<Color>(
+                        backgroundColor: MaterialStateProperty.all<Color>(
                             appModelTheme.darkTheme
                                 ? Color(0xff3e9ee0)
                                 : buttoncolor),
-                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(13.0),
                         ))),
                     // textColor: Colors.white,
@@ -1302,7 +1280,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           child: Padding(
                                                             padding:
                                                                 const EdgeInsets
-                                                                    .only(
+                                                                        .only(
                                                                     left: 10.0,
                                                                     right: 10),
                                                             child: Row(
@@ -1505,7 +1483,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: EdgeInsets.zero,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
-            childAspectRatio: (118.w / 130.h),
+            childAspectRatio: (118.w / 110.h),
             crossAxisSpacing: 14.w,
             mainAxisSpacing: 14.h),
         itemCount: categoriesSnapshot.data!.data!.length - 2,
@@ -1527,40 +1505,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         SizedBox(
-                          height: 8.h,
+                          height: 10.h,
                         ),
-                        Flexible(
-                          child: Text(
-                            getTranslated(
-                                categoriesSnapshot.data!.data![index + 2]
-                                    .categoryName!.removeAllWhitespace
-                                    .toLowerCase(),
-                                context),
-                            style: TextStyle(
-                                fontSize: 11.sp, fontFamily: 'Poppins1'),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                        Text(
+                          getTranslated(
+                              categoriesSnapshot.data!.data![index + 2]
+                                  .categoryName!.removeAllWhitespace
+                                  .toLowerCase(),
+                              context),
+                          style: TextStyle(
+                              fontSize: 12.sp, fontFamily: 'Poppins1'),
                         ),
                         SizedBox(
-                          height: 6.h,
+                          height: 10.h,
                         ),
-                        Flexible(
-                          flex: 2,
-                          child: Image(
-                            fit: BoxFit.contain,
-                            image: NetworkImage(
-                                "${categoriesSnapshot.data!.data![index + 2].icon}"),
-                            height: 50.h,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 8.h,
+                        Image(
+                          // fit: BoxFit.contain,
+                          image: NetworkImage(
+                              "${categoriesSnapshot.data!.data![index + 2].icon}"),
+                          height: 60.h,
                         ),
                       ],
                     ),
@@ -2197,18 +2162,6 @@ class _HomeScreenState extends State<HomeScreen> {
 void showNotificationPermissionDialog(BuildContext context) async {
   // Show custom dialog
   PermissionStatus status = await Permission.notification.status;
-
-  // Don't show dialog if permission is already granted or permanently denied
-  if (status.isGranted) {
-    log('Notification permission already granted, skipping dialog');
-    return;
-  }
-
-  if (status.isPermanentlyDenied) {
-    log('Notification permission permanently denied, skipping dialog');
-    return;
-  }
-
   if (!status.isGranted) {
     final result = await showDialog<bool>(
       context: context,
@@ -2289,59 +2242,32 @@ Future<void> requestNotificationPermission() async {
       );
     }
   } else if (Platform.isIOS) {
-    // For iOS, use Firebase messaging to check and request permissions
-    final messaging = FirebaseMessaging.instance;
-    NotificationSettings currentSettings =
-        await messaging.getNotificationSettings();
-
-    // Only request if not already determined
-    if (currentSettings.authorizationStatus ==
-        AuthorizationStatus.notDetermined) {
-      final settings = await messaging.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
-
-      bool granted =
-          settings.authorizationStatus == AuthorizationStatus.authorized ||
-              settings.authorizationStatus == AuthorizationStatus.provisional;
-
-      if (granted == false) {
-        Get.snackbar(
-          'Warning!',
-          'Notification permissions are denied on iOS.',
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+    // Request permissions for iOS
+    final plugin = FlutterLocalNotificationsPlugin();
+    bool? granted = await plugin
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
         );
-        await openAppSettings();
-      } else {
-        Get.snackbar(
-          'Success!',
-          'Notification permissions granted on iOS.',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
-      }
-    } else if (currentSettings.authorizationStatus ==
-            AuthorizationStatus.authorized ||
-        currentSettings.authorizationStatus ==
-            AuthorizationStatus.provisional) {
+
+    if (granted == false) {
       Get.snackbar(
-        'Info!',
-        'Notification permissions are already granted on iOS.',
-        backgroundColor: Colors.blue,
-        colorText: Colors.white,
-      );
-    } else {
-      // Permission denied or restricted
-      Get.snackbar(
-        'Error!',
-        'Notification permissions are denied. Please enable them from settings.',
+        'Warning!',
+        'Notification permissions are denied on iOS.',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
       await openAppSettings();
+    } else {
+      Get.snackbar(
+        'Success!',
+        'Notification permissions granted on iOS.',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
     }
   }
 }

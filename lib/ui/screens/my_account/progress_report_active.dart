@@ -80,7 +80,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
     appModelTheme = appModel;
     return ScreenUtilInit(
         designSize: Size(360, 690),
-        builder: (context, child) => WillPopScope(
+        builder: () => WillPopScope(
               onWillPop: () async {
                 if (!Navigator.of(context).canPop()) {
                   // If there's no screen in the stack, navigate to home screen
@@ -223,7 +223,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
                                                           child: Padding(
                                                             padding:
                                                                 const EdgeInsets
-                                                                    .only(
+                                                                        .only(
                                                                     bottom: 10),
                                                             child:
                                                                 Image.network(
@@ -464,11 +464,9 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
       context: context,
       builder: (_) => Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: hh * 0.65,
-          ),
+        insetPadding: EdgeInsets.all(20.h),
+        child: Container(
+          height: hh * 0.43,
           child: _DateTime(),
         ),
       ),
@@ -849,7 +847,6 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
         elevation: 10,
         color: appModelTheme.darkTheme ? darkmodeColor : Colors.white,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
               width: double.infinity,
@@ -893,7 +890,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
               ),
             ),
             _dateAndTime(),
-            SizedBox(height: 12),
+            Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -1017,10 +1014,10 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 30.h),
               ],
             ),
-            SizedBox(height: 10)
+            SizedBox(height: 50.h)
           ],
         ),
       ),
@@ -1029,7 +1026,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
 
   Widget _dateAndTime() {
     return Container(
-      height: hh * 0.28,
+      height: hh * 0.25,
       child: CupertinoDatePicker(
         minimumDate: DateTime.now(),
         mode: CupertinoDatePickerMode.dateAndTime,
@@ -1563,10 +1560,14 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
     try {
       var pickedfiles = await _picker.pickMultiImage();
       //you can use ImageCourse.camera for Camera capture
-      setState(() {
-        imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
-      });
-      Navigator.pop(context);
+      if (pickedfiles != null) {
+        setState(() {
+          imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
+        });
+        Navigator.pop(context);
+      } else {
+        print("No image is selected.");
+      }
     } catch (e) {
       print("error while picking file.");
     }

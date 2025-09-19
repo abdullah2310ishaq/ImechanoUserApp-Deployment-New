@@ -1,6 +1,6 @@
 // ignore_for_file: must_be_immutable, unnecessary_brace_in_string_interps
 
-import 'package:badges/badges.dart' as badges;
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -31,7 +31,7 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.title = '',
     this.menuItem,
     this.home,
-    this.height = kToolbarHeight,
+    this.height: kToolbarHeight,
     this.action,
     this.action2,
     this.flag = true,
@@ -50,7 +50,7 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
     appModelTheme = appModel;
     return ScreenUtilInit(
       // designSize: Size(500, 896),
-      builder: (context, child) => AppBar(
+      builder: () => AppBar(
         key: _key,
         toolbarHeight: preferredSize.height,
         leadingWidth: preferredSize.width,
@@ -153,7 +153,7 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
                         "${action2}",
                       ),
                     )
-                  : badges.Badge(
+                  : Badge(
                       // toAnimate: false,
                       badgeContent: Text(
                         value.notifications > 99
@@ -161,7 +161,9 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
                             : '${value.notifications}',
                         style: TextStyle(color: Colors.white),
                       ),
-                      position: badges.BadgePosition.topEnd(top: 5, end: 10),
+                      position: BadgePosition.topEnd(top: 5, end: 10),
+                      animationType: BadgeAnimationType.fade,
+                      padding: EdgeInsets.all(4),
                       child: Padding(
                         padding: EdgeInsets.only(
                             top: 15, right: 17, bottom: 15, left: 13),

@@ -11,7 +11,6 @@ import 'package:imechano/localization/language_constrants.dart';
 import 'package:imechano/ui/modal/booking_list_model.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
 import 'package:imechano/ui/screens/bottombar/bottom_bar.dart';
-
 import 'package:imechano/ui/shared/widgets/appbar/custom_appbar_widget.dart';
 import 'package:imechano/ui/styling/colors.dart';
 import 'package:intl/intl.dart';
@@ -70,7 +69,7 @@ class _BookingListShowState extends State<BookingListShow>
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
     getAddress();
     getTotal();
     pickupConditionsListBloc
@@ -92,7 +91,7 @@ class _BookingListShowState extends State<BookingListShow>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
   }
 
@@ -173,7 +172,7 @@ class _BookingListShowState extends State<BookingListShow>
               ),
               child: NotificationListener<OverscrollIndicatorNotification>(
                 onNotification: (notification) {
-                  notification.disallowIndicator();
+                  notification.disallowGlow();
                   return true;
                 },
                 child: SingleChildScrollView(

@@ -174,7 +174,7 @@ class JobsState extends State<Jobs> {
           drawer: drawerpage(),
           body: ScreenUtilInit(
             designSize: Size(414, 896),
-            builder: (context, child) =>
+            builder: () =>
                 NotificationListener<OverscrollIndicatorNotification>(
               onNotification: (notification) {
                 notification.disallowIndicator();

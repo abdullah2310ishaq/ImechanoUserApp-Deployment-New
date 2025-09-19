@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'package:imechano/ui/modal/customer_notification_list_model.dart';
 import 'package:imechano/ui/modal/notification_count_model.dart';
@@ -7,6 +10,9 @@ import 'package:imechano/ui/share_preferences/pref_key.dart';
 import 'package:imechano/ui/share_preferences/preference.dart';
 import 'package:imechano/ui/styling/config.dart';
 import 'package:imechano/utils/utils.dart';
+import 'dart:io' show Platform;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class NotificationApi {
   static Future<NotificationCountModel> getNotificationCount() async {
@@ -73,4 +79,6 @@ class NotificationApi {
 
     return deleted;
   }
+
+ 
 }

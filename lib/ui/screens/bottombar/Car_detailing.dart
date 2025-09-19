@@ -104,7 +104,7 @@ class _CarDetailingState extends State<CarDetailing> {
         backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
         body: ScreenUtilInit(
           designSize: Size(414, 896),
-          builder: (context, child) => SafeArea(
+          builder: () => SafeArea(
             child: Column(children: [
               Expanded(
                 child: Container(
@@ -386,6 +386,104 @@ class _CarDetailingState extends State<CarDetailing> {
     );
   }
 
+  Widget _textContainer() {
+    return Padding(
+      padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      child: Container(
+        height: 105.h,
+        width: 414.w,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Color(0xffE6E6E5),
+            width: 1, //                   <--- border width here
+          ),
+          color: appModelTheme.darkTheme ? darkmodeColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text(
+            'Please enter whatever you are\n experincing in the car',
+            style: TextStyle(fontSize: 15.sp, fontFamily: 'Poppins3'),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _dotBorder() {
+    // ================================by jenish=====================
+    return Padding(
+      padding: EdgeInsets.only(left: 20, right: 20),
+      child: DottedBorder(
+        dashPattern: [6, 6],
+        color: appModelTheme.darkTheme ? white : Color(0xffBFBFBF),
+        borderType: BorderType.RRect,
+        radius: Radius.circular(12),
+        padding: EdgeInsets.all(6),
+        child: ClipRRect(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          child: Container(
+              // =================================by jenish =======================
+              height: 92.h,
+              width: 354.w,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Row(
+                children: [
+                  SizedBox(width: 10.w),
+                  Column(
+                    // =============================================by jenish==================
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 5, top: 7),
+                        child: Text(
+                          'Upload Your Car Photo',
+                          style: TextStyle(
+                              fontSize: 13.sp, fontFamily: 'Montserrat1'),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10.h,
+                      ),
+                      Container(
+                        // ==========================================by jenish=============================
+                        height: 33,
+                        width: 155,
+                        child: Row(
+                          children: [
+                            SizedBox(width: 20.w),
+                            Text(
+                              'Picture Upload',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12.sp,
+                                  fontFamily: 'Montserrat1'),
+                            ),
+                            SizedBox(width: 10.w),
+                            Icon(
+                              Icons.file_upload_outlined,
+                              size: 22.sp,
+                              color: buttonGrayE8E8E7Border,
+                            )
+                          ],
+                        ),
+                        decoration: BoxDecoration(
+                          color: uploadbutton,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              )),
+        ),
+      ),
+    );
+  }
+
   Widget _appoinmentButton() {
     return Container(
       // =========================new============== by jenish====================
@@ -393,11 +491,11 @@ class _CarDetailingState extends State<CarDetailing> {
       width: 327.w,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(10.0),
           ),
-          backgroundColor: Color(0xff70BDF1), // foreground
+          primary: Color(0xff70BDF1), // background
+          onPrimary: Colors.white, // foreground
         ),
         onPressed: () {
           if (!isCarAdded ||
@@ -727,10 +825,14 @@ class _CarDetailingState extends State<CarDetailing> {
     try {
       var pickedfiles = await _picker.pickMultiImage();
       //you can use ImageCourse.camera for Camera capture
-      setState(() {
-        imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
-      });
-      Navigator.pop(context);
+      if (pickedfiles != null) {
+        setState(() {
+          imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
+        });
+        Navigator.pop(context);
+      } else {
+        print("No image is selected.");
+      }
     } catch (e) {
       print("error while picking file.");
     }

@@ -140,17 +140,29 @@ class _drawerpageState extends State<drawerpage> {
         "assets/icons/My Account/Sign_in.png",
       ];
     } else {
-      // Guest mode: only show Home, FAQs, Privacy Policy
       drawerTitle = [
         "Home",
+        "My Vehicle",
+        "My Bookings",
+        "My Location",
+        "My Invoices",
+        "Notification",
         "FAQs",
         "Privacy Policy",
+        "Dark Theme"
       ];
 
       drawerGuestIcon = [
         "assets/icons/My Account/noun_Home_4334361.png",
+        "assets/icons/My Account/Path 8567.png",
+        "assets/icons/My Account/noun_calender_2189968.png",
+        "assets/icons/My Account/locatiorn.png",
+        "assets/icons/My Account/file-text.png",
+        "assets/icons/My Account/Desk_alt_fill.png",
+        "assets/icons/My Account/notifications_black_24dp.png",
         "assets/icons/My Account/Desk_alt_fill.png",
         "assets/icons/My Account/Chield_check_fill.png",
+        "assets/icons/My Account/Path 131.png"
       ];
     }
   }
@@ -160,324 +172,236 @@ class _drawerpageState extends State<drawerpage> {
   Widget build(BuildContext context) {
     final appModel = Provider.of<AppModel>(context);
     appModelTheme = appModel;
-    return Drawer(
-      key: _key,
-      backgroundColor:
-          appModelTheme.darkTheme ? const Color(0xFF252525) : Colors.white,
-      width: 320,
-      child: Column(
-        children: [
-          userStr
-              ? Container(
-                  height: 186.h,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: logoBlue,
-                    borderRadius: BorderRadius.only(
-                        bottomRight: Radius.circular(30),
-                        bottomLeft: Radius.circular(30)),
-                  ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        PrefObj.preferences!.containsKey(PrefKeys.PROFILE_IMG)
-                            ? Center(
-                                child: CircleAvatar(
-                                  radius: 55.h,
-                                  backgroundImage: NetworkImage(PrefObj
-                                      .preferences!
-                                      .get(PrefKeys.PROFILE_IMG)),
+
+    return ScreenUtilInit(
+      designSize: Size(414, 896),
+      builder: () => Drawer(
+        key: _key,
+        child: Column(
+          children: [
+            userStr
+                ? Container(
+                    height: 186.h,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: logoBlue,
+                      borderRadius: BorderRadius.only(
+                          bottomRight: Radius.circular(30),
+                          bottomLeft: Radius.circular(30)),
+                    ),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          PrefObj.preferences!.containsKey(PrefKeys.PROFILE_IMG)
+                              ? Center(
+                                  child: CircleAvatar(
+                                    radius: 55.h,
+                                    backgroundImage: NetworkImage(PrefObj
+                                        .preferences!
+                                        .get(PrefKeys.PROFILE_IMG)),
+                                  ),
+                                )
+                              : Center(
+                                  child: CircleAvatar(
+                                    radius: 55.h,
+                                    child: Icon(Icons.person, size: 50.sp),
+                                  ),
                                 ),
-                              )
-                            : Center(
-                                child: CircleAvatar(
-                                  radius: 55.h,
-                                  child: Icon(Icons.person, size: 50.sp),
-                                ),
+                          SizedBox(
+                            width: 20.w,
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                profilename.toUpperCase(),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: "Montserrat3  ",
+                                    color: Colors.white,
+                                    fontSize: 18.sp),
                               ),
+                              Text(
+                                userphoneno,
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 13.sp),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : Container(
+                    height: 186.h,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: logoBlue,
+                      borderRadius: BorderRadius.only(
+                          bottomRight: Radius.circular(30),
+                          bottomLeft: Radius.circular(30)),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image(
+                          image: AssetImage("assets/icons/splash/logo.png"),
+                          height: 50.h,
+                        ),
                         SizedBox(
-                          width: 20.w,
+                          height: MediaQuery.of(context).size.height * 0.02,
                         ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              profilename.toUpperCase(),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: "Montserrat3  ",
-                                  color: Colors.white,
-                                  fontSize: 18.sp),
-                            ),
-                            Text(
-                              userphoneno,
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 13.sp),
-                            )
-                          ],
-                        ),
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.04,
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                          ),
+                          child: MaterialButton(
+                            child: Text("Login"),
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  return SignInScreen();
+                                },
+                              ));
+                            },
+                          ),
+                        )
                       ],
                     ),
                   ),
-                )
-              : Container(
-                  height: 186.h,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: logoBlue,
-                    borderRadius: BorderRadius.only(
-                        bottomRight: Radius.circular(30),
-                        bottomLeft: Radius.circular(30)),
-                  ),
+            Expanded(
+              child: Container(
+                  child: NotificationListener<OverscrollIndicatorNotification>(
+                onNotification: (notification) {
+                  notification.disallowGlow();
+                  return true;
+                },
+                child: SingleChildScrollView(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image(
-                        image: AssetImage("assets/icons/splash/logo.png"),
-                        height: 50.h,
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.02,
-                      ),
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.04,
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                        ),
-                        child: MaterialButton(
-                          child: Text("Login"),
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(
-                              builder: (context) {
-                                return SignInScreen();
+                      // //todo drawer if login
+
+                      ListView.separated(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              onTap: () {
+                                if (userStr ? index == 11 : index == 12) {
+                                  Container();
+                                } else {
+                                  if (index == 12) {
+                                    logOutDialog();
+                                  } else if (index == 10) {
+                                    Container();
+                                  } else if (index == 0) {
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                            builder: (context) => userStr
+                                                ? pageMyAccount[index]
+                                                : pageDrawer[index]),
+                                        (Route<dynamic> route) => false);
+                                  } else {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => userStr
+                                                ? pageMyAccount[index]
+                                                : pageDrawer[index]));
+                                  }
+                                }
                               },
-                            ));
+                              child: index == drawerGuestIcon.length - 3
+                                  ? ListTile(
+                                      trailing: Switch(
+                                        value: langSwitch,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            if (langSwitch) {
+                                              changeLocale(
+                                                  profileData['id'], 'en');
+                                              selectedLocale = Locale('en');
+                                              appModel.changeLanguage(
+                                                  selectedLocale);
+
+                                              langSwitch = false;
+                                            } else {
+                                              changeLocale(
+                                                  profileData['id'], 'ar');
+                                              selectedLocale = Locale('ar');
+                                              appModel.changeLanguage(
+                                                  selectedLocale);
+                                              langSwitch = true;
+                                            }
+                                          });
+                                        },
+                                      ),
+                                      contentPadding:
+                                          EdgeInsets.fromLTRB(30.w, 0, 30.w, 0),
+                                      leading: SizedBox(
+                                        height: 25.h,
+                                        child: Image(
+                                            image: AssetImage(
+                                                drawerGuestIcon[index])),
+                                      ),
+                                      title: Text(
+                                        getTranslated(
+                                            drawerTitle[index]
+                                                .toString()
+                                                .removeAllWhitespace
+                                                .toLowerCase(),
+                                            context),
+                                        style: TextStyle(
+                                            fontFamily: "Poppins1",
+                                            fontSize: 15),
+                                      ),
+                                    )
+                                  : ListTile(
+                                      trailing: userStr
+                                          ? index == drawerGuestIcon.length - 2
+                                              ? switchButton()
+                                              : Text("")
+                                          : index == drawerGuestIcon.length - 1
+                                              ? switchButton()
+                                              : Text(""),
+                                      contentPadding:
+                                          EdgeInsets.fromLTRB(30.w, 0, 30.w, 0),
+                                      leading: SizedBox(
+                                        height: 25.h,
+                                        child: Image(
+                                            image: AssetImage(
+                                                drawerGuestIcon[index])),
+                                      ),
+                                      title: Text(
+                                        getTranslated(
+                                            drawerTitle[index]
+                                                .toString()
+                                                .removeAllWhitespace
+                                                .toLowerCase(),
+                                            context),
+                                        style: TextStyle(
+                                            fontFamily: "Poppins1",
+                                            fontSize: 15),
+                                      ),
+                                    ),
+                            );
                           },
-                        ),
-                      )
+                          separatorBuilder: (context, index) {
+                            return Container(height: 0, child: Divider());
+                          },
+                          itemCount: drawerGuestIcon.length),
                     ],
                   ),
                 ),
-          Expanded(
-            child: Container(
-                child: NotificationListener<OverscrollIndicatorNotification>(
-              onNotification: (notification) {
-                notification.disallowIndicator();
-                return true;
-              },
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // Drawer items
-
-                    ListView.separated(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          // Simplified guest behavior: only 3 items
-                          if (!userStr) {
-                            return ListTile(
-                              contentPadding:
-                                  EdgeInsets.fromLTRB(30.w, 0, 30.w, 0),
-                              leading: SizedBox(
-                                height: 25.h,
-                                child: Image(
-                                    image: AssetImage(drawerGuestIcon[index])),
-                              ),
-                              title: Text(
-                                getTranslated(
-                                    drawerTitle[index]
-                                        .toString()
-                                        .removeAllWhitespace
-                                        .toLowerCase(),
-                                    context),
-                                style: TextStyle(
-                                    fontFamily: "Poppins1", fontSize: 15),
-                              ),
-                              onTap: () {
-                                // Close drawer before navigating
-                                Navigator.of(context).pop();
-                                if (index == 0) {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => HomeScreen()));
-                                } else if (index == 1) {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => FAQsPage()));
-                                } else if (index == 2) {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => PolicyScreen(
-                                                mdFileName: 'term_privacy.md',
-                                              )));
-                                }
-                              },
-                            );
-                          }
-                          // Logged-in special handling for Dark Theme: tap to toggle (no switch)
-                          final String _titleRaw =
-                              drawerTitle[index].toString();
-                          if (userStr && _titleRaw == 'Dark Theme') {
-                            final bool isDark = appModelTheme.darkTheme;
-                            return ListTile(
-                              contentPadding:
-                                  EdgeInsets.fromLTRB(30.w, 0, 30.w, 0),
-                              leading: SizedBox(
-                                height: 25.h,
-                                child: Image(
-                                    image: AssetImage(drawerGuestIcon[index])),
-                              ),
-                              title: Text(
-                                getTranslated(
-                                    _titleRaw.toLowerCase().removeAllWhitespace,
-                                    context),
-                                style: TextStyle(
-                                    fontFamily: "Poppins1",
-                                    fontSize: 15,
-                                    color: isDark
-                                        ? Colors.white
-                                        : const Color(0xFF374049)),
-                              ),
-                              trailing: Icon(
-                                isDark
-                                    ? Icons.wb_sunny_rounded
-                                    : Icons.dark_mode_rounded,
-                                color: isDark ? Colors.white70 : Colors.black54,
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  appModelTheme.darkTheme =
-                                      !appModelTheme.darkTheme;
-                                });
-                                // Navigate to Home to normalize layout after theme flip
-                                Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                        builder: (context) => BottomBarPage(2)),
-                                    (Route<dynamic> route) => false);
-                              },
-                            );
-                          }
-                          return GestureDetector(
-                            onTap: () {
-                              if (userStr ? index == 11 : index == 12) {
-                                Container();
-                              } else {
-                                if (index == 12) {
-                                  logOutDialog();
-                                } else if (index == 10) {
-                                  Container();
-                                } else if (index == 0) {
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) => userStr
-                                              ? pageMyAccount[index]
-                                              : pageDrawer[index]),
-                                      (Route<dynamic> route) => false);
-                                } else {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => userStr
-                                              ? pageMyAccount[index]
-                                              : pageDrawer[index]));
-                                }
-                              }
-                            },
-                            child: index == drawerGuestIcon.length - 3
-                                ? ListTile(
-                                    trailing: Switch(
-                                      value: langSwitch,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          if (langSwitch) {
-                                            changeLocale(
-                                                profileData['id'], 'en');
-                                            selectedLocale = Locale('en');
-                                            appModel
-                                                .changeLanguage(selectedLocale);
-
-                                            langSwitch = false;
-                                          } else {
-                                            changeLocale(
-                                                profileData['id'], 'ar');
-                                            selectedLocale = Locale('ar');
-                                            appModel
-                                                .changeLanguage(selectedLocale);
-                                            langSwitch = true;
-                                          }
-                                        });
-                                      },
-                                      activeColor: logoBlue,
-                                      activeTrackColor: buttonBlue3b5999,
-                                      inactiveThumbColor: Colors.grey,
-                                      inactiveTrackColor: Colors.black26,
-                                    ),
-                                    contentPadding:
-                                        EdgeInsets.fromLTRB(30.w, 0, 30.w, 0),
-                                    leading: SizedBox(
-                                      height: 25.h,
-                                      child: Image(
-                                          image: AssetImage(
-                                              drawerGuestIcon[index])),
-                                    ),
-                                    title: Text(
-                                      getTranslated(
-                                          drawerTitle[index]
-                                              .toString()
-                                              .removeAllWhitespace
-                                              .toLowerCase(),
-                                          context),
-                                      style: TextStyle(
-                                          fontFamily: "Poppins1", fontSize: 15),
-                                    ),
-                                  )
-                                : ListTile(
-                                    trailing: userStr
-                                        ? index == drawerGuestIcon.length - 2
-                                            ? switchButton()
-                                            : Text("")
-                                        : index == drawerGuestIcon.length - 1
-                                            ? switchButton()
-                                            : Text(""),
-                                    contentPadding:
-                                        EdgeInsets.fromLTRB(30.w, 0, 30.w, 0),
-                                    leading: SizedBox(
-                                      height: 25.h,
-                                      child: Image(
-                                          image: AssetImage(
-                                              drawerGuestIcon[index])),
-                                    ),
-                                    title: Text(
-                                      getTranslated(
-                                          drawerTitle[index]
-                                              .toString()
-                                              .removeAllWhitespace
-                                              .toLowerCase(),
-                                          context),
-                                      style: TextStyle(
-                                          fontFamily: "Poppins1", fontSize: 15),
-                                    ),
-                                  ),
-                          );
-                        },
-                        separatorBuilder: (context, index) {
-                          return Container(height: 0, child: Divider());
-                        },
-                        itemCount: drawerGuestIcon.length),
-                  ],
-                ),
-              ),
-            )),
-          ),
-        ],
+              )),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -516,17 +440,15 @@ class _drawerpageState extends State<drawerpage> {
           isSwitch
               ? ThemeData(
                   brightness: Brightness.dark,
+                  /* light theme settings */
                 )
               : ThemeData(
                   brightness: Brightness.light,
+                  /* dark theme settings */
                 );
           isSwitch = value;
         });
       },
-      activeColor: logoBlue,
-      activeTrackColor: buttonBlue3b5999,
-      inactiveThumbColor: Colors.grey,
-      inactiveTrackColor: Colors.black26,
     );
   }
 

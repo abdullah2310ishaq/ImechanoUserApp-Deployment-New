@@ -436,7 +436,7 @@ class _MyAccountState extends State<MyAccount> {
               key: _formKey,
               child: ScreenUtilInit(
                 designSize: Size(414, 896),
-                builder: (context, child) => SafeArea(
+                builder: () => SafeArea(
                   child: Column(children: [
                     SizedBox(height: 10.h),
                     appBarWidget(),
@@ -472,7 +472,7 @@ class _MyAccountState extends State<MyAccount> {
       ),
       child: NotificationListener<OverscrollIndicatorNotification>(
         onNotification: (notification) {
-          notification.disallowIndicator();
+          notification.disallowGlow();
           return true;
         },
         child: SingleChildScrollView(

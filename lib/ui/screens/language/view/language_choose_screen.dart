@@ -55,7 +55,7 @@ class _LanguageChooseScreenState extends State<LanguageChooseScreen> {
       onWillPop: _onWillPop,
       child: ScreenUtilInit(
         designSize: Size(414, 896),
-        builder: (context, child) => Scaffold(
+        builder: () => Scaffold(
           backgroundColor: appModelTheme.darkTheme ? Color(0xff252525) : white,
           body: Container(
             // height: size.height * 0.9,

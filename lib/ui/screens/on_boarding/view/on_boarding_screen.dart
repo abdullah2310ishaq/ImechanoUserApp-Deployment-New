@@ -24,7 +24,7 @@ class OnBoardingScreen extends StatelessWidget {
     return Scaffold(
       body: ScreenUtilInit(
         designSize: Size(414, 896),
-        builder: (context, child) => Stack(
+        builder: () => Stack(
           children: [
             PageView.builder(
               controller: _pageController,

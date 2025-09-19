@@ -8,6 +8,7 @@ import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:imechano/localization/language_constrants.dart';
@@ -90,46 +91,43 @@ class _SignInScreenState extends State<SignInScreen> {
     return Scaffold(
         body: ScreenUtilInit(
       designSize: Size(414, 896),
-      builder: (context, child) =>
-          NotificationListener<OverscrollIndicatorNotification>(
+      builder: () => NotificationListener<OverscrollIndicatorNotification>(
         onNotification: (notification) {
-          notification.disallowIndicator();
+          notification.disallowGlow();
           return true;
         },
         child: SingleChildScrollView(
           child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 700),
-              child: Container(
-                height: 1.sh,
-                padding: EdgeInsets.symmetric(horizontal: 25.w),
-                child: Form(
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              padding: EdgeInsets.only(left: 25, right: 25),
+              child: Form(
                 key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: 0.1.sh),
-                    Image.asset(
-                      "assets/icons/splash/logo.png",
-                      height: 0.11.sh,
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                    SvgPicture.asset(
+                      "assets/svg/imechano-logo.svg",
+                      height: MediaQuery.of(context).size.height * 0.11,
                       color: appModelTheme.darkTheme ? white : null,
                     ),
-                    SizedBox(height: 35.h),
+                    SizedBox(height: 35),
                     Text(
                       getTranslated("loginaccount", context),
                       style: TextStyle(
                           fontFamily: "poppins2",
-                          fontSize: 21.sp,
+                          fontSize: 21,
                           color: logoBlue),
                     ),
                     Text(
                       getTranslated("withyourphonenumber", context),
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 14,
                         fontFamily: "Poppins3",
                       ),
                     ),
-                    SizedBox(height: 35.h),
+                    SizedBox(height: 35),
                     CustomForm(
                       fillColor:
                           appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
@@ -143,7 +141,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       imagePath: 'assets/icons/auth/sign_up/mobile-number.png',
                       hintText: getTranslated('mobileno.orEmail', context),
                     ),
-                    SizedBox(height: 16.h),
+                    SizedBox(height: 16),
                     _textfiled(),
                     Container(
                       width: MediaQuery.of(context).size.width,
@@ -163,12 +161,12 @@ class _SignInScreenState extends State<SignInScreen> {
                                   child: NotificationListener<
                                       OverscrollIndicatorNotification>(
                                     onNotification: (notification) {
-                                      notification.disallowIndicator();
+                                      notification.disallowGlow();
                                       return true;
                                     },
                                     child: Container(
                                       margin: EdgeInsets.only(
-                                          left: 25.w, right: 25.w, top: 5.h),
+                                          left: 25, right: 25, top: 5),
                                       height:
                                           MediaQuery.of(context).size.height *
                                               0.6,
@@ -185,14 +183,14 @@ class _SignInScreenState extends State<SignInScreen> {
                                                 "Forgot Password",
                                                 style: TextStyle(
                                                     fontFamily: "Poppins3",
-                                                    fontSize: 26.sp,
+                                                    fontSize: 26,
                                                     fontWeight: FontWeight.bold,
                                                     color:
                                                         appModelTheme.darkTheme
                                                             ? logoBlue
                                                             : logoBlue),
                                               ),
-                                              SizedBox(height: 10.h),
+                                              SizedBox(height: 10),
                                               Text(
                                                 "ENTER YOUR REGISTERED email FOR THE \n VERIFICATION PROCESS, WE WILL SEND \n  4 DIGITS CODE TO YOUR EMAIL.",
                                                 textAlign: TextAlign.center,
@@ -200,7 +198,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                                     decoration: TextDecoration
                                                         .underline,
                                                     fontFamily: "Poppins3",
-                                                    fontSize: 13.sp),
+                                                    fontSize: 13),
                                               ),
                                               SizedBox(height: 35.h),
                                               CustomForm(
@@ -233,7 +231,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                                                 .darkTheme
                                                             ? white
                                                             : Color(0xffBFBFBF),
-                                                        height: 36.h,
+                                                        height: 36,
                                                       )),
                                                 ),
                                                 Text(
@@ -252,7 +250,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                                                 .darkTheme
                                                             ? white
                                                             : Color(0xffBFBFBF),
-                                                        height: 36.h,
+                                                        height: 36,
                                                       )),
                                                 ),
                                               ]),
@@ -280,7 +278,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                               CustomButton(
                                                 title:
                                                     Regular20White('Continue'),
-                                                width: 0.9.sw,
+                                                width: 0.9.w,
                                                 bgColor: logoBlue,
                                                 borderColor: logoBlue,
                                                 callBackFunction: () {
@@ -310,7 +308,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                                 height: 10.h,
                                               ),
                                             ],
-                ),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -329,16 +327,14 @@ class _SignInScreenState extends State<SignInScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 20.h),
+                    Spacer(),
                     CustomButton(
                       title: Text(
                         getTranslated('signin', context),
-                        style: TextStyle(
-                            fontSize: 18.sp,
-                            fontFamily: "Poppins1",
-                            color: Colors.white),
+                        style:
+                            TextStyle(fontSize: 18.sp, fontFamily: "Poppins1"),
                       ),
-                      width: 0.9,
+                      width: 0.9.w,
                       bgColor: logoBlue,
                       borderColor: logoBlue,
                       callBackFunction: () {
@@ -351,16 +347,14 @@ class _SignInScreenState extends State<SignInScreen> {
                         }
                       },
                     ),
-                    SizedBox(height: 16.h),
+                    Spacer(),
                     CustomButton(
                       title: Text(
                         getTranslated('guest', context),
-                        style: TextStyle(
-                            fontSize: 18.sp,
-                            fontFamily: "Poppins1",
-                            color: Colors.white),
+                        style:
+                            TextStyle(fontSize: 18.sp, fontFamily: "Poppins1"),
                       ),
-                      width: 0.9,
+                      width: 0.9.w,
                       bgColor: logoBlue,
                       borderColor: logoBlue,
                       callBackFunction: () {
@@ -408,20 +402,18 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
       ),
-    ),
-    ),
-    );
+    ));
   }
 
   Widget _textfiled() {
     return Container(
       child: TextFormField(
-        style: TextStyle(fontFamily: "Poppins3", color: Colors.white),
+        style: TextStyle(fontFamily: "Poppins3"),
         validator: validatePassword,
         controller: password,
         obscureText: showPassword,
         decoration: InputDecoration(
-          fillColor: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
+          fillColor: grayE6E6E5,
           filled: true,
           border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent),
@@ -469,25 +461,25 @@ class _SignInScreenState extends State<SignInScreen> {
         key: _formKey2,
         child: NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (notification) {
-            notification.disallowIndicator();
+            notification.disallowGlow();
             return true;
           },
           child: Container(
-            margin: EdgeInsets.only(left: 25.w, right: 25.w),
-            height: 0.6.sh,
+            margin: EdgeInsets.only(left: 25, right: 25),
+            height: MediaQuery.of(context).size.height * 0.6,
             child: Padding(
               padding: MediaQuery.of(context).viewInsets,
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    SizedBox(height: 40.h),
+                    SizedBox(height: 40),
                     Text("Enter 4 Digits Code",
                         style: TextStyle(
                             fontFamily: "Poppins3",
-                            fontSize: 26.sp,
+                            fontSize: 26,
                             fontWeight: FontWeight.bold,
                             color: logoBlue)),
-                    SizedBox(height: 20.h),
+                    SizedBox(height: 20),
                     Column(
                       children: [
                         Text(
@@ -495,10 +487,10 @@ class _SignInScreenState extends State<SignInScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontFamily: "Poppins1",
-                              fontSize: 14.sp,
+                              fontSize: 14,
                             )),
                         SizedBox(
-                          height: 30.h,
+                          height: 30,
                         ),
                         OtpTextField(
                           numberOfFields: 4,
@@ -528,7 +520,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           }, // end onSubmit
                         ),
                         SizedBox(
-                          height: 45.h,
+                          height: 45,
                         ),
                         // CustomButton(
                         //   title: Text(
@@ -556,7 +548,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         //     }
                         //   },
                         // ),
-                        SizedBox(height: 20.h),
+                        SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -566,7 +558,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               style: TextStyle(
                                   fontFamily: "Poppins1",
                                   height: 1.8,
-                                  fontSize: 14.sp),
+                                  fontSize: 14),
                             ),
                             TextButton(
                               onPressed: () {
@@ -581,7 +573,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                     fontFamily: "Poppins1",
                                     color: Colors.red,
                                     height: 1.8,
-                                    fontSize: 14.sp),
+                                    fontSize: 14),
                               ),
                             ),
                           ],
@@ -852,9 +844,6 @@ class _SignInScreenState extends State<SignInScreen> {
         Loader().hideLoader(context);
         snackBar('Login Success!!');
 
-        // Check for account deletion status
-        _checkAccountDeletionStatus(isLogin.data!.id!);
-
         // Navigator.pushReplacement(
         //   context,
         //   MaterialPageRoute(
@@ -912,218 +901,6 @@ class _SignInScreenState extends State<SignInScreen> {
         content: Text(message),
         duration: Duration(seconds: 2),
       ),
-    );
-  }
-
-  void _checkAccountDeletionStatus(String userId) {
-    // Check if account deletion was requested
-    bool isDeletionRequested =
-        PrefObj.preferences!.containsKey(PrefKeys.ACCOUNT_DELETION_REQUESTED);
-
-    if (!isDeletionRequested) {
-      // No deletion requested, proceed normally
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => BottomBarPage(2)),
-          (Route<dynamic> route) => false);
-      return;
-    }
-
-    // Account deletion was requested, check if it's overdue
-    if (!PrefObj.preferences!.containsKey(PrefKeys.ACCOUNT_DELETION_DATE)) {
-      // No deletion date set, clear the flag and proceed
-      PrefObj.preferences!.delete(PrefKeys.ACCOUNT_DELETION_REQUESTED);
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => BottomBarPage(2)),
-          (Route<dynamic> route) => false);
-      return;
-    }
-
-    int deletionTimestamp =
-        PrefObj.preferences!.get(PrefKeys.ACCOUNT_DELETION_DATE);
-    DateTime deletionDate =
-        DateTime.fromMillisecondsSinceEpoch(deletionTimestamp);
-    DateTime now = DateTime.now();
-
-    if (now.isAfter(deletionDate)) {
-      // Account should be deleted
-      PrefObj.preferences!.put(PrefKeys.ACCOUNT_DELETED, true);
-      _showAccountDeletedDialog();
-    } else {
-      // Account deletion is pending but not yet due - show option to cancel
-      _showAccountDeletionPendingDialog(deletionDate);
-    }
-  }
-
-  void _showAccountDeletedDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(
-            child: Column(
-              children: [
-                Icon(Icons.delete_forever, color: Colors.red, size: 50),
-                SizedBox(height: 10),
-                Text(
-                  "Account Deleted",
-                  style: TextStyle(fontFamily: "Poppins2", color: Colors.red),
-                ),
-              ],
-            ),
-          ),
-          content: Text(
-            "This account has been permanently deleted. Please create a new account to continue using the app.",
-            style: TextStyle(fontSize: 14, fontFamily: "Poppins1"),
-            textAlign: TextAlign.center,
-          ),
-          actions: <Widget>[
-            Center(
-              child: TextButton(
-                child: Text(
-                  "Create New Account",
-                  style: TextStyle(color: logoBlue, fontFamily: "Poppins1"),
-                ),
-                onPressed: () {
-                  // Clear all data and go to sign-up
-                  PrefObj.preferences?.clear();
-                  PrefObj.preferences?.put(PrefKeys.APPSTARTED, true);
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/sign-in-sign-up-landing', (Route route) => false);
-                },
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showAccountDeletionPendingDialog(DateTime deletionDate) {
-    int daysLeft = deletionDate.difference(DateTime.now()).inDays;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(
-            child: Column(
-              children: [
-                Icon(Icons.warning, color: Colors.orange, size: 50),
-                SizedBox(height: 10),
-                Text(
-                  "Account Deletion Pending",
-                  style: TextStyle(fontFamily: "Poppins2"),
-                ),
-              ],
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                daysLeft > 0
-                    ? "Your account is scheduled for deletion in $daysLeft days."
-                    : "Your account deletion is overdue.",
-                style: TextStyle(fontSize: 14, fontFamily: "Poppins1"),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 15),
-              Text(
-                "Deletion Date: ${deletionDate.day}/${deletionDate.month}/${deletionDate.year}",
-                style: TextStyle(
-                    fontSize: 12, fontFamily: "Poppins1", color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                TextButton(
-                  child: Text(
-                    "Cancel Deletion",
-                    style:
-                        TextStyle(color: Colors.green, fontFamily: "Poppins1"),
-                  ),
-                  onPressed: () {
-                    // Cancel account deletion
-                    PrefObj.preferences!
-                        .delete(PrefKeys.ACCOUNT_DELETION_REQUESTED);
-                    PrefObj.preferences!.delete(PrefKeys.ACCOUNT_DELETION_DATE);
-
-                    Navigator.of(context).pop();
-
-                    // Show success message
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Center(
-                            child: Column(
-                              children: [
-                                Icon(Icons.check_circle,
-                                    color: Colors.green, size: 50),
-                                SizedBox(height: 10),
-                                Text(
-                                  "Deletion Cancelled",
-                                  style: TextStyle(
-                                      fontFamily: "Poppins2",
-                                      color: Colors.green),
-                                ),
-                              ],
-                            ),
-                          ),
-                          content: Text(
-                            "Your account deletion has been cancelled. Welcome back!",
-                            style:
-                                TextStyle(fontSize: 14, fontFamily: "Poppins1"),
-                            textAlign: TextAlign.center,
-                          ),
-                          actions: <Widget>[
-                            Center(
-                              child: TextButton(
-                                child: Text(
-                                  "Continue",
-                                  style: TextStyle(
-                                      color: logoBlue, fontFamily: "Poppins1"),
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              BottomBarPage(2)),
-                                      (Route<dynamic> route) => false);
-                                },
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                ),
-                TextButton(
-                  child: Text(
-                    "Continue",
-                    style: TextStyle(color: logoBlue, fontFamily: "Poppins1"),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                            builder: (context) => BottomBarPage(2)),
-                        (Route<dynamic> route) => false);
-                  },
-                ),
-              ],
-            ),
-          ],
-        );
-      },
     );
   }
 }

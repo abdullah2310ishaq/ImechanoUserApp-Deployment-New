@@ -1,6 +1,7 @@
 // ignore_for_file: await_only_futures, deprecated_member_use
 import 'dart:developer';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -81,14 +82,11 @@ Future<void> main() async {
 
   final Directory appDocDir = await getApplicationDocumentsDirectory();
   Hive.init(appDocDir.path);
+  AppModel appLanguage = AppModel();
   await Hive.openBox('imechano').then(
     (value) => runApp(
       ChangeNotifierProvider(
-        create: (context) {
-          AppModel appModel = AppModel();
-          appModel.initializeApp(); // Initialize theme and language
-          return appModel;
-        },
+        create: (context) => AppModel(),
         child: IMechanoApp(
           prefs: value,
           appLanguage: "en",
@@ -132,62 +130,29 @@ class _IMechanoAppState extends State<IMechanoApp> {
   Box prefs;
   AppModel appModel = new AppModel();
   void notification() async {
-    // Guard: ensure we only ever ask once per install on iOS
-    final prefs = await SharedPreferences.getInstance();
-    final bool askedAlready = prefs.getBool('ios_notifications_asked') ?? false;
-
-    // Check current permission before requesting
-    final NotificationSettings currentSettings =
-        await _firebaseMessaging.getNotificationSettings();
-
-    if (Platform.isIOS &&
-        !askedAlready &&
-        currentSettings.authorizationStatus ==
-            AuthorizationStatus.notDetermined) {
-      final NotificationSettings settings =
-          await _firebaseMessaging.requestPermission(
-        alert: true,
-        announcement: false,
-        badge: true,
-        carPlay: false,
-        criticalAlert: false,
-        provisional: false,
-        sound: true,
-      );
-      await prefs.setBool('ios_notifications_asked', true);
-      log('Requested notifications. Status: ${settings.authorizationStatus}');
-    } else {
-      log('Skip requesting notifications. Asked: $askedAlready, Status: ${currentSettings.authorizationStatus}');
-    }
-
-    // Ensure notifications show while app is in foreground on iOS without extra prompts
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
+    NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
+      announcement: false,
       badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
       sound: true,
     );
 
+    log('User granted permission: ${settings.authorizationStatus}');
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-    // Fetch token after permission flow is settled
-    try {
-      final token = await _firebaseMessaging.getToken();
-      log('FCM token: $token');
-    } catch (e) {
-      log('Failed to get FCM token: $e');
-    }
   }
 
   @override
   void initState() {
     super.initState();
-    // Remove the _initAppTheme call since it's now handled by AppModel.initializeApp()
+    _initAppTheme();
 
-    // Ask for notification permissions first (iOS), then fetch token
+    log("Printing TOKEN");
+    _firebaseMessaging.getToken().then((value) => log(value.toString()));
     notification();
 
-    // Handle Firebase messaging here
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage? message) async {
@@ -216,15 +181,23 @@ class _IMechanoAppState extends State<IMechanoApp> {
     });
   }
 
+  void _initAppTheme() async {
+    appModel.darkTheme = await appModel.appPreference.getTheme();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppModel>(
-      builder: (context, appModel, child) {
-        return GestureDetector(
-          onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
-          child: ScreenUtilInit(
+    final appModel = Provider.of<AppModel>(context, listen: true);
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+      child: Consumer<AppModel>(
+        builder: (context, value, child) {
+          appModel.fetchLocale();
+
+          return ScreenUtilInit(
             designSize: Size(360, 690),
-            builder: (context, child) {
+            builder: () =>
+                Consumer<AppModel>(builder: (context, appLang, child) {
               return MultiProvider(
                 providers: [
                   ChangeNotifierProvider(
@@ -285,34 +258,34 @@ class _IMechanoAppState extends State<IMechanoApp> {
                   },
                 ),
               );
-            },
-          ),
-        );
-      },
+            }),
+          );
+        },
+      ),
     );
   }
 
   ThemeData buildLightTheme() {
     final ThemeData base = ThemeData.light();
     return base.copyWith(
+      buttonColor: Colors.redAccent,
       cardColor: Colors.white,
+      backgroundColor: Colors.white,
       primaryColor: Colors.red,
+      accentColor: Colors.redAccent,
       scaffoldBackgroundColor: Colors.white,
-      colorScheme: ColorScheme.fromSwatch()
-          .copyWith(secondary: Colors.redAccent)
-          .copyWith(background: Colors.white),
     );
   }
 
   ThemeData buildDarkTheme() {
     final ThemeData base = ThemeData.dark();
     return base.copyWith(
+      buttonColor: Colors.blueAccent,
       cardColor: Colors.grey[800],
+      backgroundColor: Colors.grey[800],
       primaryColor: Colors.blue[900],
+      accentColor: Colors.blueAccent,
       scaffoldBackgroundColor: Colors.grey[900],
-      colorScheme: ColorScheme.fromSwatch()
-          .copyWith(secondary: Colors.blueAccent)
-          .copyWith(background: Colors.grey[800]),
     );
   }
 

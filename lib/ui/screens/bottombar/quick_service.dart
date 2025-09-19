@@ -104,7 +104,7 @@ class _QuickServiceState extends State<QuickServices> {
         backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
         body: ScreenUtilInit(
           designSize: Size(414, 896),
-          builder: (context, child) => SafeArea(
+          builder: () => SafeArea(
             child: Column(children: [
               Expanded(
                 child: Container(
@@ -491,11 +491,11 @@ class _QuickServiceState extends State<QuickServices> {
       width: 327.w,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(10.0),
           ),
-          backgroundColor: Color(0xff70BDF1), // foreground
+          primary: Color(0xff70BDF1), // background
+          onPrimary: Colors.white, // foreground
         ),
         onPressed: () {
           if (!isCarAdded ||
@@ -825,10 +825,14 @@ class _QuickServiceState extends State<QuickServices> {
     try {
       var pickedfiles = await _picker.pickMultiImage();
       //you can use ImageCourse.camera for Camera capture
-      setState(() {
-        imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
-      });
-      Navigator.pop(context);
+      if (pickedfiles != null) {
+        setState(() {
+          imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
+        });
+        Navigator.pop(context);
+      } else {
+        print("No image is selected.");
+      }
     } catch (e) {
       print("error while picking file.");
     }

@@ -39,100 +39,83 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
           backgroundColor: appModelTheme.darkTheme ? Color(0xff252525) : white,
           body: ScreenUtilInit(
             designSize: Size(414, 896),
-            builder: (context, child) => SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
-                      child: IntrinsicHeight(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20.w, vertical: 10.h),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Flexible(
-                                flex: 2,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    // Smaller logo
-                                    Center(
-                                      child: Image(
-                                          height: 80.h, // Much smaller logo
-                                          image: AssetImage(
-                                              'assets/icons/splash/logo.png'),
-                                          color: appModelTheme.darkTheme
-                                              ? white
-                                              : null),
-                                    ),
-                                    SizedBox(height: 20.h),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10.w),
-                                      child: Center(
-                                        child: Text(
-                                            getTranslated(
-                                                "welcomemsg", context),
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(fontSize: 14.sp)),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Flexible(
-                                flex: 3,
-                                child: Center(
+            builder: () => SingleChildScrollView(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                  child: Container(
+                    height: MediaQuery.of(context).size.height,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Column(
+                              children: [
+                                Center(
                                   child: Image(
-                                      height: 250.h, // Responsive image height
                                       image: AssetImage(
-                                          'assets/icons/auth/landing.png')),
+                                          'assets/icons/splash/logo.png'),
+                                      color: appModelTheme.darkTheme
+                                          ? white
+                                          : null),
                                 ),
-                              ),
-                              Flexible(
-                                flex: 2,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    buttonsSection(),
-                                    SizedBox(height: 12),
-                                    CustomButton(
-                                      title: Text(
-                                        getTranslated("guest", context),
-                                        style: TextStyle(
-                                            fontSize: 16.sp,
-                                            fontFamily: 'Poppins1',
-                                            color: Colors.white),
-                                      ),
-                                      width: 0.85,
-                                      height: 44,
-                                      callBackFunction: () {
-                                        Navigator.push(context,
-                                            MaterialPageRoute(
-                                          builder: (context) {
-                                            return BottomBarPage(2);
-                                          },
-                                        ));
-                                      },
-                                      bgColor: logoBlue,
-                                      borderColor: logoBlue,
-                                    ),
-                                    SizedBox(height: 8),
-                                    FittedBox(child: TermsOfUse()),
-                                  ],
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 30, right: 30),
+                                  child: Center(
+                                    child: Text(
+                                        getTranslated("welcomemsg", context)),
+                                  ),
                                 ),
+                                Center(
+                                  child: Image(
+                                      height: 350,
+                                      image: AssetImage(
+                                          'assets/icons/splash/abc.png'),
+                                      color: appModelTheme.darkTheme
+                                          ? white
+                                          : null),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.02),
+                            buttonsSection(),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.02),
+                            CustomButton(
+                              title: Text(
+                                getTranslated("guest", context),
+                                style: TextStyle(
+                                    fontSize: 16.sp, fontFamily: 'Poppins1'),
                               ),
-                            ],
-                          ),
+                              width: 0.8,
+                              callBackFunction: () {
+                                // setState(() {
+                                //   appModelTheme.checkCon = true;
+                                // });
+                                //bool checkConditionDrawer = true;
+                                Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) {
+                                    return BottomBarPage(2);
+                                  },
+                                ));
+                              },
+                              bgColor: logoBlue,
+                              borderColor: logoBlue,
+                            ),
+                            SizedBox(height: 40.h),
+                            TermsOfUse(),
+                          ],
                         ),
-                      ),
+                      ],
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
             ),
           ),
@@ -141,71 +124,55 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
 
   Row buttonsSection() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 5.w),
-            child: CustomButton(
-              title: Text(
-                getTranslated('signin', context),
-                style: TextStyle(
-                    fontSize: 14.sp,
-                    fontFamily: 'Poppins1',
-                    color: Colors.white),
-              ),
-              width: 1.0, // Use full width of expanded
-              callBackFunction: () {
-                setState(() {
-                  appModelTheme.checkCon = false;
-                });
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) {
-                    return SignInScreen();
-                  },
-                ));
-              },
-              bgColor: buttonNaviBlue162e3f,
-              borderColor: buttonNaviBlue162e3f,
-            ),
+        CustomButton(
+          title: Text(
+            getTranslated('signin', context),
+            style: TextStyle(fontSize: 16.sp, fontFamily: 'Poppins1'),
           ),
+          width: 0.35,
+          callBackFunction: () {
+            setState(() {
+              appModelTheme.checkCon = false;
+            });
+            // bool checkCondition = false;
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) {
+                return SignInScreen();
+              },
+            ));
+          },
+          bgColor: buttonNaviBlue162e3f,
+          borderColor: buttonNaviBlue162e3f,
         ),
         orDividerSection(),
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 5.w),
-            child: CustomButton(
-              title: Text(
-                getTranslated('Signup', context),
-                style: TextStyle(
-                    fontSize: 14.sp,
-                    fontFamily: 'Poppins1',
-                    color: Colors.white),
-              ),
-              width: 1.0, // Use full width of expanded
-              callBackFunction: () {
-                setState(() {
-                  appModelTheme.checkCon = false;
-                });
-                Get.toNamed('/sign-up');
-              },
-              bgColor: buttonBlue3b5999,
-              borderColor: buttonBlue3b5999,
-            ),
+        CustomButton(
+          title: Text(
+            getTranslated('Signup', context),
+            style: TextStyle(fontSize: 16.sp, fontFamily: 'Poppins1'),
           ),
+          width: 0.35,
+          callBackFunction: () {
+            setState(() {
+              appModelTheme.checkCon = false;
+            });
+            Get.toNamed('/sign-up');
+          },
+          bgColor: buttonBlue3b5999,
+          borderColor: buttonBlue3b5999,
         ),
       ],
     );
   }
 
-  Widget orDividerSection() {
+  Padding orDividerSection() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 9, right: 9),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            height: 12.h,
+            height: 15.h,
             child: VerticalDivider(
               width: 10,
               color: appModelTheme.darkTheme ? white : Color(0xff374049),
@@ -215,13 +182,13 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
           Text(
             getTranslated("OR", context),
             style: TextStyle(
-              fontSize: 12.sp,
+              fontSize: 15.sp,
               fontFamily: 'Poppins1',
               color: appModelTheme.darkTheme ? white : Color(0xff374049),
             ),
           ),
           Container(
-            height: 12.h,
+            height: 15.h,
             child: VerticalDivider(
               width: 10,
               color: appModelTheme.darkTheme ? white : Color(0xff374049),

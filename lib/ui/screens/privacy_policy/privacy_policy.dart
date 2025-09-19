@@ -240,8 +240,10 @@ class AccordionPage extends StatelessWidget //__
   final _contentStyle = const TextStyle(
     color: Color(0xff999999),
     fontSize: 14,
-    fontWeight: FontWeight.normal,
+    fontWeight: FontWeight.normal, 
   );
+  final _loremIpsum =
+      '''Lorem ipsum is typically a corrupted version of 'De finibus bonorum et malorum', a 1st century BC text by the Roman statesman and philosopher Cicero, with words altered, added, and removed to make it nonsensical and improper Latin.''';
 
   @override
   build(context) => Scaffold(

@@ -10,18 +10,22 @@ import 'package:imechano/localization/language_constrants.dart';
 import 'package:imechano/ui/bloc/customer_notification_list_bloc.dart';
 import 'package:imechano/ui/modal/customer_notification_list_model.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
+import 'package:imechano/ui/screens/bottombar/my_job_card.dart';
 import 'package:imechano/ui/shared/widgets/appbar/custom_appbar_widget.dart';
 import 'package:imechano/ui/shared/widgets/appbar/custom_drawer_widget.dart';
 import 'package:imechano/ui/shared/widgets/confirmation_dialog.dart';
+import 'package:imechano/ui/shared/widgets/show_alert_dialog.dart';
 import 'package:imechano/ui/styling/colors.dart';
 import 'package:imechano/ui/styling/global.dart';
 import 'package:imechano/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:imechano/ui/common/globals.dart' as globals;
 
 import '../../provider/notification_count_provider.dart';
 import '../../share_preferences/pref_key.dart';
 import '../../share_preferences/preference.dart';
+import '../bottombar/My_Bookings_Page.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key}) : super(key: key);
@@ -62,9 +66,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
         backgroundColor: appModelTheme.darkTheme ? black : Color(0xff70bdf1),
         body: ScreenUtilInit(
           designSize: Size(414, 896),
-          child: NotificationListener<OverscrollIndicatorNotification>(
+          builder: () => NotificationListener<OverscrollIndicatorNotification>(
             onNotification: (notification) {
-              notification.disallowIndicator();
+              notification.disallowGlow();
               return true;
             },
             child: SafeArea(

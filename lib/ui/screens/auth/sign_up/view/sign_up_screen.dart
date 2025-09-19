@@ -10,6 +10,7 @@ import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:imechano/localization/language_constrants.dart';
@@ -100,251 +101,268 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final appModel = Provider.of<AppModel>(context);
     appModelTheme = appModel;
     return Scaffold(
-      body: ScreenUtilInit(
-        designSize: Size(414, 896),
-        builder: (context, child) =>
-            NotificationListener<OverscrollIndicatorNotification>(
-          onNotification: (notification) {
-            notification.disallowIndicator();
-            return true;
-          },
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 700),
-              child: Container(
-                padding: EdgeInsets.only(left: 20.w, right: 20.w),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+        body: ScreenUtilInit(
+      designSize: Size(414, 896),
+      builder: () => NotificationListener<OverscrollIndicatorNotification>(
+        onNotification: (notification) {
+          notification.disallowGlow();
+          return true;
+        },
+        child: Container(
+          padding: EdgeInsets.only(left: 20, right: 20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 50),
+                    SvgPicture.asset(
+                      "assets/svg/imechano-logo.svg",
+                      width: 200,
+                    ),
+                    SizedBox(height: 10),
+                    Text(getTranslated('createanaccount', context),
+                        style: TextStyle(
+                            fontFamily: "Poppins3",
+                            fontSize: 20,
+                            color: Colors.black)),
+                    SizedBox(height: 10),
+                  ],
+                ),
+                Expanded(
+                  child: Container(
+                    child: SingleChildScrollView(
+                      child: Column(
                         children: [
-                          SizedBox(height: 30.h),
-                          Image.asset(
-                            "assets/icons/splash/logo.png",
-                            width: 140.w,
+                          SizedBox(height: 20),
+                          emailForm(),
+                          SizedBox(height: 20),
+                          mobileForm(),
+                          SizedBox(height: 20),
+                          nameForm(),
+                          SizedBox(height: 20),
+                          _textfiled(creatpassword,
+                              getTranslated('Createpassword', context)),
+                          SizedBox(height: 20),
+                          _confirmPassfiled(Confirmpassword,
+                              getTranslated('confirmPassword', context)),
+                          SizedBox(height: 20),
+                          SizedBox(
+                            height: 66,
+                            child: CustomButton(
+                              title: Row(
+                                children: [
+                                  Image.asset("assets/images/Location.png",
+                                      scale: 4),
+                                  SizedBox(width: 10),
+                                  Regular16Black(
+                                    addressBtn,
+                                    textAlign: TextAlign.start,
+                                  ),
+                                ],
+                              ),
+                              width: 0.9,
+                              callBackFunction: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MapLocation()),
+                                );
+                                latitude = result.toString().split('/')[0];
+                                longitude = result.toString().split('/')[1];
+                                address = result.split('/')[2];
+                                var addressTxt = "";
+                                if (address.length > 30)
+                                  for (int i = 0; i < 28; i++) {
+                                    addressTxt += address[i];
+                                  }
+                                addressTxt += ".....";
+                                print(result);
+                                addressIsChanged = !addressIsChanged;
+                                setState(() {
+                                  addressIsChanged == true
+                                      ? addressBtn = "Save My Location"
+                                      : addressBtn = addressTxt;
+                                });
+                              },
+                              bgColor: grayE6E6E5,
+                              borderColor: buttonGrayE8E8E7Border,
+                            ),
                           ),
-                          SizedBox(height: 10.h),
-                          Text(getTranslated('createanaccount', context),
-                              style: TextStyle(
-                                  fontFamily: "Poppins3",
-                                  fontSize: 20.sp,
-                                  color: Colors.black)),
-                          SizedBox(height: 10.h),
-                        ],
-                      ),
-                      Expanded(
-                        child: Container(
-                          child: SingleChildScrollView(
-                            padding: EdgeInsets.only(bottom: 20.h),
-                            child: Column(
-                              children: [
-                                SizedBox(height: 20.h),
-                                SizedBox(height: 56.h, child: emailForm()),
-                                SizedBox(height: 15.h),
-                                SizedBox(height: 56.h, child: mobileForm()),
-                                SizedBox(height: 15.h),
-                                SizedBox(height: 56.h, child: nameForm()),
-                                SizedBox(height: 15.h),
-                                SizedBox(
-                                  height: 56.h,
-                                  child: _textfiled(
-                                    creatpassword,
-                                    getTranslated('Createpassword', context),
+                          SizedBox(height: 20),
+                          SizedBox(
+                            height: 66,
+                            child: CustomButton(
+                              title: Row(
+                                children: [
+                                  Image.asset("assets/images/car.png",
+                                      scale: 4),
+                                  SizedBox(width: 10.w),
+                                  Regular16Black(
+                                    getTranslated(
+                                        'Addmycar(optional)', context),
+                                    textAlign: TextAlign.start,
                                   ),
-                                ),
-                                SizedBox(height: 15.h),
-                                SizedBox(
-                                  height: 56.h,
-                                  child: _confirmPassfiled(
-                                    Confirmpassword,
-                                    getTranslated('confirmPassword', context),
-                                  ),
-                                ),
-                                SizedBox(height: 15.h),
-                                SizedBox(
-                                  height: 56.h,
-                                  child: _locationField(),
-                                ),
-                                SizedBox(height: 15.h),
-                                SizedBox(height: 15.h),
-                                SizedBox(
-                                  height: 58.h,
-                                  child: CustomButton(
-                                    title: Text(
-                                      getTranslated('Signup', context),
+                                ],
+                              ),
+                              width: 0.9,
+                              callBackFunction: () {
+                                FocusScope.of(context)
+                                    .requestFocus(FocusNode());
+
+                                Get.toNamed('/select-your-car');
+                              },
+                              bgColor: grayE6E6E5,
+                              borderColor: buttonGrayE8E8E7Border,
+                            ),
+                          ),
+                          SizedBox(height: 40),
+                          SizedBox(
+                            height: 58,
+                            child: CustomButton(
+                              title: Text(
+                                getTranslated('Signup', context),
+                                style: TextStyle(
+                                    fontSize: 18.sp, fontFamily: "poppins1"),
+                              ),
+                              width: 0.9,
+                              callBackFunction: () {
+                                if (_formKey.currentState!.validate()) {
+                                  validatePassword(creatpassword.text);
+                                  validateConfirmPassword(Confirmpassword.text);
+                                  if (!agreePolicy) {
+                                    Get.snackbar(
+                                        getTranslated('tocmessage', context),
+                                        "",
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white);
+                                    return; // Stop execution here so it doesn't call onRegisterAPI()
+                                  }
+                                  onRegisterAPI();
+                                  // showOtpModelsheet();
+                                }
+                              },
+                              bgColor: logoBlue,
+                              borderColor: logoBlue,
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                  getTranslated("alreadyhaveaccount", context) +
+                                      " ?",
+                                  style: TextStyle(
+                                      fontFamily: 'poppins1',
+                                      fontSize: 15.sp,
+                                      color: appModelTheme.darkTheme
+                                          ? white
+                                          : black)),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(getTranslated('signin', context),
                                       style: TextStyle(
-                                          fontSize: 18.sp,
-                                          fontFamily: "poppins1",
-                                          color: Colors.white),
-                                    ),
-                                    width: 0.9,
-                                    callBackFunction: () {
-                                      if (_formKey.currentState!.validate()) {
-                                        validatePassword(creatpassword.text);
-                                        validateConfirmPassword(
-                                            Confirmpassword.text);
-                                        if (!agreePolicy) {
-                                          Get.snackbar(
-                                              getTranslated(
-                                                  'tocmessage', context),
-                                              "",
-                                              backgroundColor: Colors.red,
-                                              colorText: Colors.white);
-                                          return; // Stop execution here so it doesn't call onRegisterAPI()
-                                        }
-                                        onRegisterAPI();
-                                        // showOtpModelsheet();
-                                      }
-                                    },
-                                    bgColor: logoBlue,
-                                    borderColor: logoBlue,
-                                  ),
-                                ),
-                                SizedBox(height: 15.h),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                        getTranslated(
-                                                "alreadyhaveaccount", context) +
-                                            " ?",
-                                        style: TextStyle(
-                                            fontFamily: 'poppins1',
-                                            fontSize: 15.sp,
-                                            color: appModelTheme.darkTheme
-                                                ? white
-                                                : black)),
-                                    TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text(
-                                            getTranslated('signin', context),
-                                            style: TextStyle(
-                                                fontFamily: 'poppins1',
-                                                fontSize: 15.sp,
-                                                color: appModelTheme.darkTheme
-                                                    ? logoBlue
-                                                    : red))),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 5.w, top: 10.h, bottom: 10.h),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                          fontFamily: 'poppins1',
+                                          fontSize: 15.sp,
+                                          color: appModelTheme.darkTheme
+                                              ? logoBlue
+                                              : red))),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 5),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                RichText(
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                    text:
+                                        "${getTranslated("term_condition_message", context)} \n ",
+                                    style:
+                                        Theme.of(context).textTheme.bodyText1,
                                     children: [
-                                      Expanded(
-                                        child: RichText(
-                                          textAlign: TextAlign.center,
-                                          text: TextSpan(
-                                            text:
-                                                "${getTranslated("term_condition_message", context)} \n ",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyLarge!
-                                                .copyWith(
-                                                  fontSize: 13.sp,
-                                                ),
-                                            children: [
-                                              TextSpan(
-                                                text: getTranslated(
-                                                    "terms_and_condition",
-                                                    context),
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: buttonBlue3b5999,
-                                                    fontSize: 13.sp),
-                                                recognizer:
-                                                    TapGestureRecognizer()
-                                                      ..onTap = () {
-                                                        showModal(
-                                                          context: context,
-                                                          configuration:
-                                                              FadeScaleTransitionConfiguration(),
-                                                          builder: (context) {
-                                                            return PolicyDialog(
-                                                              mdFileName:
-                                                                  'toc.md',
-                                                            );
-                                                          },
-                                                        );
-                                                      },
-                                              ),
-                                              TextSpan(
-                                                  text:
-                                                      "${getTranslated("and", context)} ",
-                                                  style: TextStyle(
-                                                      fontSize: 13.sp)),
-                                              TextSpan(
-                                                text:
-                                                    "${getTranslated("privacy_policy", context)}!",
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: buttonBlue3b5999,
-                                                    fontSize: 13.sp),
-                                                recognizer:
-                                                    TapGestureRecognizer()
-                                                      ..onTap = () {
-                                                        showDialog(
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return PolicyDialog(
-                                                              mdFileName:
-                                                                  'privacy.md',
-                                                            );
-                                                          },
-                                                        );
-                                                      },
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                      TextSpan(
+                                        text: getTranslated(
+                                            "terms_and_condition", context),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: buttonBlue3b5999),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            showModal(
+                                              context: context,
+                                              configuration:
+                                                  FadeScaleTransitionConfiguration(),
+                                              builder: (context) {
+                                                return PolicyDialog(
+                                                  mdFileName: 'toc.md',
+                                                );
+                                              },
+                                            );
+                                          },
                                       ),
-                                      SizedBox(width: 5.w),
-                                      Checkbox(
-                                        value: agreePolicy,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            agreePolicy = value!;
-                                          });
-                                        },
-                                        materialTapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
-                                        visualDensity: VisualDensity.compact,
+                                      TextSpan(
+                                          text:
+                                              "${getTranslated("and", context)} "),
+                                      TextSpan(
+                                        text:
+                                            "${getTranslated("privacy_policy", context)}!",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: buttonBlue3b5999),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return PolicyDialog(
+                                                  mdFileName: 'privacy.md',
+                                                );
+                                              },
+                                            );
+                                          },
                                       ),
                                     ],
                                   ),
                                 ),
+                                Checkbox(
+                                  value: agreePolicy,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      agreePolicy = value!;
+                                    });
+                                  },
+                                ), //
                               ],
                             ),
-                          ),
-                        ),
+                          )
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _textfiled(TextEditingController controller, String title) {
     return Container(
       child: TextFormField(
-        style: TextStyle(fontFamily: "Poppins3", color: black),
+        style: TextStyle(fontFamily: "Poppins3"),
         validator: validatePassword,
         controller: controller,
         obscureText: showPassword,
         decoration: InputDecoration(
-          fillColor: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
+          fillColor: grayE6E6E5,
           filled: true,
           border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent),
@@ -383,12 +401,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _confirmPassfiled(TextEditingController controller, String title) {
     return Container(
       child: TextFormField(
-        style: TextStyle(fontFamily: "Poppins3", color: black),
+        style: TextStyle(fontFamily: "Poppins3"),
         validator: validateConfirmPassword,
         controller: controller,
         obscureText: showPassword,
         decoration: InputDecoration(
-          fillColor: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
+          fillColor: grayE6E6E5,
           filled: true,
           border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent),
@@ -418,61 +436,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
             },
             icon: Icon(showPassword ? Icons.visibility_off : Icons.visibility,
                 color: Colors.grey),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _locationField() {
-    return Container(
-      child: InkWell(
-        onTap: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => MapLocation()),
-          );
-          latitude = result.toString().split('/')[0];
-          longitude = result.toString().split('/')[1];
-          address = result.split('/')[2];
-          var addressTxt = "";
-          if (address.length > 30)
-            for (int i = 0; i < 28; i++) {
-              addressTxt += address[i];
-            }
-          addressTxt += ".....";
-          print(result);
-          addressIsChanged = !addressIsChanged;
-          setState(() {
-            addressIsChanged == true
-                ? addressBtn = "Save My Location"
-                : addressBtn = addressTxt;
-          });
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            color: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.transparent),
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
-            child: Row(
-              children: [
-                Image.asset("assets/images/Location.png", scale: 4),
-                SizedBox(width: 10.w),
-                Expanded(
-                  child: Text(
-                    addressBtn,
-                    style: TextStyle(
-                      fontFamily: "Poppins3",
-                      color: black,
-                      fontSize: 16.sp,
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       ),

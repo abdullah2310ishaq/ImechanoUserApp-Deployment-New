@@ -207,8 +207,7 @@ class _MapLocationState extends State<MapLocation> {
 
     return ScreenUtilInit(
         designSize: Size(360, 690),
-        builder: (context, child) {
-          // ignore: deprecated_member_use
+        builder: () {
           return WillPopScope(
             onWillPop: () async {
               if (Navigator.of(context).canPop()) {
@@ -377,10 +376,6 @@ class _MapLocationState extends State<MapLocation> {
                   width: 250.w,
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(logoBlue),
-                      foregroundColor:
-                          MaterialStateProperty.all<Color>(Colors.white),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),

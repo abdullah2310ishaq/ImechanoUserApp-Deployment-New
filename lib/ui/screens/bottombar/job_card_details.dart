@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -29,7 +31,9 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
+
 import '../../modal/send_notification_admin_modal.dart';
+
 
 String value = '';
 String deletejobid = '';
@@ -98,8 +102,16 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
+  }
+
+  void _updateState() {
+    Future.microtask(() {
+      setState(() {
+        // update your state here
+      });
+    });
   }
 
   void onResumed() {
@@ -138,9 +150,6 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
       case AppLifecycleState.detached:
         onDetached();
         break;
-      case AppLifecycleState.hidden:
-        // TODO: Handle this case.
-        break;
     }
   }
 
@@ -155,7 +164,7 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
 
     return ScreenUtilInit(
       designSize: Size(414, 896),
-      builder: (context, child) => Scaffold(
+      builder: () => Scaffold(
         appBar: WidgetAppBar(
           title: getTranslated('JobCard', context),
           menuItem: 'assets/svg/Menu.svg',
@@ -178,7 +187,7 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                           topLeft: Radius.circular(25))),
                   child: NotificationListener<OverscrollIndicatorNotification>(
                     onNotification: (notification) {
-                      notification.disallowIndicator();
+                      notification.disallowGlow();
                       return true;
                     },
                     child: StreamBuilder<CustomerJobListModel>(
@@ -403,10 +412,8 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                                       fontSize: 14,
                                                       fontFamily: "Poppins1")),
                                               style: TextButton.styleFrom(
-                                                foregroundColor: Colors.black,
-                                                disabledForegroundColor: Colors
-                                                    .yellow
-                                                    .withOpacity(0.38),
+                                                primary: Colors.black,
+                                                onSurface: Colors.yellow,
                                                 side: BorderSide(
                                                     color: Color(0xff374049),
                                                     width: 2),
@@ -493,6 +500,40 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
           ),
         ]),
       ),
+    );
+  }
+
+  Future _asyncConfirmDialog(BuildContext context, String jobnumber) async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false, // user must tap button for close dialog!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Gateway'),
+          content: const Text(
+              'You will be asked to pay via Card at this page. Please Click on Pay & Confirm for sandbox test. Thanks'),
+          actions: [
+            // FlatButton(
+            //   child: const Text('CANCEL'),
+            //   onPressed: () {
+            //     Navigator.of(context).pop();
+            //   },
+            // ),
+            TextButton(
+              child: const Text('Pay & Confirm'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                onSendNotificationAdminAPI();
+                acceptbookingApiCall(jobnumber);
+
+                setState(() {
+                  print("I m rebuild");
+                });
+              },
+            )
+          ],
+        );
+      },
     );
   }
 
@@ -873,6 +914,54 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
             ],
           );
         });
+  }
+
+  Widget _customDivider() {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 20,
+        right: 20,
+      ),
+      child: Divider(
+        color: appModelTheme.darkTheme ? white : Colors.black38,
+      ),
+    );
+  }
+
+  Widget _delTotal() {
+    return Padding(
+      // ========================by jenish==========================
+      padding: const EdgeInsets.only(left: 27, right: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            // ========================by jenish==========================
+            getTranslated('total', context),
+            style: TextStyle(
+              fontSize: 13,
+              fontFamily: 'Poppins1',
+            ),
+          ),
+          Text(
+            '',
+            // // ========================by jenish==========================
+            // // 'KWD ${widget.selectedService['total']}',
+            // widget.data.total == null
+            //     ? getTranslated("qr", context)! + ' 0.00'
+            //     : widget.data.total!.isEmpty
+            //         ? getTranslated("qr", context)! + ' 0.00'
+            //         : getTranslated("qr", context)! + '$formattedGrossTotal',
+            textAlign: TextAlign.end,
+            style: TextStyle(
+              fontSize: 13,
+              fontFamily: 'Poppins2',
+              color: black,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   acceptbookingApiCall(String jobNumber) async {

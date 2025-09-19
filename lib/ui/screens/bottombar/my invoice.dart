@@ -77,7 +77,7 @@ class _MyInvoiceState extends State<MyInvoice>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
 
     _tabController = TabController(length: 4, vsync: this);
     userStr =
@@ -100,7 +100,7 @@ class _MyInvoiceState extends State<MyInvoice>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
   }
 
@@ -157,7 +157,7 @@ class _MyInvoiceState extends State<MyInvoice>
           backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
           body: ScreenUtilInit(
             designSize: Size(414, 896),
-            builder: (context, child) => SafeArea(
+            builder: () => SafeArea(
               child: Column(children: [
                 Row(
                   children: [
@@ -404,26 +404,27 @@ class _MyInvoiceState extends State<MyInvoice>
       children: [
         Container(
           margin: EdgeInsets.only(left: 1, right: 15),
-          height: 40,
+          height: size.height * 0.05,
           child: TabBar(
             controller: _tabController,
-            isScrollable: false,
-            indicatorSize: TabBarIndicatorSize.tab,
-            indicator: ShapeDecoration(
+            indicator: BoxDecoration(
+              border: Border.all(color: Colors.transparent),
+              borderRadius: BorderRadius.circular(5.0),
+              // color: appModelTheme.darkTheme ? Colors.grey : Colors.white,
               color: appModelTheme.darkTheme ? logoBlue : Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
+              // color: Colors.white,
             ),
             labelColor: appModelTheme.darkTheme ? Colors.white : logoBlue,
+            // labelColor: Colors.black,
             labelStyle: TextStyle(
+              color: Colors.red,
               fontSize: 13,
               fontFamily: "Poppins3",
             ),
-            indicatorPadding: EdgeInsets.symmetric(horizontal: 5),
-            labelPadding: EdgeInsets.zero,
+            indicatorPadding: EdgeInsets.only(left: 10),
+            labelPadding: EdgeInsets.only(left: 10),
             unselectedLabelColor:
-                appModelTheme.darkTheme ? Colors.white70 : Colors.white,
+                appModelTheme.darkTheme ? Colors.white : Colors.grey[100],
             onTap: (index) {
               selectTab = index;
 
@@ -489,80 +490,60 @@ class _MyInvoiceState extends State<MyInvoice>
             tabs: [
               Tab(
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5),
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: selectTab == 0
-                        ? Border.all(color: Colors.transparent, width: 0)
-                        : Border.all(color: Colors.white, width: 1.5),
-                  ),
-                  child: Center(
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.white, width: 1)),
+                  child: Align(
+                    alignment: Alignment.center,
                     child: Text(
                       getTranslated('Booking', context),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 11),
+                      style: TextStyle(fontSize: 12),
                     ),
                   ),
                 ),
               ),
               Tab(
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5),
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: selectTab == 1
-                        ? Border.all(color: Colors.transparent, width: 0)
-                        : Border.all(color: Colors.white, width: 1.5),
-                  ),
-                  child: Center(
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.white, width: 1)),
+                  child: Align(
+                    alignment: Alignment.center,
                     child: Text(
                       getTranslated('JobCard', context),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 11),
+                      style: TextStyle(fontSize: 12),
                     ),
                   ),
                 ),
               ),
               Tab(
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5),
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: selectTab == 2
-                        ? Border.all(color: Colors.transparent, width: 0)
-                        : Border.all(color: Colors.white, width: 1.5),
-                  ),
-                  child: Center(
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.white, width: 1)),
+                  child: Align(
+                    alignment: Alignment.center,
                     child: Text(
                       getTranslated('DeliveryScheduled', context),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 11),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ),
               ),
               Tab(
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5),
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: selectTab == 3
-                        ? Border.all(color: Colors.transparent, width: 0)
-                        : Border.all(color: Colors.white, width: 1.5),
-                  ),
-                  child: Center(
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.white, width: 1)),
+                  child: Align(
+                    alignment: Alignment.center,
                     child: Text(
                       getTranslated('DeliveryConfirmed', context),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 11),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 12),
                     ),
                   ),
                 ),
@@ -2114,8 +2095,7 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(right: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Colors.lightBlueAccent, // This is what you need!
+                primary: Colors.lightBlueAccent, // This is what you need!
               ),
               child: Text(
                 'Approve',
@@ -2143,7 +2123,7 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(left: 6.0, right: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey, // This is what you need!
+                primary: Colors.grey, // This is what you need!
               ),
               child: Text(
                 'Reject',
@@ -2163,7 +2143,7 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(left: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, // This is what you need!
+                primary: Colors.red, // This is what you need!
               ),
               child: Text(
                 'Close',

@@ -79,7 +79,7 @@ class _SelectYourCarScreenState extends State<SelectYourCarScreen> {
                     return NotificationListener<
                         OverscrollIndicatorNotification>(
                       onNotification: (notification) {
-                        notification.disallowIndicator();
+                        notification.disallowGlow();
                         return true;
                       },
                       child: GridView.builder(

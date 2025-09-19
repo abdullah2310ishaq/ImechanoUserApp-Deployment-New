@@ -41,6 +41,7 @@ import 'package:imechano/ui/provider/view_parts_provider.dart';
 import 'package:imechano/ui/provider/view_services_provider.dart';
 import 'package:imechano/ui/styling/global.dart';
 
+import '../provider/car_checkup_booking_provider.dart';
 import '../provider/car_detailing_booking.dart';
 import '../provider/emergency_car_booking_provider.dart';
 import '../provider/job_cards_list_provider.dart';

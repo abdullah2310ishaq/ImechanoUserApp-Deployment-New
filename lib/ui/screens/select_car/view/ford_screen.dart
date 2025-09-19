@@ -56,13 +56,30 @@ class _FordScreenState extends State<FordScreen> {
 
   String carImage = '';
 
+  void _scrollToSelectedContent({required GlobalKey expansionTileKey}) {
+    final keyContext = expansionTileKey.currentContext;
+    if (keyContext != null) {
+      Future.delayed(Duration(milliseconds: 200)).then((value) {
+        Scrollable.ensureVisible(keyContext,
+            duration: Duration(milliseconds: 200));
+      });
+    }
+  }
+
   String modelNameTile = getTranslated('ModelName', Get.context!);
   String CylinerTypeTile = getTranslated('SelectCylinderType', Get.context!);
   String SelectCarYar = getTranslated('SelectModalYear', Get.context!);
   final _repository = Repository();
   bool isPetrol = true;
   String? newValue;
-// define the boolean to track the state of the dropdown button
+  bool _isDropdownOpen =
+      false; // define the boolean to track the state of the dropdown button
+  void _toggleDropdown() {
+    setState(() {
+      _isDropdownOpen =
+          !_isDropdownOpen; // toggle the state of the dropdown button
+    });
+  }
 
   String idnumber = "1";
   String user_idaaa = "24";
@@ -163,7 +180,7 @@ class _FordScreenState extends State<FordScreen> {
       final carData =
           json.decode(PrefObj.preferences!.get(PrefKeys.ADDCARDATA));
 
-      PrefObj.preferences!.get(PrefKeys.USER_ID).toString();
+      String str = PrefObj.preferences!.get(PrefKeys.USER_ID).toString();
 
       final addCarModel isAddcar = await _repository.onaddcarApi(
           widget.carId.toString(),
@@ -226,7 +243,7 @@ class _FordScreenState extends State<FordScreen> {
     appModelTheme = appModel;
     return ScreenUtilInit(
       designSize: Size(360, 690),
-      builder: (context, child) => Scaffold(
+      builder: () => Scaffold(
         backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
         key: scaffoldKey,
         drawer: drawerpage(),
@@ -246,7 +263,7 @@ class _FordScreenState extends State<FordScreen> {
           ),
           child: NotificationListener<OverscrollIndicatorNotification>(
             onNotification: (notification) {
-              notification.disallowIndicator();
+              notification.disallowGlow();
               return true;
             },
             child: SingleChildScrollView(

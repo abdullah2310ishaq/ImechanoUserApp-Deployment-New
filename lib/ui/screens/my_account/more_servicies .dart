@@ -102,12 +102,12 @@ class _MoreServiciesState extends State<MoreServicies> {
       backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
       body: NotificationListener<OverscrollIndicatorNotification>(
         onNotification: (notification) {
-          notification.disallowIndicator();
+          notification.disallowGlow();
           return true;
         },
         child: ScreenUtilInit(
           designSize: Size(414, 896),
-          builder: (context, child) => SafeArea(
+          builder: () => SafeArea(
             child: Column(
               children: [
                 Expanded(

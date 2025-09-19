@@ -27,6 +27,8 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
 
   dynamic appModelTheme;
 
+  TabController? _tabController;
+
   @override
   Widget build(BuildContext context) {
     final appModel = Provider.of<AppModel>(context);
@@ -43,7 +45,7 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
       backgroundColor: appModelTheme.darkTheme ? Color(0xff252525) : white,
       body: ScreenUtilInit(
         designSize: Size(414, 896),
-        builder: (context, child) => Column(
+        builder: () => Column(
           children: [
             // appBarWidget(),
             Expanded(
@@ -65,7 +67,7 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
                         child: NotificationListener<
                             OverscrollIndicatorNotification>(
                           onNotification: (notification) {
-                            notification.disallowIndicator();
+                            notification.disallowGlow();
                             return true;
                           },
                           child: SingleChildScrollView(
@@ -306,6 +308,18 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
         ));
   }
 
+  Widget _blankContainer() {
+    return Container(
+      height: 100.h,
+      decoration: BoxDecoration(
+        color: appModelTheme.darkTheme ? black : logoBlue,
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(100.0.w),
+            bottomRight: Radius.circular(100.0.w)),
+      ),
+    );
+  }
+
   Widget table() {
     List partno = [
       '1',
@@ -482,7 +496,7 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
             ),
             DataCell(Center(
               child: Text(
-                'Test Invoice',
+                'Lorem Ipsum is simply dummy text of the',
                 style: TextStyle(fontFamily: 'Poppins1', fontSize: 11.sp),
               ),
             )),
@@ -1051,6 +1065,18 @@ class _ViewDataPageState extends State<ViewDataPage> {
             )
           ],
         ));
+  }
+
+  Widget _blankContainer() {
+    return Container(
+      height: 100.h,
+      decoration: BoxDecoration(
+        color: appModelTheme.darkTheme ? black : logoBlue,
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(100.0.w),
+            bottomRight: Radius.circular(100.0.w)),
+      ),
+    );
   }
 
   Widget _infoList() {

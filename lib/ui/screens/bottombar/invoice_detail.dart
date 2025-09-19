@@ -645,14 +645,14 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
         },
       ),
     );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    _scaffoldKey.currentState?.showSnackBar(snackBar);
     setState(() {
       loader_download = false;
     });
   }
 
   void scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       scrollController.animateTo(
         scrollController.position.maxScrollExtent,
         duration: Duration(milliseconds: 300),
@@ -688,282 +688,256 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
       backgroundColor: appModelTheme.darkTheme ? Color(0xff252525) : white,
       body: ScreenUtilInit(
         designSize: Size(414, 896),
-        builder: (context, child) => Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 720),
-            child: Column(
-              children: [
-                appBarWidget(),
-                if (widget.invoiceData != null)
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        _blankContainer(),
-                        RepaintBoundary(
-                          key: previewContainer,
-                          child: Center(
-                            child: Container(
-                              margin: EdgeInsets.only(left: 15, right: 15),
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  color: appModelTheme.darkTheme
-                                      ? darkmodeColor
-                                      : white,
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(25.0),
-                                      topLeft: Radius.circular(25.0))),
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: NotificationListener<
-                                    OverscrollIndicatorNotification>(
-                                  onNotification: (notification) {
-                                    notification.disallowIndicator();
-                                    return true;
-                                  },
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: double.infinity,
-                                          height: 64.h,
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.only(
-                                                  topRight:
-                                                      Radius.circular(15.0),
-                                                  topLeft:
-                                                      Radius.circular(15.0)),
-                                              image: DecorationImage(
-                                                fit: BoxFit.fitWidth,
-                                                image: AssetImage(
-                                                    "assets/icons/My Vehicle/Group 9252.png"),
-                                              )),
-                                          margin: EdgeInsets.only(
-                                              left: 10.w, right: 10.w),
-                                          child: Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 8.w),
-                                            child: Row(
+        builder: () => Column(
+          children: [
+            appBarWidget(),
+            if (widget.invoiceData != null)
+              Expanded(
+                child: Stack(
+                  children: [
+                    _blankContainer(),
+                    RepaintBoundary(
+                      key: previewContainer,
+                      child: Center(
+                        child: Container(
+                          margin: EdgeInsets.only(left: 15, right: 15),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                              color: appModelTheme.darkTheme
+                                  ? darkmodeColor
+                                  : white,
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(25.0),
+                                  topLeft: Radius.circular(25.0))),
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: NotificationListener<
+                                OverscrollIndicatorNotification>(
+                              onNotification: (notification) {
+                                notification.disallowGlow();
+                                return true;
+                              },
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: double.infinity,
+                                      height: 64.h,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              topRight: Radius.circular(15.0),
+                                              topLeft: Radius.circular(15.0)),
+                                          image: DecorationImage(
+                                            fit: BoxFit.fitWidth,
+                                            image: AssetImage(
+                                                "assets/icons/My Vehicle/Group 9252.png"),
+                                          )),
+                                      margin: EdgeInsets.only(
+                                          left: 10.w, right: 10.w),
+                                      child: Container(
+                                        width: double.infinity,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            CRNo(),
+                                            Column(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                                                  MainAxisAlignment.center,
                                               children: [
-                                                Flexible(child: CRNo()),
-                                                Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Image(
-                                                      height: 30.h,
-                                                      image: AssetImage(
-                                                          "assets/icons/splash/logo.png"),
-                                                      color: Colors.white,
-                                                    ),
-                                                    Text(
-                                                      getTranslated(
-                                                          "PoweredbyCompany",
-                                                          context),
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 8.sp,
-                                                          fontFamily:
-                                                              "Poppins1"),
-                                                    )
-                                                  ],
+                                                Image(
+                                                  height: 30.h,
+                                                  image: AssetImage(
+                                                      "assets/icons/splash/logo.png"),
+                                                  color: Colors.white,
                                                 ),
-                                                Flexible(child: mobileNumber()),
+                                                Text(
+                                                  getTranslated(
+                                                      "PoweredbyCompany",
+                                                      context),
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 8.sp,
+                                                      fontFamily: "Poppins1"),
+                                                )
                                               ],
                                             ),
-                                          ),
+                                            mobileNumber(),
+                                          ],
                                         ),
-                                        SizedBox(height: 8),
-                                        dataCard(),
-                                        SizedBox(height: 8),
-                                        Container(
-                                          margin: EdgeInsets.only(
-                                              left: 10.w, right: 10.w),
-                                          child: Column(
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    dataCard(),
+                                    SizedBox(height: 8),
+                                    Container(
+                                      margin: EdgeInsets.only(
+                                          left: 10.w, right: 10.w),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Divider(
+                                            indent: 10.w,
+                                            endIndent: 10.w,
+                                            color: Colors.grey,
+                                          ),
+                                          SizedBox(
+                                            height: 10.h,
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                left: 10.w, right: 10.w),
+                                            child: Text(
+                                              getTranslated("Service", context),
+                                              style: TextStyle(
+                                                fontFamily: "Poppins2",
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 10.h),
+                                          Row(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Divider(
-                                                indent: 10.w,
-                                                endIndent: 10.w,
-                                                color: Colors.grey,
-                                              ),
-                                              SizedBox(
-                                                height: 10.h,
-                                              ),
-                                              Container(
-                                                margin: EdgeInsets.only(
-                                                    left: 10.w, right: 10.w),
-                                                child: Text(
-                                                  getTranslated(
-                                                      "Service", context),
-                                                  style: TextStyle(
-                                                    fontFamily: "Poppins2",
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(height: 10.h),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      for (int i = 0;
-                                                          i <
-                                                              widget
-                                                                  .invoiceData!
-                                                                  .items!
-                                                                  .length;
-                                                          i++)
-                                                        Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  left: 17,
-                                                                  top: 5),
-                                                          child: Row(
-                                                            children: [
-                                                              Icon(
-                                                                Icons.circle,
-                                                                color:
-                                                                    buttonBlue3b5999,
-                                                                size: 8,
-                                                              ),
-                                                              SizedBox(
-                                                                  width: 10.w),
-                                                              widget
-                                                                          .invoiceData!
-                                                                          .items![
-                                                                              i]
-                                                                          .subCategoryId ==
-                                                                      10013
-                                                                  ? Text(
+                                                  for (int i = 0;
+                                                      i <
+                                                          widget.invoiceData!
+                                                              .items!.length;
+                                                      i++)
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          left: 17, top: 5),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.circle,
+                                                            color:
+                                                                buttonBlue3b5999,
+                                                            size: 8,
+                                                          ),
+                                                          SizedBox(width: 10.w),
+                                                          widget
+                                                                      .invoiceData!
+                                                                      .items![i]
+                                                                      .subCategoryId ==
+                                                                  10013
+                                                              ? Text(
+                                                                  widget
+                                                                      .invoiceData!
+                                                                      .items![i]
+                                                                      .itemName!
+                                                                      .removeAllWhitespace,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        10.sp,
+                                                                    fontFamily:
+                                                                        'Poppins3',
+                                                                  ),
+                                                                )
+                                                              : Text(
+                                                                  getTranslated(
                                                                       widget
                                                                           .invoiceData!
                                                                           .items![
                                                                               i]
                                                                           .itemName!
                                                                           .removeAllWhitespace,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            10.sp,
-                                                                        fontFamily:
-                                                                            'Poppins3',
-                                                                      ),
-                                                                    )
-                                                                  : Text(
-                                                                      getTranslated(
-                                                                          widget
-                                                                              .invoiceData!
-                                                                              .items![i]
-                                                                              .itemName!
-                                                                              .removeAllWhitespace,
-                                                                          context),
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            10.sp,
-                                                                        fontFamily:
-                                                                            'Poppins3',
-                                                                      ),
-                                                                    ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                    ],
-                                                  ),
-                                                  Container(
-                                                    child: Opacity(
-                                                      opacity:
-                                                          0.6, // Set the opacity value between 0.0 (completely transparent) and 1.0 (fully opaque)
-                                                      child: Image.asset(
-                                                        'assets/images/signaturestamp.png',
-                                                        width: 170,
-                                                        height: 170,
+                                                                      context),
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        10.sp,
+                                                                    fontFamily:
+                                                                        'Poppins3',
+                                                                  ),
+                                                                ),
+                                                        ],
                                                       ),
                                                     ),
-                                                  )
                                                 ],
                                               ),
-                                              Divider(),
-                                              widget.showTables
-                                                  ? Column(
-                                                      children: [
-                                                        Center(
-                                                            child:
-                                                                partsTable()),
-                                                        SizedBox(height: 25.h),
-                                                        Center(
-                                                            child:
-                                                                servicetable()),
-                                                        SizedBox(
-                                                          height: 30.h,
-                                                        ),
-                                                        Align(
-                                                          alignment: Alignment
-                                                              .centerRight,
-                                                          child: Text(
-                                                            getTranslated(
-                                                                    "date",
-                                                                    context) +
-                                                                ': ${widget.invoiceData!.updatedAt!.substring(0, 10)}',
-                                                            style: TextStyle(
-                                                                fontSize: 13.sp,
-                                                                fontFamily:
-                                                                    "Poppins1"),
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 10.h),
-                                                      ],
-                                                    )
-                                                  : invoice0(),
-                                              Align(
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                child: SizedBox(
-                                                    width:
-                                                        screenSize!.width * 0.5,
-                                                    child: widget.choice == 1
-                                                        ? invoice1()
-                                                        : widget.choice == 2
-                                                            ? invoice2()
-                                                            : widget.choice == 3
-                                                                ? invoice3()
-                                                                : null),
-                                              ),
-                                              SizedBox(height: 30.h),
+                                              Container(
+                                                child: Opacity(
+                                                  opacity:
+                                                      0.6, // Set the opacity value between 0.0 (completely transparent) and 1.0 (fully opaque)
+                                                  child: Image.asset(
+                                                    'assets/images/signaturestamp.png',
+                                                    width: 170,
+                                                    height: 170,
+                                                  ),
+                                                ),
+                                              )
                                             ],
                                           ),
-                                        ),
-                                      ],
+                                          Divider(),
+                                          widget.showTables
+                                              ? Column(
+                                                  children: [
+                                                    Center(child: partsTable()),
+                                                    SizedBox(height: 25.h),
+                                                    Center(
+                                                        child: servicetable()),
+                                                    SizedBox(
+                                                      height: 30.h,
+                                                    ),
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.centerRight,
+                                                      child: Text(
+                                                        getTranslated("date",
+                                                                context) +
+                                                            ': ${widget.invoiceData!.updatedAt!.substring(0, 10)}',
+                                                        style: TextStyle(
+                                                            fontSize: 13.sp,
+                                                            fontFamily:
+                                                                "Poppins1"),
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 10.h),
+                                                  ],
+                                                )
+                                              : invoice0(),
+                                          Align(
+                                            alignment: Alignment.centerRight,
+                                            child: SizedBox(
+                                                width: screenSize!.width * 0.5,
+                                                child: widget.choice == 1
+                                                    ? invoice1()
+                                                    : widget.choice == 2
+                                                        ? invoice2()
+                                                        : widget.choice == 3
+                                                            ? invoice3()
+                                                            : null),
+                                          ),
+                                          SizedBox(height: 30.h),
+                                        ],
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  )
-                else
-                  const Center(
-                    child: Text('Invoice not available yet!'),
-                  )
-              ],
-            ),
-          ),
+                  ],
+                ),
+              )
+            else
+              const Center(
+                child: Text('Invoice not available yet!'),
+              )
+          ],
         ),
       ),
     );
@@ -1383,19 +1357,19 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                 ),
               ),
               SizedBox(height: 5.h),
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                spacing: 16,
-                runSpacing: 10,
+              Row(
                 children: [
                   Image(
                       image:
                           AssetImage("assets/icons/My Vehicle/Group 9254.png"),
                       height: 50.h),
+                  Spacer(),
                   carddivider(
                       getTranslated("CXname", context), profileData["name"]),
+                  Spacer(),
                   carddivider(getTranslated("Address", context),
                       widget.invoiceData!.address!.substring(0, 20)),
+                  Spacer(),
                   carddivider(getTranslated("mobileno.", context),
                       profileData['mobile_number']),
                 ],
@@ -1408,36 +1382,44 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                 style: TextStyle(fontFamily: "Poppins2", fontSize: 10.sp),
               ),
               SizedBox(height: 10.h),
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                spacing: 16,
-                runSpacing: 10,
+              Row(
                 children: [
                   Image(
                       image:
                           AssetImage("assets/icons/My Vehicle/Group 9253.png"),
                       height: 50.h),
+                  Spacer(),
                   carddivider(getTranslated("Make", context),
                       widget.invoiceData!.car!.carBrand!),
+                  Spacer(),
                   carddivider(getTranslated("Model", context),
                       widget.invoiceData!.car!.carModel!),
+                  Spacer(),
                   carddivider(getTranslated("Year", context),
                       widget.invoiceData!.car!.carYear!),
                 ],
               ),
               SizedBox(height: 10.h),
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                spacing: 16,
-                runSpacing: 10,
+              Row(
                 children: [
-                  carddivider(getTranslated("Mileage", context),
+                  carddivider(
+                      getTranslated("Mileage", context),
+                      //"Milage",
                       widget.invoiceData!.car!.carMileage!),
-                  carddivider(getTranslated("cylindertype", context),
+                  Spacer(),
+                  carddivider(
+                      getTranslated("cylindertype", context),
+                      // "Cylinder",
                       widget.invoiceData!.car!.carCylinder!),
-                  carddivider(getTranslated("carplateno", context),
+                  Spacer(),
+                  carddivider(
+                      getTranslated("carplateno", context),
+                      //"Car Plate",
                       widget.invoiceData!.car!.plateNo!),
-                  carddivider(getTranslated("ChasisNo", context),
+                  Spacer(),
+                  carddivider(
+                      getTranslated("ChasisNo", context),
+                      //"Chasis No (Optional)",
                       widget.invoiceData!.car!.carChasis!)
                 ],
               ),

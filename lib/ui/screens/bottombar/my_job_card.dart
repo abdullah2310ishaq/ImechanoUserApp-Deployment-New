@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -98,38 +99,31 @@ class _MyJobCardState extends State<MyJobCard>
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
     _tabController = TabController(length: 4, vsync: this);
     userStr =
         PrefObj.preferences!.containsKey(PrefKeys.USER_DATA) ? true : false;
     _tabController?.animateTo(currentJobcardTab);
 
-    // Only fetch job cards if user is logged in
-    if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
-      jobcardsListbloc
-          .jobcardslistsink(PrefObj.preferences!.get(PrefKeys.USER_ID),
-              currentJobcardTab.toString())
-          .then((value) {
-        flag = false;
-        showFilter = false;
-        setState(() {
-          selectTab = currentJobcardTab;
-        });
-        print('Approved Booking Value = $value');
-      });
-    } else {
-      // Guest mode - no job cards to fetch
+    jobcardsListbloc
+        .jobcardslistsink(PrefObj.preferences!.get(PrefKeys.USER_ID),
+            currentJobcardTab.toString())
+        .then((value) {
       flag = false;
       showFilter = false;
       setState(() {
+        // payconfirmKey = true;
+        // confirmKey = true;
+        // payconfirmKey =true;
         selectTab = currentJobcardTab;
       });
-    }
+      print('Approved Booking Value = $value');
+    });
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
   }
 
@@ -147,9 +141,6 @@ class _MyJobCardState extends State<MyJobCard>
         break;
       case AppLifecycleState.detached:
         onDetached();
-        break;
-      case AppLifecycleState.hidden:
-        // Handle hidden state
         break;
     }
   }
@@ -177,6 +168,7 @@ class _MyJobCardState extends State<MyJobCard>
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     final appModel = Provider.of<AppModel>(context);
     appModelTheme = appModel;
     return WillPopScope(
@@ -203,11 +195,8 @@ class _MyJobCardState extends State<MyJobCard>
           backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
           body: ScreenUtilInit(
             designSize: Size(414, 896),
-            builder: (context, child) => SafeArea(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 720),
-                  child: Column(children: [
+            builder: () => SafeArea(
+              child: Column(children: [
                 Row(
                   children: [
                     Expanded(
@@ -320,8 +309,6 @@ class _MyJobCardState extends State<MyJobCard>
               ]),
             ),
           )),
-    ),
-    ),
     );
   }
 
@@ -404,160 +391,133 @@ class _MyJobCardState extends State<MyJobCard>
         children: [
           Container(
             margin: EdgeInsets.only(right: 10.w),
-            height: 40,
+            height: 35,
             child: TabBar(
               controller: _tabController,
-              isScrollable: false,
-              indicatorSize: TabBarIndicatorSize.tab,
-              indicator: ShapeDecoration(
+              indicator: BoxDecoration(
+                border: Border.all(color: Colors.transparent),
+                borderRadius: BorderRadius.circular(5.0),
+                // color: appModelTheme.darkTheme ? Colors.grey : Colors.white,
                 color: appModelTheme.darkTheme ? logoBlue : Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
+                // color: Colors.white,
               ),
               labelColor: appModelTheme.darkTheme ? Colors.white : logoBlue,
+              // labelColor: Colors.black,
               labelStyle: TextStyle(
+                color: Colors.red,
                 fontSize: 13,
                 fontFamily: "Poppins3",
               ),
-              indicatorPadding: EdgeInsets.symmetric(horizontal: 5),
-              labelPadding: EdgeInsets.zero,
+              indicatorPadding: EdgeInsets.only(left: 10),
+              labelPadding: EdgeInsets.only(left: 10),
               unselectedLabelColor:
-                  appModelTheme.darkTheme ? Colors.white70 : Colors.white,
+                  appModelTheme.darkTheme ? Colors.white : Colors.grey[100],
               onTap: (index) {
                 selectTab = index;
                 flag = true;
                 setState(() {});
-
-                // Only fetch job cards if user is logged in
-                if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
-                  final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
-                  if (selectTab == 0) {
-                    currentJobcardTab = 0;
-                    jobcardsListbloc
-                        .jobcardslistsink(userId, '0')
-                        .then((value) {
-                      flag = false;
-                      showFilter = false;
-                      setState(() {});
-                      print(value);
-                    });
-                  } else if (selectTab == 1) {
-                    currentJobcardTab = 1;
-                    jobcardsListbloc
-                        .jobcardslistsink(userId, '1')
-                        .then((value) {
-                      flag = false;
-                      showFilter = false;
-                      setState(() {});
-                      print(value);
-                    });
-                  } else if (selectTab == 2) {
-                    currentJobcardTab = 2;
-                    jobcardsListbloc
-                        .jobcardslistsink(userId, '2')
-                        .then((value) {
-                      flag = false;
-                      showFilter = false;
-                      setState(() {});
-                      print(value);
-                    });
-                  } else {
-                    currentJobcardTab = 3;
-                    jobcardsListbloc
-                        .jobcardslistsink(userId, '3')
-                        .then((value) {
-                      flag = false;
-                      showFilter = false;
-                      setState(() {});
-                      print(value);
-                    });
-                  }
+                if (selectTab == 0) {
+                  currentJobcardTab = 0;
+                  jobcardsListbloc
+                      .jobcardslistsink(
+                          PrefObj.preferences!.get(PrefKeys.USER_ID), '0')
+                      .then((value) {
+                    flag = false;
+                    showFilter = false;
+                    setState(() {});
+                    print(value);
+                  });
+                } else if (selectTab == 1) {
+                  currentJobcardTab = 1;
+                  jobcardsListbloc
+                      .jobcardslistsink(
+                          PrefObj.preferences!.get(PrefKeys.USER_ID), '1')
+                      .then((value) {
+                    flag = false;
+                    showFilter = false;
+                    setState(() {});
+                    print(value);
+                  });
+                } else if (selectTab == 2) {
+                  currentJobcardTab = 2;
+                  jobcardsListbloc
+                      .jobcardslistsink(
+                          PrefObj.preferences!.get(PrefKeys.USER_ID), '2')
+                      .then((value) {
+                    flag = false;
+                    showFilter = false;
+                    setState(() {});
+                    print(value);
+                  });
                 } else {
-                  // Guest mode - just update the tab without fetching data
-                  currentJobcardTab = index;
-                  flag = false;
-                  showFilter = false;
-                  setState(() {});
+                  currentJobcardTab = 3;
+                  jobcardsListbloc
+                      .jobcardslistsink(
+                          PrefObj.preferences!.get(PrefKeys.USER_ID), '3')
+                      .then((value) {
+                    flag = false;
+                    showFilter = false;
+                    setState(() {});
+                    print(value);
+                  });
                 }
+                setState(() {});
               },
               tabs: [
                 Tab(
                   child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 5),
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                      border: selectTab == 0
-                          ? Border.all(color: Colors.transparent, width: 0)
-                          : Border.all(color: Colors.white, width: 1.5),
-                    ),
-                    child: Center(
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                            color: Colors.white,
+                            width: selectTab == 0 ? 0 : 1)),
+                    child: Align(
+                      alignment: Alignment.center,
                       child: Text(
                         getTranslated("Pending", context),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 11),
+                        style: TextStyle(fontSize: 12),
                       ),
                     ),
                   ),
                 ),
                 Tab(
                   child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 5),
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                      border: selectTab == 1
-                          ? Border.all(color: Colors.transparent, width: 0)
-                          : Border.all(color: Colors.white, width: 1.5),
-                    ),
-                    child: Center(
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Colors.white, width: 1)),
+                    child: Align(
+                      alignment: Alignment.center,
                       child: Text(
                         getTranslated("Completed", context),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 11),
+                        style: TextStyle(fontSize: 12),
                       ),
                     ),
                   ),
                 ),
                 Tab(
                   child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 5),
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                      border: selectTab == 2
-                          ? Border.all(color: Colors.transparent, width: 0)
-                          : Border.all(color: Colors.white, width: 1.5),
-                    ),
-                    child: Center(
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Colors.white, width: 1)),
+                    child: Align(
+                      alignment: Alignment.center,
                       child: Text(
                         getTranslated("Canceled", context),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 11),
+                        style: TextStyle(fontSize: 12),
                       ),
                     ),
                   ),
                 ),
                 Tab(
                   child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 5),
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                      border: selectTab == 3
-                          ? Border.all(color: Colors.transparent, width: 0)
-                          : Border.all(color: Colors.white, width: 1.5),
-                    ),
-                    child: Center(
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Colors.white, width: 1)),
+                    child: Align(
+                      alignment: Alignment.center,
                       child: Text(
                         getTranslated("Approved", context),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 11),
+                        style: TextStyle(fontSize: 12),
                       ),
                     ),
                   ),
@@ -571,51 +531,6 @@ class _MyJobCardState extends State<MyJobCard>
   }
 
   Widget _JobCards() {
-    // If user is not logged in (guest mode), show appropriate message
-    if (!PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.assignment,
-              size: 64,
-              color: Colors.grey,
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Please sign in to view your job cards',
-              style: TextStyle(
-                fontFamily: 'Poppins1',
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(logoBlue),
-                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                  ),
-                ),
-              ),
-              child: Text(
-                'Sign In',
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/sign-in-sign-up-landing', (Route route) => false);
-              },
-            ),
-          ],
-        ),
-      );
-    }
-
     return StreamBuilder<CustomerJobListModel>(
         stream: jobcardsListbloc.jobcardsliststream,
         builder: (context,
@@ -783,9 +698,9 @@ class _MyJobCardState extends State<MyJobCard>
                                           ElevatedButton(
                                             style: ButtonStyle(
                                                 backgroundColor:
-                                                    WidgetStateProperty.all<
+                                                    MaterialStateProperty.all<
                                                         Color>(logoBlue),
-                                                shape: WidgetStateProperty.all<
+                                                shape: MaterialStateProperty.all<
                                                         RoundedRectangleBorder>(
                                                     RoundedRectangleBorder(
                                                         borderRadius:
@@ -827,15 +742,15 @@ class _MyJobCardState extends State<MyJobCard>
                                                             .data![index]
                                                             .status ==
                                                         "0"
-                                                    ? WidgetStateProperty.all<
+                                                    ? MaterialStateProperty.all<
                                                         Color>(Colors.grey)
-                                                    : WidgetStateProperty.all<Color>(
+                                                    : MaterialStateProperty.all<Color>(
                                                         currentJobcardTab == 2
                                                             ? Color.fromARGB(
                                                                 255, 186, 186, 186)
                                                             : Colors.green
                                                                 .shade400),
-                                                shape: WidgetStateProperty.all<
+                                                shape: MaterialStateProperty.all<
                                                         RoundedRectangleBorder>(
                                                     RoundedRectangleBorder(
                                                   borderRadius:
@@ -957,9 +872,9 @@ class _MyJobCardState extends State<MyJobCard>
                     ElevatedButton(
                       style: ButtonStyle(
                           backgroundColor:
-                              WidgetStateProperty.all<Color>(logoBlue),
+                              MaterialStateProperty.all<Color>(logoBlue),
                           shape:
-                              WidgetStateProperty.all<RoundedRectangleBorder>(
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0),
                           ))),
@@ -982,9 +897,9 @@ class _MyJobCardState extends State<MyJobCard>
                     ElevatedButton(
                       style: ButtonStyle(
                           backgroundColor:
-                              WidgetStateProperty.all<Color>(logoBlue),
+                              MaterialStateProperty.all<Color>(logoBlue),
                           shape:
-                              WidgetStateProperty.all<RoundedRectangleBorder>(
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0),
                           ))),
@@ -1017,11 +932,8 @@ class _MyJobCardState extends State<MyJobCard>
     print("~~~~~~~ resumed");
     // _tabController?.animateTo(currentBookingTab);
 
-    // Only fetch job cards if user is logged in
-    if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
-      jobcardsListbloc.jobcardslistsink(
-          PrefObj.preferences!.get(PrefKeys.USER_ID), selectTab.toString());
-    }
+    jobcardsListbloc.jobcardslistsink(
+        PrefObj.preferences!.get(PrefKeys.USER_ID), selectTab.toString());
   }
 
   void onPaused() {

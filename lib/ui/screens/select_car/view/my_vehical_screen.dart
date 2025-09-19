@@ -61,7 +61,7 @@ class _MyvehicalscreenState extends State<Myvehicalscreen> {
     appModelTheme = appModel;
     return ScreenUtilInit(
       designSize: Size(414, 896),
-      builder: (context, child) => WillPopScope(
+      builder: () => WillPopScope(
         onWillPop: () async {
           Navigator.pushReplacement(
               context,
@@ -147,8 +147,8 @@ class _MyvehicalscreenState extends State<Myvehicalscreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            "assets/icons/splash/logo.png",
+          SvgPicture.asset(
+            "assets/svg/imechano-logo.svg",
             height: MediaQuery.of(context).size.height * 0.11,
             color: appModelTheme.darkTheme ? white : null,
           ),
@@ -250,8 +250,6 @@ class _MyvehicalscreenState extends State<Myvehicalscreen> {
                             ]),
                         child: Card(
                           elevation: 0,
-                          color:
-                              appModelTheme.darkTheme ? darkmodeColor : white,
                           child: Padding(
                             padding: const EdgeInsets.only(left: 12, right: 12),
                             child: Column(
