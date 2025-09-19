@@ -1518,6 +1518,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
         transitionDuration: const Duration(milliseconds: 200),
         pageBuilder: (BuildContext buildContext, Animation animation,
             Animation secondaryAnimation) {
+          final appModelTheme = Provider.of<AppModel>(buildContext);
           return Container(
             width: MediaQuery.of(context).size.width - 10,
             height: MediaQuery.of(context).size.height - 100,
@@ -1927,12 +1928,15 @@ Widget dynamicBottomCard() {
                 itemCount: conditionsListsnapshort.data!.data!.length,
                 // reverse: true,
                 itemBuilder: (BuildContext context, int index) {
+                  final appModel = Provider.of<AppModel>(context);
                   return Column(
                     children: [
                       Container(
                         // height: double.infinity,
                         decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: appModel.darkTheme
+                                ? darkmodeColor
+                                : Colors.white,
                             borderRadius: BorderRadius.only(
                                 topRight: Radius.circular(25.0),
                                 topLeft: Radius.circular(25.0))),
@@ -1952,40 +1956,51 @@ Widget dynamicBottomCard() {
 
 Widget Frontbumber(
     String label, String carCondition, String workNeeded, String image) {
-  return Container(
-    width: double.infinity,
-    margin: EdgeInsets.only(left: 10.w, right: 10.w, top: 10.h, bottom: 10.h),
-    decoration: BoxDecoration(
-        border: Border.all(color: Color(0xffa9d7f7)),
-        borderRadius: BorderRadius.all(Radius.circular(10))),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 7, bottom: 7, left: 10),
-          child: Text(
-            "$label",
-            style: TextStyle(fontFamily: "Poppins1", fontSize: 15.sp),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 10),
-          child: Row(
-            children: [
-              carImage(image),
-              // carImage(temp == null ? '' : temp!.path.toString()),
-              // carImage(temp == null ? '' : temp!.path.toString()),
-            ],
-          ),
-        ),
-        Row(
+  return Consumer<AppModel>(
+    builder: (context, appModel, child) {
+      return Container(
+        width: double.infinity,
+        margin:
+            EdgeInsets.only(left: 10.w, right: 10.w, top: 10.h, bottom: 10.h),
+        decoration: BoxDecoration(
+            color: appModel.darkTheme ? darkmodeColor : Colors.white,
+            border: Border.all(
+                color: appModel.darkTheme ? Colors.white30 : Color(0xffa9d7f7)),
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            bottomCard(carCondition, workNeeded),
+            Padding(
+              padding: const EdgeInsets.only(top: 7, bottom: 7, left: 10),
+              child: Text(
+                "$label",
+                style: TextStyle(
+                  fontFamily: "Poppins1",
+                  fontSize: 15.sp,
+                  color: appModel.darkTheme ? white : Colors.black,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Row(
+                children: [
+                  carImage(image),
+                  // carImage(temp == null ? '' : temp!.path.toString()),
+                  // carImage(temp == null ? '' : temp!.path.toString()),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                bottomCard(carCondition, workNeeded),
+              ],
+            )
           ],
-        )
-      ],
-    ),
+        ),
+      );
+    },
   );
 }
 
@@ -2032,59 +2047,67 @@ Widget carImage(String images) {
 }
 
 Widget bottomCard(String carCondition, String workNeeded) {
-  return Expanded(
-      child: Column(
-    children: [
-      Material(
-        child: Container(
-          margin: EdgeInsets.all(10.h),
-          padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
-          decoration: BoxDecoration(
-              color: cardgreycolor2,
-              borderRadius: BorderRadius.all(Radius.circular(10))),
-          child: ListTile(
-            title: Text(
-              "Pickup Condition",
-              style: TextStyle(
-                  color: greycolorfont, fontSize: 9.sp, fontFamily: "Poppins3"),
-            ),
-            subtitle: Container(
-              margin: EdgeInsets.only(top: 5.h),
-              child: Text("$carCondition",
+  return Consumer<AppModel>(
+    builder: (context, appModel, child) {
+      return Expanded(
+          child: Column(
+        children: [
+          Material(
+            child: Container(
+              margin: EdgeInsets.all(10.h),
+              padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
+              decoration: BoxDecoration(
+                  color: appModel.darkTheme ? darkmodeColor : cardgreycolor2,
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              child: ListTile(
+                title: Text(
+                  "Pickup Condition",
                   style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 11.sp,
-                      fontFamily: "Poppins3")),
+                      color: appModel.darkTheme ? white : greycolorfont,
+                      fontSize: 9.sp,
+                      fontFamily: "Poppins3"),
+                ),
+                subtitle: Container(
+                  margin: EdgeInsets.only(top: 5.h),
+                  child: Text("$carCondition",
+                      style: TextStyle(
+                          color: appModel.darkTheme ? white : Colors.black,
+                          fontSize: 11.sp,
+                          fontFamily: "Poppins3")),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-      Material(
-        child: Container(
-          margin: EdgeInsets.all(10.h),
-          padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
-          decoration: BoxDecoration(
-              color: cardgreycolor2,
-              borderRadius: BorderRadius.all(Radius.circular(10))),
-          child: ListTile(
-            title: Text(
-              "Type of Work Needed",
-              style: TextStyle(
-                  color: greycolorfont, fontSize: 9.sp, fontFamily: "Poppins3"),
-            ),
-            subtitle: Container(
-              margin: EdgeInsets.only(top: 5.h),
-              child: Text("$workNeeded",
+          Material(
+            child: Container(
+              margin: EdgeInsets.all(10.h),
+              padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
+              decoration: BoxDecoration(
+                  color: appModel.darkTheme ? darkmodeColor : cardgreycolor2,
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              child: ListTile(
+                title: Text(
+                  "Type of Work Needed",
                   style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 11.sp,
-                      fontFamily: "Poppins3")),
+                      color: appModel.darkTheme ? white : greycolorfont,
+                      fontSize: 9.sp,
+                      fontFamily: "Poppins3"),
+                ),
+                subtitle: Container(
+                  margin: EdgeInsets.only(top: 5.h),
+                  child: Text("$workNeeded",
+                      style: TextStyle(
+                          color: appModel.darkTheme ? white : Colors.black,
+                          fontSize: 11.sp,
+                          fontFamily: "Poppins3")),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-    ],
-  ));
+        ],
+      ));
+    },
+  );
 }
 
 Widget cardPoint(String title) {

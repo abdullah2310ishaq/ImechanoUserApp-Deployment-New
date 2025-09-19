@@ -80,16 +80,17 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
     appModelTheme = appModel;
     return ScreenUtilInit(
         designSize: Size(360, 690),
-        builder: (context, child) => PopScope(
-              canPop: true,
-              onPopInvoked: (didPop) {
-                if (!didPop) {
-                  if (!Navigator.of(context).canPop()) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => BottomBarPage(2)),
-                    );
-                  }
+        builder: (context, child) => WillPopScope(
+              onWillPop: () async {
+                if (!Navigator.of(context).canPop()) {
+                  // If there's no screen in the stack, navigate to home screen
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => BottomBarPage(2)),
+                  );
+                  return false; // Return false to prevent the app from closing
+                } else {
+                  return true; // Return true to allow the app to close
                 }
               },
               child: Scaffold(
@@ -463,9 +464,11 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
       context: context,
       builder: (_) => Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding: EdgeInsets.all(20.h),
-        child: Container(
-          height: hh * 0.43,
+        insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: hh * 0.65,
+          ),
           child: _DateTime(),
         ),
       ),
@@ -846,6 +849,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
         elevation: 10,
         color: appModelTheme.darkTheme ? darkmodeColor : Colors.white,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
               width: double.infinity,
@@ -889,7 +893,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
               ),
             ),
             _dateAndTime(),
-            Spacer(),
+            SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -1013,10 +1017,10 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
                     ),
                   ),
                 ),
-                SizedBox(height: 30.h),
+                SizedBox(height: 20),
               ],
             ),
-            SizedBox(height: 50.h)
+            SizedBox(height: 10)
           ],
         ),
       ),
@@ -1025,7 +1029,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
 
   Widget _dateAndTime() {
     return Container(
-      height: hh * 0.25,
+      height: hh * 0.28,
       child: CupertinoDatePicker(
         minimumDate: DateTime.now(),
         mode: CupertinoDatePickerMode.dateAndTime,
@@ -1049,7 +1053,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
       'job_number': widget.job_number.toString(),
     });
     print("Iam here");
-    request
+    var res = request
         .send()
         .then((value) => http.Response.fromStream(value).then((onvalue) {
               final result = jsonDecode(onvalue.body) as Map<String, dynamic>;
@@ -1098,7 +1102,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
     Loader().showLoader(context);
     final SendNotificationAdminModel isAdmin =
         await _repository.onSendNotificationAdminAPI(
-            'Delivery Confirmed', 'User has confirmed delivery. Thank you');
+            'Delivery Confirmed', 'User has confirmed delivery.');
     Loader().hideLoader(context);
     if (isAdmin.code != '0') {
       FocusScope.of(context).requestFocus(FocusNode());
@@ -1323,6 +1327,19 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
                                 child: InkWell(
                                   onTap: () async {
                                     openCamera();
+                                    // image = await _picker.pickImage(
+                                    //     source: ImageSource.camera);
+                                    // if (image != null) {
+                                    //   setState(() {
+                                    //     temp = image;
+                                    //     XFile imageFile = XFile(image!.path);
+                                    //
+                                    //     var imagefile = imageFile as List<XFile>?;
+                                    //     imagefiles = [...?imagefiles, ...?imagefile].toSet().toList();
+                                    //   });
+                                    //
+                                    // }
+                                    // Navigator.pop(context);
                                   },
                                   child: Container(
                                     height: 60.h,
@@ -1347,6 +1364,12 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
                                 child: InkWell(
                                   onTap: () async {
                                     openGallery();
+                                    // image = await _picker.pickImage(
+                                    //     source: ImageSource.gallery);
+                                    //
+                                    // setState(() {
+                                    //   temp = image;
+                                    // });
                                   },
                                   child: Container(
                                     height: 60.h,
@@ -1518,11 +1541,14 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
 
   openCamera() async {
     try {
-      final picked = await _picker.pickImage(source: ImageSource.camera);
-      if (picked != null) {
+      XFile? image = await _picker.pickImage(source: ImageSource.camera);
+      if (image != null) {
+        temp = image;
+        List<XFile>? imagefile = <XFile>[];
+        imagefile.add(image);
+
         setState(() {
-          temp = picked;
-          imagefiles = [...?imagefiles, picked];
+          imagefiles = [...?imagefiles, ...imagefile].toSet().toList();
         });
         Navigator.pop(context);
       } else {
@@ -1537,14 +1563,10 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
     try {
       var pickedfiles = await _picker.pickMultiImage();
       //you can use ImageCourse.camera for Camera capture
-      if (pickedfiles.isNotEmpty) {
-        setState(() {
-          imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
-        });
-        Navigator.pop(context);
-      } else {
-        print("No image is selected.");
-      }
+      setState(() {
+        imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
+      });
+      Navigator.pop(context);
     } catch (e) {
       print("error while picking file.");
     }

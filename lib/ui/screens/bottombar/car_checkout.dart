@@ -93,8 +93,8 @@ class _CheckOutState extends State<CheckOut> {
 
   bool loadMap = true;
   var address;
-  dynamic lat = 0.obs;
-  dynamic long;
+  String lat = '0.00';
+  String long = '0.00';
   List<Marker> _markers = <Marker>[];
 
   final GlobalKey<ScaffoldState> _key = GlobalKey();
@@ -661,7 +661,7 @@ class _CheckOutState extends State<CheckOut> {
                   // height: size.height * 0.01,
                   width: size.width * 0.06,
                   child: Radio(
-                    fillColor: MaterialStateColor.resolveWith(
+                    fillColor: WidgetStateColor.resolveWith(
                         (states) => Color(0xffED4E46)),
                     value: 2,
                     groupValue: val,
