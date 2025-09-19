@@ -62,15 +62,16 @@ class _SplashScreenState extends State<SplashScreen> {
     var size = MediaQuery.of(context).size;
     setScreenSize(size);
     return ScreenUtilInit(
+      designSize: Size(414, 896),
       builder: (context, child) => Scaffold(
         body: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(8.w),
           child: Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                SizedBox(height: 20),
+                SizedBox(height: 20.h),
                 Image(
                     image: AssetImage('assets/icons/splash/logo.png'),
                     width: 140.w,
@@ -94,8 +95,8 @@ class _SplashScreenState extends State<SplashScreen> {
   Image loadGIF() {
     return Image.asset(
       'assets/meter.gif',
-      height: 120,
-      width: 120,
+      height: 120.h,
+      width: 120.w,
     );
   }
 }

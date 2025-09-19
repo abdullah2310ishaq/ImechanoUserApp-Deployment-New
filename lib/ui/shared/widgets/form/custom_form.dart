@@ -67,7 +67,10 @@ class CustomForm extends StatelessWidget {
               ),
             ),
             hintText: hintText,
-            hintStyle: TextStyle(fontFamily: 'Poppins3', color: black),
+            hintStyle: TextStyle(
+              fontFamily: 'Poppins3',
+              color: appModelTheme.darkTheme ? white : black,
+            ),
             prefixIconConstraints: BoxConstraints(minWidth: 40),
             suffixIcon: isSuffix
                 ? Icon(

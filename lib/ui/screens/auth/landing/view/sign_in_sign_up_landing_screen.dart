@@ -81,9 +81,9 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
                                       width: 0.99.sw,
                                       fit: BoxFit.contain,
                                       image: AssetImage(
-                                          'assets/icons/splash/abc.png'),
+                                          'assets/icons/auth/landing.png'),
                                       color: appModelTheme.darkTheme
-                                          ? white
+                                          ? transparent
                                           : null),
                                 ),
                               ],

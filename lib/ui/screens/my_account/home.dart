@@ -5,7 +5,8 @@ import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -112,10 +113,23 @@ class _HomeScreenState extends State<HomeScreen> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(Duration(seconds: 2), () {
-        showNotificationPermissionDialog(context);
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Avoid double prompts on iOS: request directly via FirebaseMessaging
+      if (Platform.isIOS) {
+        await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+          announcement: false,
+          criticalAlert: false,
+          provisional: false,
+          carPlay: false,
+        );
+      } else {
+        Future.delayed(Duration(seconds: 2), () {
+          showNotificationPermissionDialog(context);
+        });
+      }
     });
 
     getAddress();
@@ -932,14 +946,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .toString()
                                     .length >
                                 1
-                        ? Text(
-                            '${PrefObj.preferences!.get(PrefKeys.CARNAME)}',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "Poppins1",
-                                fontSize: 13.sp),
+                        ? Center(
+                            child: Text(
+                              '${PrefObj.preferences!.get(PrefKeys.CARNAME)}',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Poppins1",
+                                  fontSize: 13.sp),
+                            ),
                           )
                         : Row(
                             mainAxisSize: MainAxisSize.min,
@@ -2266,18 +2283,18 @@ Future<void> requestNotificationPermission() async {
       );
     }
   } else if (Platform.isIOS) {
-    // Request permissions for iOS
-    final plugin = FlutterLocalNotificationsPlugin();
-    bool? granted = await plugin
-        .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
-        ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
-
-    if (granted == false) {
+    // Use Firebase Messaging on iOS to avoid duplicate prompts
+    NotificationSettings settings =
+        await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+      announcement: false,
+      criticalAlert: false,
+      provisional: false,
+      carPlay: false,
+    );
+    if (settings.authorizationStatus == AuthorizationStatus.denied) {
       Get.snackbar(
         'Warning!',
         'Notification permissions are denied on iOS.',
@@ -2285,6 +2302,14 @@ Future<void> requestNotificationPermission() async {
         colorText: Colors.white,
       );
       await openAppSettings();
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
+      Get.snackbar(
+        'Info',
+        'Notifications enabled provisionally on iOS.',
+        backgroundColor: Colors.blue,
+        colorText: Colors.white,
+      );
     } else {
       Get.snackbar(
         'Success!',

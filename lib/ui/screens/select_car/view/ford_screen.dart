@@ -777,10 +777,18 @@ class _FordScreenState extends State<FordScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  ElevatedButton(
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: logoBlue,
                         foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        elevation: 2,
+                        padding: EdgeInsets.symmetric(
+                            vertical: 6.h, horizontal: 20.w),
                       ),
                       onPressed: () {
                         FocusScope.of(context).requestFocus(FocusNode());
@@ -797,18 +805,25 @@ class _FordScreenState extends State<FordScreen> {
                               getTranslated('AddAllRequiredData!', context));
                         }
                       },
-                      child: SizedBox(
-                          width: 310.w,
-                          height: 50.h,
-                          child: Center(
-                              child: Text(
-                                  widget.type != AddCarType.edit
-                                      ? getTranslated('AddCar', context)
-                                      : "Save Car",
-                                  style: TextStyle(
-                                    fontFamily: "Poppins1",
-                                    color: Colors.white,
-                                  ))))),
+                      child: Container(
+                        width: double.infinity,
+                        height: 50.h,
+                        child: Center(
+                          child: Text(
+                            widget.type != AddCarType.edit
+                                ? getTranslated('AddCar', context)
+                                : "Save Car",
+                            style: TextStyle(
+                              fontFamily: "Poppins1",
+                              color: Colors.white,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   SizedBox(
                     height: 20.h,
                   )

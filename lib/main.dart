@@ -164,6 +164,13 @@ class _IMechanoAppState extends State<IMechanoApp> {
     });
 
     // onMessage: When the app is open and it receives a push notification
+    // Ensure iOS shows alerts when app is in foreground
+    FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
       log("onMessage data: ${message.data}");

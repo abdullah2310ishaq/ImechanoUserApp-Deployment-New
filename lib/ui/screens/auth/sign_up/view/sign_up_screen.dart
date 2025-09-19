@@ -128,7 +128,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             fontFamily: "Poppins3",
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black)),
+                            color: appModelTheme.darkTheme
+                                ? white
+                                : Colors.black)),
                     SizedBox(height: 10),
                   ],
                 ),
@@ -156,13 +158,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               title: Row(
                                 children: [
                                   SizedBox(
-                                    width: 20,
+                                    width: 40,
                                     child: Align(
                                       alignment: Alignment.centerLeft,
                                       child: Image.asset(
                                         "assets/images/Location.png",
                                         width: 20,
                                         height: 20,
+                                        color: appModelTheme.darkTheme
+                                            ? Colors.white
+                                            : null,
                                       ),
                                     ),
                                   ),
@@ -176,7 +181,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       style: TextStyle(
                                         fontFamily: 'Poppins3',
                                         fontSize: 16,
-                                        color: Colors.black,
+                                        color: appModelTheme.darkTheme
+                                            ? Colors.white
+                                            : Colors.black,
                                       ),
                                     ),
                                   ),
@@ -206,8 +213,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       : addressBtn = addressTxt;
                                 });
                               },
-                              bgColor: grayE6E6E5,
-                              borderColor: buttonGrayE8E8E7Border,
+                              bgColor: appModelTheme.darkTheme
+                                  ? darkmodeColor
+                                  : grayE6E6E5,
+                              borderColor: Colors.transparent,
                             ),
                           ),
                           SizedBox(height: 20),
@@ -217,13 +226,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               title: Row(
                                 children: [
                                   SizedBox(
-                                    width: 20,
+                                    width: 40,
                                     child: Align(
                                       alignment: Alignment.centerLeft,
                                       child: Image.asset(
                                         "assets/images/car.png",
                                         width: 20,
                                         height: 20,
+                                        color: appModelTheme.darkTheme
+                                            ? Colors.white
+                                            : null,
                                       ),
                                     ),
                                   ),
@@ -238,7 +250,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       style: TextStyle(
                                         fontFamily: 'Poppins3',
                                         fontSize: 16,
-                                        color: Colors.black,
+                                        color: appModelTheme.darkTheme
+                                            ? Colors.white
+                                            : Colors.black,
                                       ),
                                     ),
                                   ),
@@ -251,8 +265,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                                 Get.toNamed('/select-your-car');
                               },
-                              bgColor: grayE6E6E5,
-                              borderColor: buttonGrayE8E8E7Border,
+                              bgColor: appModelTheme.darkTheme
+                                  ? darkmodeColor
+                                  : grayE6E6E5,
+                              borderColor: Colors.transparent,
                             ),
                           ),
                           SizedBox(height: 40),
@@ -394,12 +410,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _textfiled(TextEditingController controller, String title) {
     return Container(
       child: TextFormField(
-        style: TextStyle(fontFamily: "Poppins3"),
+        style: TextStyle(
+            fontFamily: "Poppins3",
+            color: appModelTheme.darkTheme ? white : black),
         validator: validatePassword,
         controller: controller,
         obscureText: showPassword,
         decoration: InputDecoration(
-          fillColor: grayE6E6E5,
+          fillColor: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
           filled: true,
           border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent),
@@ -419,7 +437,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           prefixIcon:
               Image.asset('assets/icons/auth/sign_up/create-password.png'),
           hintText: title,
-          hintStyle: TextStyle(fontFamily: "Poppins3", color: black),
+          hintStyle: TextStyle(
+              fontFamily: "Poppins3",
+              color: appModelTheme.darkTheme ? white : black),
           prefixIconConstraints: BoxConstraints(minWidth: 40),
           suffixIcon: IconButton(
             onPressed: () {
@@ -438,12 +458,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _confirmPassfiled(TextEditingController controller, String title) {
     return Container(
       child: TextFormField(
-        style: TextStyle(fontFamily: "Poppins3"),
+        style: TextStyle(
+            fontFamily: "Poppins3",
+            color: appModelTheme.darkTheme ? white : black),
         validator: validateConfirmPassword,
         controller: controller,
         obscureText: showPassword,
         decoration: InputDecoration(
-          fillColor: grayE6E6E5,
+          fillColor: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
           filled: true,
           border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent),
@@ -463,7 +485,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           prefixIcon:
               Image.asset('assets/icons/auth/sign_up/create-password.png'),
           hintText: title,
-          hintStyle: TextStyle(fontFamily: "Poppins3", color: black),
+          hintStyle: TextStyle(
+              fontFamily: "Poppins3",
+              color: appModelTheme.darkTheme ? white : black),
           prefixIconConstraints: BoxConstraints(minWidth: 40),
           suffixIcon: IconButton(
             onPressed: () {
