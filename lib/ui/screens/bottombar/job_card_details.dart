@@ -173,7 +173,7 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                     child: Container(
                   decoration: BoxDecoration(
                       color: appModelTheme.darkTheme
-                          ? darkmodeColor
+                          ? Colors.grey[850]
                           : Colors.white,
                       borderRadius: BorderRadius.only(
                           topRight: Radius.circular(25),
@@ -539,9 +539,16 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
         margin: EdgeInsets.only(left: 9, right: 9, top: 7, bottom: 7),
         padding: EdgeInsets.only(bottom: 15, top: 15),
         decoration: BoxDecoration(
-            color:
-                appModelTheme.darkTheme ? Colors.grey[800] : Colors.grey[100],
-            borderRadius: BorderRadius.all(Radius.circular(10))),
+            color: appModelTheme.darkTheme
+                ? Colors.grey[900]
+                : Colors.grey[100], // Darker card background
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            border: Border.all(
+              color: appModelTheme.darkTheme
+                  ? Colors.grey[700]!
+                  : Colors.grey[300]!,
+              width: 1,
+            )),
         child: Container(
             margin: EdgeInsets.only(left: 15),
             child: Text(title,
@@ -1013,12 +1020,19 @@ Widget textFiled(
     height: 60,
     width: 175,
     decoration: BoxDecoration(
-      color: Colors.yellow[100],
+      color: appModel.darkTheme
+          ? Colors.black
+          : Colors.white, // Full black for dark mode
       borderRadius: BorderRadius.circular(15),
-      border: Border.all(color: Colors.orange, width: 3),
+      border: Border.all(
+        color: appModel.darkTheme ? Colors.white : Colors.green,
+        width: 1,
+      ),
       boxShadow: [
         BoxShadow(
-          color: Colors.orange.withOpacity(0.5),
+          color: appModel.darkTheme
+              ? Colors.black26
+              : Colors.green.withOpacity(0.8),
           spreadRadius: 2,
           blurRadius: 5,
         ),
@@ -1028,7 +1042,10 @@ Widget textFiled(
       readOnly: true,
       controller: controller,
       style: TextStyle(
-          color: Colors.red[800], fontSize: 18, fontWeight: FontWeight.bold),
+        color: appModel.darkTheme ? Colors.white : Colors.black,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
       decoration: InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
@@ -1039,8 +1056,11 @@ Widget textFiled(
           ),
           hintText: title,
           hintStyle: TextStyle(
-              fontSize: 13, fontFamily: 'Poppins3', color: Colors.grey),
-          fillColor: Colors.yellow[100],
+            fontSize: 13,
+            fontFamily: 'Poppins3',
+            color: appModel.darkTheme ? Colors.white : Colors.grey,
+          ),
+          fillColor: appModel.darkTheme ? Colors.black : Colors.white,
           filled: true),
     ),
   );

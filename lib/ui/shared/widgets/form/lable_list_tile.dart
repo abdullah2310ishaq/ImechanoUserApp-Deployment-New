@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:imechano/ui/provider/theme_provider.dart';
 
 class LabelListTile extends StatelessWidget {
   final String title;
@@ -14,13 +16,14 @@ class LabelListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appModel = Provider.of<AppModel>(context);
     var size = MediaQuery.of(context).size;
     return Container(
         decoration: BoxDecoration(
-            color: Colors.grey.shade100,
+            color: appModel.darkTheme ? Colors.black : Colors.grey.shade100,
             border: Border.all(
-              color: Colors.grey, // Border color
-              width: 1.5, // Border width
+              color: appModel.darkTheme ? Colors.white : Colors.grey,
+              width: 1.5,
             ),
             borderRadius: BorderRadius.circular(8.0)),
         width: size.width * widthFactor,
@@ -32,16 +35,20 @@ class LabelListTile extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                  color: appModel.darkTheme ? Colors.white : Colors.black,
+                ),
               ),
-              // SizedBox(
-              //   height: size.height * 0.001,
-              // ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 8, 0, 12),
                 child: Text(subtitle!,
-                    style:
-                        TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: appModel.darkTheme ? Colors.white : Colors.black,
+                    )),
               )
             ],
           ),
