@@ -1013,15 +1013,22 @@ Widget textFiled(
     height: 60,
     width: 175,
     decoration: BoxDecoration(
-      color: Colors.blue[50],
+      color: Colors.yellow[100],
       borderRadius: BorderRadius.circular(15),
-      border: Border.all(color: Colors.blue, width: 2),
+      border: Border.all(color: Colors.orange, width: 3),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.orange.withOpacity(0.5),
+          spreadRadius: 2,
+          blurRadius: 5,
+        ),
+      ],
     ),
     child: TextField(
       readOnly: true,
       controller: controller,
       style: TextStyle(
-          color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+          color: Colors.red[800], fontSize: 18, fontWeight: FontWeight.bold),
       decoration: InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
@@ -1033,7 +1040,7 @@ Widget textFiled(
           hintText: title,
           hintStyle: TextStyle(
               fontSize: 13, fontFamily: 'Poppins3', color: Colors.grey),
-          fillColor: Colors.blue[50],
+          fillColor: Colors.yellow[100],
           filled: true),
     ),
   );

@@ -74,15 +74,22 @@ class _SplashScreenState extends State<SplashScreen> {
                 SizedBox(height: 20.h),
                 Image(
                     image: AssetImage('assets/icons/splash/logo.png'),
-                    width: 140.w,
-                    height: 140.h),
+                    width: 120.w,
+                    height: 120.h,
+                    fit: BoxFit.contain),
                 Regular20Black(
                     getTranslated('welcometoiFixcarservice', context)),
-                Image(image: AssetImage('assets/icons/splash/splash.png')),
+                Image(
+                  image: AssetImage('assets/icons/splash/splash.png'),
+                  width: 0.9.sw,
+                  height: 200.h,
+                  fit: BoxFit.contain,
+                ),
                 Image.asset(
                   'assets/meter.gif',
-                  height: 120.h,
-                  width: 120.w,
+                  height: 100.h,
+                  width: 100.w,
+                  fit: BoxFit.contain,
                 ),
               ],
             ),
