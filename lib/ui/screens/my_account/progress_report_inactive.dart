@@ -33,7 +33,7 @@ class _ProgressreportInactiveState extends State<ProgressreportInactive> {
       body: SafeArea(
         child: ScreenUtilInit(
           designSize: Size(414, 896),
-          builder: () => Column(
+          builder: (context, child) => Column(
             children: [
               Expanded(
                 child: Container(

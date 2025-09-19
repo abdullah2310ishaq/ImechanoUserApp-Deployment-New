@@ -1,7 +1,6 @@
 // ignore_for_file: await_only_futures, deprecated_member_use
 import 'dart:developer';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -82,7 +81,7 @@ Future<void> main() async {
 
   final Directory appDocDir = await getApplicationDocumentsDirectory();
   Hive.init(appDocDir.path);
-  AppModel appLanguage = AppModel();
+
   await Hive.openBox('imechano').then(
     (value) => runApp(
       ChangeNotifierProvider(
@@ -196,7 +195,7 @@ class _IMechanoAppState extends State<IMechanoApp> {
 
           return ScreenUtilInit(
             designSize: Size(360, 690),
-            builder: () =>
+            builder: (context, child) =>
                 Consumer<AppModel>(builder: (context, appLang, child) {
               return MultiProvider(
                 providers: [
@@ -268,24 +267,26 @@ class _IMechanoAppState extends State<IMechanoApp> {
   ThemeData buildLightTheme() {
     final ThemeData base = ThemeData.light();
     return base.copyWith(
-      buttonColor: Colors.redAccent,
       cardColor: Colors.white,
-      backgroundColor: Colors.white,
       primaryColor: Colors.red,
-      accentColor: Colors.redAccent,
       scaffoldBackgroundColor: Colors.white,
+      colorScheme: base.colorScheme.copyWith(
+        primary: Colors.red,
+        secondary: Colors.redAccent,
+      ),
     );
   }
 
   ThemeData buildDarkTheme() {
     final ThemeData base = ThemeData.dark();
     return base.copyWith(
-      buttonColor: Colors.blueAccent,
       cardColor: Colors.grey[800],
-      backgroundColor: Colors.grey[800],
       primaryColor: Colors.blue[900],
-      accentColor: Colors.blueAccent,
       scaffoldBackgroundColor: Colors.grey[900],
+      colorScheme: base.colorScheme.copyWith(
+        primary: Colors.blue[900]!,
+        secondary: Colors.blueAccent,
+      ),
     );
   }
 

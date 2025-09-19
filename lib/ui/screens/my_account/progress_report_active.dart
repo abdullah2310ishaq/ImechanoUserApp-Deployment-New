@@ -80,17 +80,16 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
     appModelTheme = appModel;
     return ScreenUtilInit(
         designSize: Size(360, 690),
-        builder: () => WillPopScope(
-              onWillPop: () async {
-                if (!Navigator.of(context).canPop()) {
-                  // If there's no screen in the stack, navigate to home screen
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => BottomBarPage(2)),
-                  );
-                  return false; // Return false to prevent the app from closing
-                } else {
-                  return true; // Return true to allow the app to close
+        builder: (context, child) => PopScope(
+              canPop: true,
+              onPopInvoked: (didPop) {
+                if (!didPop) {
+                  if (!Navigator.of(context).canPop()) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => BottomBarPage(2)),
+                    );
+                  }
                 }
               },
               child: Scaffold(
@@ -223,7 +222,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
                                                           child: Padding(
                                                             padding:
                                                                 const EdgeInsets
-                                                                        .only(
+                                                                    .only(
                                                                     bottom: 10),
                                                             child:
                                                                 Image.network(
@@ -1050,7 +1049,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
       'job_number': widget.job_number.toString(),
     });
     print("Iam here");
-    var res = request
+    request
         .send()
         .then((value) => http.Response.fromStream(value).then((onvalue) {
               final result = jsonDecode(onvalue.body) as Map<String, dynamic>;
@@ -1099,7 +1098,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
     Loader().showLoader(context);
     final SendNotificationAdminModel isAdmin =
         await _repository.onSendNotificationAdminAPI(
-            'Delivery Confirmed', 'User has confirmed delivery.');
+            'Delivery Confirmed', 'User has confirmed delivery. Thank you');
     Loader().hideLoader(context);
     if (isAdmin.code != '0') {
       FocusScope.of(context).requestFocus(FocusNode());
@@ -1324,19 +1323,6 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
                                 child: InkWell(
                                   onTap: () async {
                                     openCamera();
-                                    // image = await _picker.pickImage(
-                                    //     source: ImageSource.camera);
-                                    // if (image != null) {
-                                    //   setState(() {
-                                    //     temp = image;
-                                    //     XFile imageFile = XFile(image!.path);
-                                    //
-                                    //     var imagefile = imageFile as List<XFile>?;
-                                    //     imagefiles = [...?imagefiles, ...?imagefile].toSet().toList();
-                                    //   });
-                                    //
-                                    // }
-                                    // Navigator.pop(context);
                                   },
                                   child: Container(
                                     height: 60.h,
@@ -1361,12 +1347,6 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
                                 child: InkWell(
                                   onTap: () async {
                                     openGallery();
-                                    // image = await _picker.pickImage(
-                                    //     source: ImageSource.gallery);
-                                    //
-                                    // setState(() {
-                                    //   temp = image;
-                                    // });
                                   },
                                   child: Container(
                                     height: 60.h,
@@ -1538,14 +1518,11 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
 
   openCamera() async {
     try {
-      XFile? image = await _picker.pickImage(source: ImageSource.camera);
-      if (image != null) {
-        temp = image;
-        List<XFile>? imagefile = <XFile>[];
-        imagefile.add(image);
-
+      final picked = await _picker.pickImage(source: ImageSource.camera);
+      if (picked != null) {
         setState(() {
-          imagefiles = [...?imagefiles, ...imagefile].toSet().toList();
+          temp = picked;
+          imagefiles = [...?imagefiles, picked];
         });
         Navigator.pop(context);
       } else {
@@ -1560,7 +1537,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
     try {
       var pickedfiles = await _picker.pickMultiImage();
       //you can use ImageCourse.camera for Camera capture
-      if (pickedfiles != null) {
+      if (pickedfiles.isNotEmpty) {
         setState(() {
           imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
         });

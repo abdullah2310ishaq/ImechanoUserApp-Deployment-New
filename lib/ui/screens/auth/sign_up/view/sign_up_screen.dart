@@ -80,7 +80,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   void initState() {
     firebaseCloudMessaging_Listeners();
-    // TODO: implement initState
     super.initState();
     carid = PrefObj.preferences!.containsKey(PrefKeys.CARID) ? true : false;
     timerController = CountdownTimerController(endTime: endTime, onEnd: onEnd);
@@ -103,9 +102,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Scaffold(
         body: ScreenUtilInit(
       designSize: Size(414, 896),
-      builder: () => NotificationListener<OverscrollIndicatorNotification>(
+      builder: (context, child) =>
+          NotificationListener<OverscrollIndicatorNotification>(
         onNotification: (notification) {
-          notification.disallowGlow();
+          notification.disallowIndicator();
           return true;
         },
         child: Container(
@@ -284,7 +284,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     text:
                                         "${getTranslated("term_condition_message", context)} \n ",
                                     style:
-                                        Theme.of(context).textTheme.bodyText1,
+                                        Theme.of(context).textTheme.bodyMedium,
                                     children: [
                                       TextSpan(
                                         text: getTranslated(

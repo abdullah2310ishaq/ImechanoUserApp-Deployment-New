@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -97,9 +96,8 @@ class _MyJobCardState extends State<MyJobCard>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 4, vsync: this);
     userStr =
         PrefObj.preferences!.containsKey(PrefKeys.USER_DATA) ? true : false;
@@ -123,7 +121,7 @@ class _MyJobCardState extends State<MyJobCard>
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -141,6 +139,9 @@ class _MyJobCardState extends State<MyJobCard>
         break;
       case AppLifecycleState.detached:
         onDetached();
+        break;
+      case AppLifecycleState.hidden:
+        onPaused();
         break;
     }
   }
@@ -168,20 +169,17 @@ class _MyJobCardState extends State<MyJobCard>
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
+    final _ = MediaQuery.of(context).size;
     final appModel = Provider.of<AppModel>(context);
     appModelTheme = appModel;
-    return WillPopScope(
-      onWillPop: () async {
-        if (!Navigator.of(context).canPop()) {
-          // If there's no screen in the stack, navigate to home screen
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (didPop) {
+        if (!didPop && !Navigator.of(context).canPop()) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => BottomBarPage(2)),
           );
-          return false; // Return false to prevent the app from closing
-        } else {
-          return true; // Return true to allow the app to close
         }
       },
       child: Scaffold(
@@ -195,7 +193,7 @@ class _MyJobCardState extends State<MyJobCard>
           backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
           body: ScreenUtilInit(
             designSize: Size(414, 896),
-            builder: () => SafeArea(
+            builder: (context, child) => SafeArea(
               child: Column(children: [
                 Row(
                   children: [
@@ -698,9 +696,9 @@ class _MyJobCardState extends State<MyJobCard>
                                           ElevatedButton(
                                             style: ButtonStyle(
                                                 backgroundColor:
-                                                    MaterialStateProperty.all<
+                                                    WidgetStateProperty.all<
                                                         Color>(logoBlue),
-                                                shape: MaterialStateProperty.all<
+                                                shape: WidgetStateProperty.all<
                                                         RoundedRectangleBorder>(
                                                     RoundedRectangleBorder(
                                                         borderRadius:
@@ -742,15 +740,15 @@ class _MyJobCardState extends State<MyJobCard>
                                                             .data![index]
                                                             .status ==
                                                         "0"
-                                                    ? MaterialStateProperty.all<
+                                                    ? WidgetStateProperty.all<
                                                         Color>(Colors.grey)
-                                                    : MaterialStateProperty.all<Color>(
+                                                    : WidgetStateProperty.all<Color>(
                                                         currentJobcardTab == 2
                                                             ? Color.fromARGB(
                                                                 255, 186, 186, 186)
                                                             : Colors.green
                                                                 .shade400),
-                                                shape: MaterialStateProperty.all<
+                                                shape: WidgetStateProperty.all<
                                                         RoundedRectangleBorder>(
                                                     RoundedRectangleBorder(
                                                   borderRadius:

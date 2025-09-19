@@ -27,19 +27,19 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
   Widget build(BuildContext context) {
     final appModel = Provider.of<AppModel>(context);
     appModelTheme = appModel;
-    return WillPopScope(
-        onWillPop: () async {
+    return PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => LanguageChooseScreen()),
           );
-          return false; // Prevents default back button behavior
         },
         child: Scaffold(
           backgroundColor: appModelTheme.darkTheme ? Color(0xff252525) : white,
           body: ScreenUtilInit(
             designSize: Size(414, 896),
-            builder: () => SingleChildScrollView(
+            builder: (context, child) => SingleChildScrollView(
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
@@ -57,21 +57,29 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
                                   child: Image(
                                       image: AssetImage(
                                           'assets/icons/splash/logo.png'),
+                                      width: 180.w,
+                                      height: 60.h,
+                                      fit: BoxFit.contain,
                                       color: appModelTheme.darkTheme
                                           ? white
                                           : null),
                                 ),
+                                SizedBox(height: 24.h),
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       left: 30, right: 30),
                                   child: Center(
                                     child: Text(
-                                        getTranslated("welcomemsg", context)),
+                                      getTranslated("welcomemsg", context),
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ),
                                 ),
                                 Center(
                                   child: Image(
-                                      height: 350,
+                                      height: 350.h,
+                                      width: 0.99.sw,
+                                      fit: BoxFit.contain,
                                       image: AssetImage(
                                           'assets/icons/splash/abc.png'),
                                       color: appModelTheme.darkTheme
@@ -91,7 +99,9 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
                               title: Text(
                                 getTranslated("guest", context),
                                 style: TextStyle(
-                                    fontSize: 16.sp, fontFamily: 'Poppins1'),
+                                    fontSize: 16.sp,
+                                    fontFamily: 'Poppins1',
+                                    color: Colors.white),
                               ),
                               width: 0.8,
                               callBackFunction: () {
@@ -129,7 +139,8 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
         CustomButton(
           title: Text(
             getTranslated('signin', context),
-            style: TextStyle(fontSize: 16.sp, fontFamily: 'Poppins1'),
+            style: TextStyle(
+                fontSize: 16.sp, fontFamily: 'Poppins1', color: Colors.white),
           ),
           width: 0.35,
           callBackFunction: () {
@@ -150,7 +161,8 @@ class _SignInSignUpLandingScreenState extends State<SignInSignUpLandingScreen> {
         CustomButton(
           title: Text(
             getTranslated('Signup', context),
-            style: TextStyle(fontSize: 16.sp, fontFamily: 'Poppins1'),
+            style: TextStyle(
+                fontSize: 16.sp, fontFamily: 'Poppins1', color: Colors.white),
           ),
           width: 0.35,
           callBackFunction: () {

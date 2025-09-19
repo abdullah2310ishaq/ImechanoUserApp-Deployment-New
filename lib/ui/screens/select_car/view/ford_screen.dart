@@ -180,7 +180,7 @@ class _FordScreenState extends State<FordScreen> {
       final carData =
           json.decode(PrefObj.preferences!.get(PrefKeys.ADDCARDATA));
 
-      String str = PrefObj.preferences!.get(PrefKeys.USER_ID).toString();
+      final _ = PrefObj.preferences!.get(PrefKeys.USER_ID).toString();
 
       final addCarModel isAddcar = await _repository.onaddcarApi(
           widget.carId.toString(),
@@ -243,7 +243,7 @@ class _FordScreenState extends State<FordScreen> {
     appModelTheme = appModel;
     return ScreenUtilInit(
       designSize: Size(360, 690),
-      builder: () => Scaffold(
+      builder: (context, child) => Scaffold(
         backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
         key: scaffoldKey,
         drawer: drawerpage(),
@@ -263,7 +263,7 @@ class _FordScreenState extends State<FordScreen> {
           ),
           child: NotificationListener<OverscrollIndicatorNotification>(
             onNotification: (notification) {
-              notification.disallowGlow();
+              notification.disallowIndicator();
               return true;
             },
             child: SingleChildScrollView(

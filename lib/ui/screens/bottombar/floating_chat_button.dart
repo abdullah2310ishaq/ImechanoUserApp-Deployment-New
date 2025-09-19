@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, unused_element
 import 'dart:developer';
 import 'dart:io';
 
@@ -104,7 +104,7 @@ class _ChatScreenState extends State<ChatScreen> {
         backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
         body: ScreenUtilInit(
           designSize: Size(414, 896),
-          builder: () => SafeArea(
+          builder: (context, child) => SafeArea(
             child: Column(children: [
               Expanded(
                 child: Container(
@@ -506,8 +506,8 @@ class _ChatScreenState extends State<ChatScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(10.0),
           ),
-          primary: logoBlue, // background
-          onPrimary: Colors.white, // foreground
+          backgroundColor: logoBlue,
+          foregroundColor: Colors.white,
         ),
         onPressed: () {
           if (!isCarAdded ||
@@ -653,15 +653,11 @@ class _ChatScreenState extends State<ChatScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(10.0),
           ),
-          primary: Color.fromRGBO(37, 211, 102, 1), // background
-          onPrimary: Colors.white, // foreground
+          backgroundColor: Color.fromRGBO(37, 211, 102, 1),
+          foregroundColor: Colors.white,
         ),
         onPressed: () {
           openWhatsapp();
-          var whatsappURl_android =
-              "whatsapp://send?phone=923430529998&text=hello";
-          var whatappURL_ios =
-              "https://wa.me/923430529998?text=${Uri.parse("hello")}";
         },
         child: Text(
           getTranslated('whatsapp', context),
@@ -681,8 +677,8 @@ class _ChatScreenState extends State<ChatScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(10.0),
           ),
-          primary: Color(0xff70BDF1), // background
-          onPrimary: Colors.white, // foreground
+          backgroundColor: Color(0xff70BDF1),
+          foregroundColor: Colors.white,
         ),
         onPressed: () {
           _makePhoneCall("+97455929250");
@@ -879,9 +875,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   openGallery() async {
     try {
-      var pickedfiles = await _picker.pickMultiImage();
-      //you can use ImageCourse.camera for Camera capture
-      if (pickedfiles != null) {
+      final pickedfiles = await _picker.pickMultiImage();
+      if (pickedfiles.isNotEmpty) {
         setState(() {
           imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
         });

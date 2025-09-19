@@ -80,7 +80,7 @@ class _seach_subcategry_pageState extends State<seach_subcategry_page> {
         backgroundColor: appModelTheme.darkTheme ? black : Color(0xff70bdf1),
         body: ScreenUtilInit(
           designSize: Size(414, 896),
-          builder: () => SafeArea(
+          builder: (context, child) => SafeArea(
             child: Column(
               children: [
                 Expanded(
@@ -264,7 +264,6 @@ class _seach_subcategry_pageState extends State<seach_subcategry_page> {
                                     // print(widget.categoryId);
                                     // print(widget.categoryName);
                                     // print(currentCount);
-
                                   }
                                 },
                                 // shape: new RoundedRectangleBorder(

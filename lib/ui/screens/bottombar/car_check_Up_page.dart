@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, unused_element
 
 import 'dart:developer';
 import 'dart:io';
@@ -105,7 +105,7 @@ class _CarCheckupPageState extends State<CarCheckupPage> {
         backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
         body: ScreenUtilInit(
           designSize: Size(414, 896),
-          builder: () => SafeArea(
+          builder: (context, child) => SafeArea(
             child: Column(children: [
               Expanded(
                 child: Container(
@@ -495,8 +495,8 @@ class _CarCheckupPageState extends State<CarCheckupPage> {
           shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(10.0),
           ),
-          primary: Color(0xff70BDF1), // background
-          onPrimary: Colors.white, // foreground
+          backgroundColor: Color(0xff70BDF1), // background
+          foregroundColor: Colors.white, // foreground
         ),
         onPressed: () {
           if (!isCarAdded ||
@@ -824,9 +824,8 @@ class _CarCheckupPageState extends State<CarCheckupPage> {
 
   openGallery() async {
     try {
-      var pickedfiles = await _picker.pickMultiImage();
-      //you can use ImageCourse.camera for Camera capture
-      if (pickedfiles != null) {
+      final pickedfiles = await _picker.pickMultiImage();
+      if (pickedfiles.isNotEmpty) {
         setState(() {
           imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
         });

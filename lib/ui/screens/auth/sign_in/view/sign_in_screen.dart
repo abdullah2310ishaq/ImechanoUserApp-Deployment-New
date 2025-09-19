@@ -91,9 +91,10 @@ class _SignInScreenState extends State<SignInScreen> {
     return Scaffold(
         body: ScreenUtilInit(
       designSize: Size(414, 896),
-      builder: () => NotificationListener<OverscrollIndicatorNotification>(
+      builder: (context, child) =>
+          NotificationListener<OverscrollIndicatorNotification>(
         onNotification: (notification) {
-          notification.disallowGlow();
+          notification.disallowIndicator();
           return true;
         },
         child: SingleChildScrollView(
@@ -161,7 +162,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                   child: NotificationListener<
                                       OverscrollIndicatorNotification>(
                                     onNotification: (notification) {
-                                      notification.disallowGlow();
+                                      notification.disallowIndicator();
                                       return true;
                                     },
                                     child: Container(
@@ -461,7 +462,7 @@ class _SignInScreenState extends State<SignInScreen> {
         key: _formKey2,
         child: NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (notification) {
-            notification.disallowGlow();
+            notification.disallowIndicator();
             return true;
           },
           child: Container(

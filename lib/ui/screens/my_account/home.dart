@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:back_button_interceptor/back_button_interceptor.dart';
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -11,7 +11,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:imechano/api/notification_api.dart';
+
 import 'package:imechano/localization/language_constrants.dart';
 import 'package:imechano/ui/bloc/categories_bloc.dart';
 import 'package:imechano/ui/bloc/item_list_bloc.dart';
@@ -19,7 +19,7 @@ import 'package:imechano/ui/bloc/oil%20change%20bloc.dart';
 import 'package:imechano/ui/common/globals.dart' as globals;
 import 'package:imechano/ui/modal/categoriesModelClass.dart';
 import 'package:imechano/ui/modal/item_list_model.dart';
-import 'package:imechano/ui/modal/notification_count_model.dart';
+
 import 'package:imechano/ui/modal/oilchange_model.dart';
 import 'package:imechano/ui/provider/notification_count_provider.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
@@ -79,6 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // ignore: unused_field
   List<Marker> _markers = <Marker>[];
 
   String? enteredKeyword = "";
@@ -111,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(Duration(seconds: 2), () {
         showNotificationPermissionDialog(context);
       });
@@ -266,7 +267,8 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: appModelTheme.darkTheme ? black : Color(0xff70bdf1),
       body: ScreenUtilInit(
         designSize: Size(414, 896),
-        builder: () => NotificationListener<OverscrollIndicatorNotification>(
+        builder: (context, child) =>
+            NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (notification) {
             notification.disallowIndicator();
             return true;
@@ -772,7 +774,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   top: 20, bottom: 20, left: 1.w, right: 15.w),
                           child: SvgPicture.asset("assets/svg/ball.svg",
                               height: 20.h, width: 20.w))
-                      : Badge(
+                      : badges.Badge(
                           // toAnimate: false,
                           badgeContent: Text(
                             value.notifications > 99
@@ -780,9 +782,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 : '${value.notifications}',
                             style: TextStyle(color: Colors.white),
                           ),
-                          position: BadgePosition.topEnd(top: 5, end: -8),
-                          animationType: BadgeAnimationType.fade,
-                          padding: EdgeInsets.all(4),
+                          position:
+                              badges.BadgePosition.topEnd(top: 5, end: -8),
                           child: Container(
                               padding: appModelTheme.appLocal == Locale("en")
                                   ? EdgeInsets.only(
@@ -1280,7 +1281,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           child: Padding(
                                                             padding:
                                                                 const EdgeInsets
-                                                                        .only(
+                                                                    .only(
                                                                     left: 10.0,
                                                                     right: 10),
                                                             child: Row(

@@ -37,16 +37,18 @@ class PolicyDialog extends StatelessWidget {
               },
             ),
           ),
-          FlatButton(
-            padding: EdgeInsets.all(0),
-            color: logoBlue,
-            onPressed: () => Navigator.of(context).pop(),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(radius),
-                bottomRight: Radius.circular(radius),
+          TextButton(
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.all(0),
+              backgroundColor: logoBlue,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(radius),
+                  bottomRight: Radius.circular(radius),
+                ),
               ),
             ),
+            onPressed: () => Navigator.of(context).pop(),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(

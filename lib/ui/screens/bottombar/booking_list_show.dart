@@ -69,7 +69,7 @@ class _BookingListShowState extends State<BookingListShow>
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     getAddress();
     getTotal();
     pickupConditionsListBloc
@@ -91,7 +91,7 @@ class _BookingListShowState extends State<BookingListShow>
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -109,6 +109,9 @@ class _BookingListShowState extends State<BookingListShow>
         break;
       case AppLifecycleState.detached:
         onDetached();
+        break;
+      case AppLifecycleState.hidden:
+        onPaused();
         break;
     }
   }
@@ -172,7 +175,7 @@ class _BookingListShowState extends State<BookingListShow>
               ),
               child: NotificationListener<OverscrollIndicatorNotification>(
                 onNotification: (notification) {
-                  notification.disallowGlow();
+                  notification.disallowIndicator();
                   return true;
                 },
                 child: SingleChildScrollView(
@@ -1070,7 +1073,7 @@ class _BookingListShowState extends State<BookingListShow>
       final Map<int, String> values = {
         for (int i = 0; i < split.length; i++) i: split[i]
       };
-      var containers = "";
+      // Removed unused variable
 
       return Row(
         children: [

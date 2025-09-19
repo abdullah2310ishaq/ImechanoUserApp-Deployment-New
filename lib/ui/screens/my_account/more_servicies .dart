@@ -25,6 +25,7 @@ class MoreServicies extends StatefulWidget {
 }
 
 class _MoreServiciesState extends State<MoreServicies> {
+  // ignore: unused_field
   final List<bool> _selected = List.generate(7, (i) => false);
   bool _isTextFieldEnable = true;
   TextEditingController _others = TextEditingController();
@@ -47,8 +48,6 @@ class _MoreServiciesState extends State<MoreServicies> {
     final response = await http.post(uri,
         body: json.encode(postData),
         headers: {'content-Type': 'application/json'});
-
-    dynamic responseJson;
 
     if (response.statusCode == 200) {
       globals.other.add(itemId);
@@ -102,12 +101,12 @@ class _MoreServiciesState extends State<MoreServicies> {
       backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
       body: NotificationListener<OverscrollIndicatorNotification>(
         onNotification: (notification) {
-          notification.disallowGlow();
+          notification.disallowIndicator();
           return true;
         },
         child: ScreenUtilInit(
           designSize: Size(414, 896),
-          builder: () => SafeArea(
+          builder: (context, child) => SafeArea(
             child: Column(
               children: [
                 Expanded(

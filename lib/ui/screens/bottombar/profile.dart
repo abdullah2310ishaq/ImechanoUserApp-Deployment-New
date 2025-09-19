@@ -24,11 +24,9 @@ import 'package:imechano/ui/styling/global.dart';
 
 import 'package:provider/provider.dart';
 
-
 import '../../shared/widgets/form/custom_form_car.dart';
 import '../../styling/config.dart';
 import 'bottom_bar.dart';
-
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -106,17 +104,14 @@ class _ProfilePageState extends State<ProfilePage> {
     final appModel = Provider.of<AppModel>(context);
     appModelTheme = appModel;
 
-    return WillPopScope(
-        onWillPop: () async {
-          if (!Navigator.of(context).canPop()) {
-            // If there's no screen in the stack, navigate to home screen
+    return PopScope(
+        canPop: true,
+        onPopInvoked: (didPop) {
+          if (!didPop && !Navigator.of(context).canPop()) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => BottomBarPage(2)),
             );
-            return false; // Return false to prevent the app from closing
-          } else {
-            return true; // Return true to allow the app to close
           }
         },
         child: Scaffold(
@@ -133,7 +128,7 @@ class _ProfilePageState extends State<ProfilePage> {
             key: _formKey,
             child: ScreenUtilInit(
               designSize: Size(414, 896),
-              builder: () => SafeArea(
+              builder: (context, child) => SafeArea(
                 child: Column(children: [
                   Expanded(
                     child: Container(
@@ -166,7 +161,7 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       child: NotificationListener<OverscrollIndicatorNotification>(
         onNotification: (notification) {
-          notification.disallowGlow();
+          notification.disallowIndicator();
           return true;
         },
         child: SingleChildScrollView(

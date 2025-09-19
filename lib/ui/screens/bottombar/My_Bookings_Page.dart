@@ -145,7 +145,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     _tabController = TabController(length: 4, vsync: this);
     userStr =
@@ -168,7 +168,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -187,6 +187,9 @@ class _MyBookingsPageState extends State<MyBookingsPage>
       case AppLifecycleState.detached:
         onDetached();
         break;
+      case AppLifecycleState.hidden:
+        onPaused();
+        break;
     }
   }
 
@@ -194,7 +197,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
+    final _ = MediaQuery.of(context).size; // keep for future layout if needed
     print("I m builddddd Shoaib TAriq");
     print(PrefObj.preferences!.get(PrefKeys.CARID));
     final appModel = Provider.of<AppModel>(context);
@@ -224,7 +227,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
           backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
           body: ScreenUtilInit(
             designSize: Size(414, 896),
-            builder: () => SafeArea(
+            builder: (context, child) => SafeArea(
               child: Column(children: [
                 Row(
                   children: [
@@ -723,8 +726,6 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                       SizedBox(width: 8),
                       data.items![i].subCategoryId == "10013"
                           ? Text(
-                              
-
                               data.items![i].item!.removeAllWhitespace,
                               style: TextStyle(
                                 fontSize: 10,
@@ -732,7 +733,6 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                               ),
                             )
                           : Text(
-                              
                               getTranslated(
                                   data.items![i].item!.removeAllWhitespace,
                                   context),
@@ -768,8 +768,6 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                   SizedBox(width: 7),
                   data.items![i].subCategoryId == "10013"
                       ? Text(
-                          
-
                           data.items![i].item!.removeAllWhitespace,
                           style: TextStyle(
                             fontSize: 10,
@@ -1139,8 +1137,6 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                                     textColor: Colors.white,
                                     fontSize: 16.0);
                               } else if (data.pickupStatus == "3") {
-                      
-
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -1775,7 +1771,7 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(right: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.lightBlueAccent, // This is what you need!
+                backgroundColor: Colors.lightBlueAccent,
               ),
               child: Text(
                 'Approve',
@@ -1803,7 +1799,7 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(left: 6.0, right: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.grey, // This is what you need!
+                backgroundColor: Colors.grey,
               ),
               child: Text(
                 'Reject',
@@ -1823,7 +1819,7 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(left: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.red, // This is what you need!
+                backgroundColor: Colors.red,
               ),
               child: Text(
                 'Close',
@@ -1937,7 +1933,6 @@ Widget carImage(String images) {
     final Map<int, String> values = {
       for (int i = 0; i < split.length; i++) i: split[i]
     };
-    var containers = "";
 
     return Row(children: [
       for (int i = 0; i < values.length - 1; i++)

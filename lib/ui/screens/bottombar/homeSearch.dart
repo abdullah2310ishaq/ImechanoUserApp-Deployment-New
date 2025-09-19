@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -79,7 +78,6 @@ class JobsState extends State<Jobs> {
     'ؤ': 'W',
     'إ': 'I',
     'ئ': 'Y',
-    'ئ': 'Y',
     'ة': 'H',
   };
 
@@ -111,7 +109,6 @@ class JobsState extends State<Jobs> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     categoriesListBloc.categoriesSinck("null");
     print("I am disposed");
@@ -143,10 +140,6 @@ class JobsState extends State<Jobs> {
     });
   }
 
-  Future<bool> _willPopCallback() async {
-    return Future.value(false);
-  }
-
   @override
   Widget build(BuildContext context) {
     print(convertArabicToEnglish("س"));
@@ -174,7 +167,7 @@ class JobsState extends State<Jobs> {
           drawer: drawerpage(),
           body: ScreenUtilInit(
             designSize: Size(414, 896),
-            builder: () =>
+            builder: (context, child) =>
                 NotificationListener<OverscrollIndicatorNotification>(
               onNotification: (notification) {
                 notification.disallowIndicator();

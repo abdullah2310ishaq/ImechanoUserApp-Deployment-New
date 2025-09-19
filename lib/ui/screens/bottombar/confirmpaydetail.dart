@@ -20,8 +20,8 @@ import 'package:provider/provider.dart';
 import '../../styling/image_enlarge.dart';
 
 class ConfirmPayDetail extends StatefulWidget {
-  ItemData data;
-  int selectedindex;
+  final ItemData data;
+  final int selectedindex;
   ConfirmPayDetail({Key? key, required this.data, required this.selectedindex})
       : super(key: key);
 
@@ -321,7 +321,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
               padding: EdgeInsets.only(right: 6.0),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.lightBlueAccent, // This is what you need!
+                  backgroundColor: Colors.lightBlueAccent,
                 ),
                 child: Text(
                   getTranslated('approve', context),
@@ -346,7 +346,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
               padding: EdgeInsets.only(left: 6.0, right: 6.0),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.red, // This is what you need!
+                  backgroundColor: Colors.red,
                 ),
                 child: Text(
                   getTranslated("reject", context),
@@ -478,7 +478,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
       final Map<int, String> values = {
         for (int i = 0; i < split.length; i++) i: split[i]
       };
-      var containers = "";
+      // removed unused variable
 
       return ListView.builder(
         scrollDirection: Axis.horizontal,

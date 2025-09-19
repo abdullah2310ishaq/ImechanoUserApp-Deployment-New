@@ -3,7 +3,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -30,7 +30,6 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../bloc/view_services_bloc.dart';
 import '../../modal/view_parts_model.dart';
 import '../../modal/view_services_model.dart';
-import '../../repository/repository.dart';
 
 ///Salman//
 String value = '';
@@ -645,14 +644,14 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
         },
       ),
     );
-    _scaffoldKey.currentState?.showSnackBar(snackBar);
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
     setState(() {
       loader_download = false;
     });
   }
 
   void scrollToBottom() {
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollController.animateTo(
         scrollController.position.maxScrollExtent,
         duration: Duration(milliseconds: 300),
@@ -688,7 +687,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
       backgroundColor: appModelTheme.darkTheme ? Color(0xff252525) : white,
       body: ScreenUtilInit(
         designSize: Size(414, 896),
-        builder: () => Column(
+        builder: (context, child) => Column(
           children: [
             appBarWidget(),
             if (widget.invoiceData != null)
@@ -714,7 +713,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                             child: NotificationListener<
                                 OverscrollIndicatorNotification>(
                               onNotification: (notification) {
-                                notification.disallowGlow();
+                                notification.disallowIndicator();
                                 return true;
                               },
                               child: SingleChildScrollView(
@@ -1674,7 +1673,6 @@ class EmployeeDataSource extends DataGridSource {
   }
 
   List<DataGridRow> _employeeData = [];
-  final _repository = Repository();
 
   @override
   List<DataGridRow> get rows => _employeeData;
@@ -1724,7 +1722,6 @@ class ServicesDataSource extends DataGridSource {
   }
 
   List<DataGridRow> _ServicesData = [];
-  final _repository = Repository();
 
   @override
   List<DataGridRow> get rows => _ServicesData;

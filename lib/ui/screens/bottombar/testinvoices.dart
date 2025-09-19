@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, deprecated_member_use
+// ignore_for_file: non_constant_identifier_names, deprecated_member_use, unused_element
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -27,8 +27,6 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
 
   dynamic appModelTheme;
 
-  TabController? _tabController;
-
   @override
   Widget build(BuildContext context) {
     final appModel = Provider.of<AppModel>(context);
@@ -45,7 +43,7 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
       backgroundColor: appModelTheme.darkTheme ? Color(0xff252525) : white,
       body: ScreenUtilInit(
         designSize: Size(414, 896),
-        builder: () => Column(
+        builder: (context, child) => Column(
           children: [
             // appBarWidget(),
             Expanded(
@@ -67,7 +65,7 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
                         child: NotificationListener<
                             OverscrollIndicatorNotification>(
                           onNotification: (notification) {
-                            notification.disallowGlow();
+                            notification.disallowIndicator();
                             return true;
                           },
                           child: SingleChildScrollView(

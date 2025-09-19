@@ -20,7 +20,6 @@ class _ChooseLanguageState extends State<ChooseLanguage> {
   //Locale selectedLocale = Locale('en');
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     log('Inside init state of choose language screen');
     var lang = Provider.of<AppModel>(context, listen: false).fetchLocale();
@@ -37,7 +36,7 @@ class _ChooseLanguageState extends State<ChooseLanguage> {
     appModelTheme = appModel;
     return ScreenUtilInit(
       designSize: Size(414, 896),
-      builder: () => Scaffold(
+      builder: (context, child) => Scaffold(
         backgroundColor: appModelTheme.darkTheme ? Color(0xff252525) : white,
         body: Container(
           width: double.infinity,

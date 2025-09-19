@@ -1,7 +1,5 @@
 // ignore_for_file: deprecated_member_use
 
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -31,9 +29,7 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-
 import '../../modal/send_notification_admin_modal.dart';
-
 
 String value = '';
 String deletejobid = '';
@@ -102,16 +98,8 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-  }
-
-  void _updateState() {
-    Future.microtask(() {
-      setState(() {
-        // update your state here
-      });
-    });
   }
 
   void onResumed() {
@@ -150,6 +138,9 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
       case AppLifecycleState.detached:
         onDetached();
         break;
+      case AppLifecycleState.hidden:
+        onPaused();
+        break;
     }
   }
 
@@ -164,7 +155,7 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
 
     return ScreenUtilInit(
       designSize: Size(414, 896),
-      builder: () => Scaffold(
+      builder: (context, child) => Scaffold(
         appBar: WidgetAppBar(
           title: getTranslated('JobCard', context),
           menuItem: 'assets/svg/Menu.svg',
@@ -187,7 +178,7 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                           topLeft: Radius.circular(25))),
                   child: NotificationListener<OverscrollIndicatorNotification>(
                     onNotification: (notification) {
-                      notification.disallowGlow();
+                      notification.disallowIndicator();
                       return true;
                     },
                     child: StreamBuilder<CustomerJobListModel>(
@@ -412,8 +403,9 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                                       fontSize: 14,
                                                       fontFamily: "Poppins1")),
                                               style: TextButton.styleFrom(
-                                                primary: Colors.black,
-                                                onSurface: Colors.yellow,
+                                                foregroundColor: Colors.black,
+                                                disabledForegroundColor:
+                                                    Colors.yellow,
                                                 side: BorderSide(
                                                     color: Color(0xff374049),
                                                     width: 2),

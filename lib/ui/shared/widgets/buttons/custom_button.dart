@@ -33,7 +33,7 @@ class CustomButton extends StatelessWidget {
           callBackFunction();
         },
         style: ElevatedButton.styleFrom(
-          primary: transparent,
+          backgroundColor: transparent,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),

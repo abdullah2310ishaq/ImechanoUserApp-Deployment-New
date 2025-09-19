@@ -7,7 +7,7 @@ class OrDivider extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         horizontalLine(),
-        Text("OR", style: Theme.of(context).textTheme.subtitle1),
+        Text("OR", style: Theme.of(context).textTheme.titleMedium),
         horizontalLine(),
       ],
     );

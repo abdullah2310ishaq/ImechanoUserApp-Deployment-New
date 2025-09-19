@@ -25,7 +25,7 @@ class _ReturnCarState extends State<ReturnCar> {
   Widget build(BuildContext context) {
     return ScreenUtilInit(
         designSize: Size(414, 896),
-        builder: () => Scaffold(
+        builder: (context, child) => Scaffold(
             appBar: WidgetAppBar(
                 title: 'Return Car',
                 menuItem: 'assets/svg/Arrow_alt_left.svg',
@@ -326,7 +326,7 @@ class _ReturnCarState extends State<ReturnCar> {
                     style: TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.redAccent,
+                    backgroundColor: Colors.redAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

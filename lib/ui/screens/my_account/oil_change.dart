@@ -55,6 +55,7 @@ class _oil_ChangeState extends State<oil_Change>
   int total = 0;
   String subCatogory = "";
 
+  // ignore: unused_field
   bool _isTextFieldEnable = true;
   List<bool> s = [];
   List<int> indexed = [];
@@ -77,6 +78,7 @@ class _oil_ChangeState extends State<oil_Change>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     // log('Main Category: ${widget.mainCatogory}');
     //log('Category name: ${widget.categoryName}');
     globals.sselected.add({
@@ -103,7 +105,7 @@ class _oil_ChangeState extends State<oil_Change>
       backgroundColor: appModelTheme.darkTheme ? black : Color(0xff70bdf1),
       body: ScreenUtilInit(
         designSize: Size(414, 896),
-        builder: () => SafeArea(
+        builder: (context, child) => SafeArea(
           child: Column(
             children: [
               Expanded(

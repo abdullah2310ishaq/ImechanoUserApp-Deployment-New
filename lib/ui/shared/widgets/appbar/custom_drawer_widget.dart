@@ -175,7 +175,7 @@ class _drawerpageState extends State<drawerpage> {
 
     return ScreenUtilInit(
       designSize: Size(414, 896),
-      builder: () => Drawer(
+      builder: (context, child) => Drawer(
         key: _key,
         child: Column(
           children: [
@@ -277,7 +277,7 @@ class _drawerpageState extends State<drawerpage> {
               child: Container(
                   child: NotificationListener<OverscrollIndicatorNotification>(
                 onNotification: (notification) {
-                  notification.disallowGlow();
+                  notification.disallowIndicator();
                   return true;
                 },
                 child: SingleChildScrollView(

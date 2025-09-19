@@ -61,13 +61,15 @@ class _MyvehicalscreenState extends State<Myvehicalscreen> {
     appModelTheme = appModel;
     return ScreenUtilInit(
       designSize: Size(414, 896),
-      builder: () => WillPopScope(
-        onWillPop: () async {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => BottomBarPage(2)));
-          return true;
+      builder: (context, child) => PopScope(
+        canPop: true,
+        onPopInvoked: (didPop) {
+          if (!didPop) {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => BottomBarPage(2)));
+          }
         },
         child: Scaffold(
           drawer: drawerpage(),

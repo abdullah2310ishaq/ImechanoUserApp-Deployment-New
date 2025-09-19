@@ -77,7 +77,7 @@ class _MyInvoiceState extends State<MyInvoice>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     _tabController = TabController(length: 4, vsync: this);
     userStr =
@@ -100,7 +100,7 @@ class _MyInvoiceState extends State<MyInvoice>
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -157,7 +157,7 @@ class _MyInvoiceState extends State<MyInvoice>
           backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
           body: ScreenUtilInit(
             designSize: Size(414, 896),
-            builder: () => SafeArea(
+            builder: (context, child) => SafeArea(
               child: Column(children: [
                 Row(
                   children: [
@@ -2095,7 +2095,7 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(right: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.lightBlueAccent, // This is what you need!
+                backgroundColor: Colors.lightBlueAccent,
               ),
               child: Text(
                 'Approve',
@@ -2123,7 +2123,7 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(left: 6.0, right: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.grey, // This is what you need!
+                backgroundColor: Colors.grey,
               ),
               child: Text(
                 'Reject',
@@ -2143,7 +2143,7 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(left: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.red, // This is what you need!
+                backgroundColor: Colors.red,
               ),
               child: Text(
                 'Close',
@@ -2257,7 +2257,6 @@ Widget carImage(String images) {
     final Map<int, String> values = {
       for (int i = 0; i < split.length; i++) i: split[i]
     };
-    var containers = "";
 
     return Row(children: [
       for (int i = 0; i < values.length - 1; i++)

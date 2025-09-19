@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:imechano/localization/language_constrants.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
@@ -207,17 +207,19 @@ class _MapLocationState extends State<MapLocation> {
 
     return ScreenUtilInit(
         designSize: Size(360, 690),
-        builder: () {
-          return WillPopScope(
-            onWillPop: () async {
-              if (Navigator.of(context).canPop()) {
-                Navigator.pop(context);
-              } else {
-                Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => BottomBarPage(2)),
-                    (Route<dynamic> route) => false);
+        builder: (context, child) {
+          return PopScope(
+            canPop: true,
+            onPopInvoked: (didPop) {
+              if (!didPop) {
+                if (Navigator.of(context).canPop()) {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => BottomBarPage(2)),
+                      (Route<dynamic> route) => false);
+                }
               }
-              return true;
             },
             child: Scaffold(
                 key: _key,
@@ -376,7 +378,7 @@ class _MapLocationState extends State<MapLocation> {
                   width: 250.w,
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
                           side: BorderSide(

@@ -34,7 +34,7 @@ class _MyBookingState extends State<MyBooking> {
     appModelTheme = appModel;
     return ScreenUtilInit(
       designSize: Size(414, 896),
-      builder: () => Scaffold(
+      builder: (context, child) => Scaffold(
           appBar: WidgetAppBar(
             title: 'My Booking',
             menuItem: 'assets/svg/Menu.svg',
@@ -162,7 +162,7 @@ class _MyBookingState extends State<MyBooking> {
                       child:
                           NotificationListener<OverscrollIndicatorNotification>(
                         onNotification: (notification) {
-                          notification.disallowGlow();
+                          notification.disallowIndicator();
                           return true;
                         },
                         child: SingleChildScrollView(
@@ -185,7 +185,7 @@ class _MyBookingState extends State<MyBooking> {
         height: MediaQuery.of(context).size.height,
         child: NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (notification) {
-            notification.disallowGlow();
+            notification.disallowIndicator();
             return true;
           },
           child: ListView.builder(
