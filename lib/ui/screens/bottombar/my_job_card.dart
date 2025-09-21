@@ -713,18 +713,20 @@ class _MyJobCardState extends State<MyJobCard>
                                                           .data![index]
                                                           .dateTime !=
                                                       null
-                                                  ? jobcardslistsnapshot.data!
-                                                      .data![index].dateTime
-                                                      .toString()
-                                                      .substring(
-                                                          10,
-                                                          jobcardslistsnapshot
-                                                                  .data!
-                                                                  .data![index]
-                                                                  .jobDate
-                                                                  .toString()
-                                                                  .length -
-                                                              7)
+                                                  ? convertTo12HourFormat(
+                                                      jobcardslistsnapshot.data!
+                                                          .data![index].dateTime
+                                                          .toString()
+                                                          .substring(
+                                                              10,
+                                                              jobcardslistsnapshot
+                                                                      .data!
+                                                                      .data![
+                                                                          index]
+                                                                      .jobDate
+                                                                      .toString()
+                                                                      .length -
+                                                                  7))
                                                   : fromTime),
                                           SizedBox(width: 10.w),
                                         ],
@@ -1040,5 +1042,28 @@ class _MyJobCardState extends State<MyJobCard>
 
   void onDetached() {
     print("~~~~~~~ onDetached");
+  }
+
+  // Helper function to convert 24-hour time to 12-hour format
+  String convertTo12HourFormat(String time24) {
+    try {
+      // Extract time part (HH:MM:SS or HH:MM)
+      String timePart = time24.length > 8 ? time24.substring(0, 8) : time24;
+      if (timePart.length == 5) {
+        timePart += ':00'; // Add seconds if missing
+      }
+
+      // Parse the time
+      List<String> parts = timePart.split(':');
+      int hour = int.parse(parts[0]);
+      int minute = int.parse(parts[1]);
+
+      String period = hour >= 12 ? 'PM' : 'AM';
+      int hour12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+
+      return '${hour12.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $period';
+    } catch (e) {
+      return time24; // Return original if parsing fails
+    }
   }
 }
