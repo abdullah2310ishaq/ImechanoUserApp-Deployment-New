@@ -77,8 +77,8 @@ class _MapLocationState extends State<MapLocation> {
   }
 
   GoogleMapController? mapsController;
-
   LatLng? middlePointOfScreenOnMap;
+  bool _isLocationLoading = false;
 
   marker() async {
     _markers.add(Marker(

@@ -152,48 +152,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           _confirmPassfiled(Confirmpassword,
                               getTranslated('confirmPassword', context)),
                           SizedBox(height: 20),
-                          SizedBox(
+                          Container(
                             height: 60,
-                            child: CustomButton(
-                              title: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 30,
-                                      child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Image.asset(
-                                          "assets/images/Location.png",
-                                          width: 20,
-                                          height: 20,
-                                          color: appModelTheme.darkTheme
-                                              ? Colors.white
-                                              : null,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        addressBtn,
-                                        textAlign: TextAlign.start,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins3',
-                                          fontSize: 16,
-                                          color: appModelTheme.darkTheme
-                                              ? Colors.white
-                                              : Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              width: 0.9,
-                              callBackFunction: () async {
+                            decoration: BoxDecoration(
+                              color: appModelTheme.darkTheme
+                                  ? darkmodeColor
+                                  : grayE6E6E5,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: TextFormField(
+                              readOnly: true,
+                              onTap: () async {
                                 final result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -216,65 +185,59 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       : addressBtn = addressTxt;
                                 });
                               },
-                              bgColor: appModelTheme.darkTheme
-                                  ? darkmodeColor
-                                  : grayE6E6E5,
-                              borderColor: Colors.transparent,
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          SizedBox(
-                            height: 60,
-                            child: CustomButton(
-                              title: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 30,
-                                      child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Image.asset(
-                                          "assets/images/car.png",
-                                          width: 20,
-                                          height: 20,
-                                          color: appModelTheme.darkTheme
-                                              ? Colors.white
-                                              : null,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        getTranslated(
-                                            'Addmycar(optional)', context),
-                                        textAlign: TextAlign.start,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins3',
-                                          fontSize: 16,
-                                          color: appModelTheme.darkTheme
-                                              ? Colors.white
-                                              : Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              style: TextStyle(
+                                fontFamily: "Poppins3",
+                                fontSize: 16,
+                                color: appModelTheme.darkTheme ? white : black,
                               ),
-                              width: 0.9,
-                              callBackFunction: () {
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-
-                                Get.toNamed('/select-your-car');
-                              },
-                              bgColor: appModelTheme.darkTheme
-                                  ? darkmodeColor
-                                  : grayE6E6E5,
-                              borderColor: Colors.transparent,
+                              decoration: InputDecoration(
+                                fillColor: appModelTheme.darkTheme
+                                    ? darkmodeColor
+                                    : grayE6E6E5,
+                                filled: true,
+                                border: const OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                focusedBorder: const OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                enabledBorder: const OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                errorBorder: const OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                focusedErrorBorder: const OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                prefixIcon: Image.asset(
+                                  'assets/images/Location.png',
+                                  width: 20,
+                                  height: 20,
+                                  color: appModelTheme.darkTheme
+                                      ? Colors.white
+                                      : null,
+                                ),
+                                hintText: addressBtn,
+                                hintStyle: TextStyle(
+                                  fontFamily: "Poppins3",
+                                  fontSize: 16,
+                                  color:
+                                      appModelTheme.darkTheme ? white : black,
+                                ),
+                                prefixIconConstraints:
+                                    BoxConstraints(minWidth: 40),
+                              ),
                             ),
                           ),
                           SizedBox(height: 40),

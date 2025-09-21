@@ -65,33 +65,7 @@ Future<void> main() async {
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark));
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  
-  // Initialize FlutterLocalNotificationsPlugin for iOS
-  flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  
-  // iOS-specific initialization
-  const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
-    requestAlertPermission: true,
-    requestBadgePermission: true,
-    requestSoundPermission: true,
-  );
-  
-  const InitializationSettings initializationSettings = InitializationSettings(
-    iOS: initializationSettingsIOS,
-  );
-  
-  await flutterLocalNotificationsPlugin.initialize(
-    initializationSettings,
-    onDidReceiveNotificationResponse: (NotificationResponse response) {
-      // Handle notification tap
-      log('Notification tapped: ${response.payload}');
-    },
-  );
-  
-  // Set the background messaging handler early on
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  
+  await Firebase.initializeApp();
   // //===========CRASHLYTICS==========
 
   // // Pass all uncaught "fatal" errors from the framework to Crashlytics
@@ -166,18 +140,6 @@ class _IMechanoAppState extends State<IMechanoApp> {
     );
 
     log('User granted permission: ${settings.authorizationStatus}');
-    
-    // Additional iOS-specific permission check
-    if (Platform.isIOS) {
-      await flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
-    }
-    
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 

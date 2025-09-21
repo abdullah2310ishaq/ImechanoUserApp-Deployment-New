@@ -9,8 +9,8 @@
 
 
     <application
-        android:icon="@mipmap/ic_launcher"
-        android:label="imechano">
+        android:icon="@mipmap/launcher_icon"
+        android:label="iMecchano">
 
         <meta-data
   android:name="com.google.firebase.messaging.default_notification_channel_id"
