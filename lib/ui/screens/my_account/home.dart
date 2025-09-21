@@ -329,7 +329,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           children: [
                             Container(
-                              padding: EdgeInsets.only(top: 4.h, bottom: 25.h),
+                              padding: EdgeInsets.only(top: 4.h, bottom: 10.h),
                               decoration: BoxDecoration(
                                   color: appModelTheme.darkTheme
                                       ? Color(0xff252525)
@@ -366,14 +366,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       child: Container(
                                                         margin: EdgeInsets.only(
                                                             bottom: 7.sp),
-                                                        height:
-                                                            selectedindex == 0
-                                                                ? 230.h
-                                                                : 220.h,
-                                                        width:
-                                                            selectedindex == 0
-                                                                ? 167.w
-                                                                : 155.w,
+                                                        height: 220.h,
+                                                        width: 155.w,
                                                         child: card(
                                                             getTranslated(
                                                                 'Emergency',
@@ -422,14 +416,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       child: Container(
                                                         margin: EdgeInsets.only(
                                                             bottom: 7.sp),
-                                                        height:
-                                                            selectedindex == 1
-                                                                ? 230.h
-                                                                : 220.h,
-                                                        width:
-                                                            selectedindex == 1
-                                                                ? 167.w
-                                                                : 155.w,
+                                                        height: 220.h,
+                                                        width: 155.w,
                                                         child: card(
                                                             getTranslated(
                                                                 'Dontknowwhat',
@@ -464,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       height: 5.h,
                                                       width: 1.w,
                                                     ),
-                                              SizedBox(width: 10.w),
+                                              SizedBox(width: 5.w),
                                               quick.contains(enteredKeyword!) ||
                                                       enteredKeyword == ""
                                                   ? GestureDetector(
@@ -478,14 +466,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       child: Container(
                                                         margin: EdgeInsets.only(
                                                             bottom: 7.sp),
-                                                        height:
-                                                            selectedindex == 2
-                                                                ? 230.h
-                                                                : 220.h,
-                                                        width:
-                                                            selectedindex == 2
-                                                                ? 167.w
-                                                                : 155.w,
+                                                        height: 220.h,
+                                                        width: 155.w,
                                                         child: card(
                                                             getTranslated(
                                                                 "Quickservice",
@@ -516,7 +498,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       height: 5.h,
                                                       width: 1.w,
                                                     ),
-                                              SizedBox(width: 10.w),
+                                              SizedBox(width: 5.w),
                                               detailing.contains(
                                                           enteredKeyword!) ||
                                                       enteredKeyword == ""
@@ -531,14 +513,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       child: Container(
                                                         margin: EdgeInsets.only(
                                                             bottom: 7.sp),
-                                                        height:
-                                                            selectedindex == 3
-                                                                ? 230.h
-                                                                : 220.h,
-                                                        width:
-                                                            selectedindex == 3
-                                                                ? 167.w
-                                                                : 155.w,
+                                                        height: 220.h,
+                                                        width: 155.w,
                                                         child: card(
                                                             getTranslated(
                                                                 "upholstery",
@@ -600,8 +576,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       //     child: Text("Checkout")),
                                       Container(
                                         margin: EdgeInsets.only(
-                                            left: 25.sp,
-                                            top: 7.sp,
+                                            left: 17.w,
+                                            top: 2.sp,
                                             right: 25.sp),
                                         child: Text(
                                           getTranslated('OurServices', context),
@@ -610,7 +586,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               fontSize: 15.sp),
                                         ),
                                       ),
-                                      SizedBox(height: 10.h),
+                                      SizedBox(height: 2.h),
                                       StreamBuilder<CategoriesModelClass>(
                                           stream: categoriesListBloc
                                               .CategoryListStream,
@@ -835,7 +811,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                margin: EdgeInsets.fromLTRB(5.w, 0, 5.w, 0),
+                margin: EdgeInsets.fromLTRB(15.w, 0, 5.w, 0),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
@@ -1006,9 +982,10 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(20),
         ),
         shadowColor: Colors.black45,
-        elevation: isselected ? 6 : 0,
+        elevation: 2,
         color: color,
         child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 8.w),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -1027,32 +1004,36 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 5.h,
                 ),
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-                            child: Text(
-                              txt,
-                              style: TextStyle(
-                                  fontFamily: "Poppins1",
-                                  color: colorr,
-                                  fontSize: 13.sp),
-                            ),
+                        Expanded(
+                          child: Text(
+                            txt,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontFamily: "Poppins1",
+                                color: colorr,
+                                fontSize: 13.sp),
                           ),
                         ),
                       ],
                     ),
                     Center(
-                      child: Text(
-                        sub,
-                        style: TextStyle(
-                            color: subcolor,
-                            fontSize: 10.sp,
-                            fontFamily: "poppins3"),
+                      child: Container(
+                        width: double.infinity,
+                        child: Text(
+                          sub,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: subcolor,
+                              fontSize: 10.sp,
+                              fontFamily: "poppins3"),
+                        ),
                       ),
                     ),
                   ],

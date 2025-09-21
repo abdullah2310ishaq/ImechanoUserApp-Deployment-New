@@ -401,7 +401,7 @@ class _MyInvoiceState extends State<MyInvoice>
     return Column(
       children: [
         Container(
-          margin: EdgeInsets.only(left: 1, right: 15),
+          margin: EdgeInsets.symmetric(horizontal: 10.w),
           height: 40,
           child: TabBar(
             controller: _tabController,

@@ -257,6 +257,10 @@ class _BookingListShowState extends State<BookingListShow>
           SizedBox(height: 15),
           _delTotal(),
           SizedBox(height: 15),
+          _backButton(),
+          SizedBox(height: 15),
+          _bookAppoinment(),
+          SizedBox(height: 20),
           dynamicBottomCard(),
           SizedBox(height: 15),
         ],
@@ -475,13 +479,19 @@ class _BookingListShowState extends State<BookingListShow>
 
   Widget _addLocationComment() {
     return Padding(
-      padding: const EdgeInsets.only(left: 25, right: 18),
+      padding: const EdgeInsets.only(left: 26, right: 20),
       child: Container(
           height: 50,
           width: double.infinity,
           decoration: BoxDecoration(
             color: appModelTheme.darkTheme ? darkmodeColor : Color(0xffE6E6E5),
             borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: appModelTheme.darkTheme
+                  ? greycolo.withOpacity(0.3)
+                  : Colors.grey[300]!,
+              width: 1,
+            ),
           ),
           child: Row(
             children: [
@@ -783,9 +793,62 @@ class _BookingListShowState extends State<BookingListShow>
     );
   }
 
+  Widget _backButton() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 26, right: 20),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: Container(
+          height: 50,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color:
+                appModelTheme.darkTheme ? Color(0xff2a2a2a) : Colors.grey[200],
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: appModelTheme.darkTheme
+                  ? greycolo.withOpacity(0.3)
+                  : Colors.grey[300]!,
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.arrow_back_ios,
+                color: appModelTheme.darkTheme ? white : black,
+                size: 18,
+              ),
+              SizedBox(width: 8),
+              Text(
+                getTranslated('Back', context),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: appModelTheme.darkTheme ? white : black,
+                  fontFamily: "Poppins2",
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _bookAppoinment() {
     return Padding(
-      padding: const EdgeInsets.only(left: 25, right: 20),
+      padding: const EdgeInsets.only(left: 26, right: 20),
       child: GestureDetector(
         onTap: () {
           showDialog(
@@ -801,35 +864,52 @@ class _BookingListShowState extends State<BookingListShow>
           );
         },
         child: Container(
-          height: 48,
-          width: 380,
+          height: 50,
+          width: double.infinity,
           decoration: BoxDecoration(
             color: logoBlue,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: logoBlue.withOpacity(0.3),
+              width: 1,
+            ),
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Text(
-                '3 Services Selected',
-                style: TextStyle(
-                  fontFamily: 'Poppins1',
-                  color: white,
-                  fontSize: 10,
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Icon(
+                  Icons.calendar_today,
+                  color: Colors.white,
+                  size: 20,
                 ),
               ),
-              Text(
-                'Book Apointment',
-                style: TextStyle(
-                  fontFamily: 'Poppins1',
-                  color: white,
-                  fontSize: 15,
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: Text(
+                  '${widget.data.items?.length ?? 0} ' +
+                      getTranslated('Selected', context) +
+                      ' ' +
+                      getTranslated('Service', context) +
+                      '... ' +
+                      getTranslated('BookAppointment', context),
+                  style: TextStyle(
+                    fontFamily: 'Poppins2',
+                    color: white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               Icon(
-                Icons.shopping_cart,
+                Icons.arrow_forward_ios,
                 color: white,
-              )
+                size: 16,
+              ),
             ],
           ),
         ),

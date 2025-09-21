@@ -398,7 +398,7 @@ class _MyJobCardState extends State<MyJobCard>
       child: Column(
         children: [
           Container(
-            margin: EdgeInsets.only(right: 10.w),
+            margin: EdgeInsets.symmetric(horizontal: 10.w),
             height: 40,
             child: TabBar(
               controller: _tabController,

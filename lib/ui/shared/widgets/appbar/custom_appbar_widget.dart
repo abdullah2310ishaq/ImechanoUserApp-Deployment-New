@@ -64,20 +64,18 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
               InkWell(
                 onTap: () {
                   print("I M RRR");
-                  // Navigator.pop(context);
                   if (menuItem!.contains('assets/svg/Arrow_alt_left.svg')) {
-                    // var route = ModalRoute.of(context);
-                    // if (route != null) {
-                    //   print(route.settings.name);
-                    //   if (route.settings.name == null) {
-                    //     print("service selection");
-                    //   }
-                    // }
-                    // if (globals.screenstack != 0) globals.screenstack--;
-                    // print('globals.screenstack');
-                    // print(globals.screenstack);
-                    // Scaffold.of(context).openDrawer();
+                    // Back button - navigate back
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.pop(context);
+                    } else {
+                      Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (context) => BottomBarPage(2)),
+                          (Route<dynamic> route) => false);
+                    }
                   } else {
+                    // Menu button - open drawer
                     Scaffold.of(context).openDrawer();
                   }
                 },
@@ -93,11 +91,9 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
               InkWell(
                 splashColor: Color(0xFF2A7AD5), // Customizing the splash color
-
                 onTap: () {
                   if (imageicon != null) {
                     print("Shoaib Pressed Back button from App Bar");
-
                     if (Navigator.of(context).canPop()) {
                       Navigator.pop(context);
                     } else {

@@ -35,16 +35,38 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   bool isSwitch = true;
   dynamic appModelTheme;
+  bool isLoading = false;
+  String? errorMessage;
 
   @override
   void initState() {
     super.initState();
     print("Notification page");
-    Provider.of<NotificationCountProvider>(context, listen: false)
-        .setNotifications();
-    if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
-      customerNotificationListBloc
-          .notificationListSinck(PrefObj.preferences!.get(PrefKeys.USER_ID));
+    _loadNotifications();
+  }
+
+  Future<void> _loadNotifications() async {
+    try {
+      setState(() {
+        isLoading = true;
+        errorMessage = null;
+      });
+
+      await Provider.of<NotificationCountProvider>(context, listen: false)
+          .setNotifications();
+      if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+        await customerNotificationListBloc
+            .notificationListSinck(PrefObj.preferences!.get(PrefKeys.USER_ID));
+      }
+    } catch (e) {
+      log('Error loading notifications: $e');
+      setState(() {
+        errorMessage = 'Failed to load notifications';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -93,9 +115,112 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             builder: (context,
                                 AsyncSnapshot<CustomerNotificationListModel>
                                     notificationListSnapshot) {
-                              if (!notificationListSnapshot.hasData) {
+                              if (isLoading) {
                                 return Center(
-                                  child: CircularProgressIndicator(),
+                                  child: CircularProgressIndicator(
+                                    valueColor:
+                                        AlwaysStoppedAnimation<Color>(logoBlue),
+                                  ),
+                                );
+                              }
+
+                              if (errorMessage != null) {
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.error_outline,
+                                        size: 50,
+                                        color: red,
+                                      ),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        errorMessage!,
+                                        style: TextStyle(
+                                          color: appModelTheme.darkTheme
+                                              ? white
+                                              : black,
+                                          fontSize: 14,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(height: 16),
+                                      ElevatedButton(
+                                        onPressed: _loadNotifications,
+                                        child: Text('Retry'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: logoBlue,
+                                          foregroundColor: white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+
+                              if (notificationListSnapshot.hasError) {
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.error_outline,
+                                        size: 50,
+                                        color: red,
+                                      ),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        'Error loading notifications',
+                                        style: TextStyle(
+                                          color: appModelTheme.darkTheme
+                                              ? white
+                                              : black,
+                                          fontSize: 14,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(height: 16),
+                                      ElevatedButton(
+                                        onPressed: _loadNotifications,
+                                        child: Text('Retry'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: logoBlue,
+                                          foregroundColor: white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+
+                              if (!notificationListSnapshot.hasData ||
+                                  notificationListSnapshot.data!.data == null ||
+                                  notificationListSnapshot
+                                      .data!.data!.isEmpty) {
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.notifications_none,
+                                        size: 50,
+                                        color: appModelTheme.darkTheme
+                                            ? greycolo
+                                            : Colors.grey[400],
+                                      ),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        'No notifications yet',
+                                        style: TextStyle(
+                                          color: appModelTheme.darkTheme
+                                              ? white
+                                              : black,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 );
                               }
                               return ListView.separated(
@@ -105,34 +230,59 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                     notificationListSnapshot.data!.data!.length,
                                 shrinkWrap: true,
                                 separatorBuilder: (context, index) {
-                                  return Divider();
+                                  return Divider(
+                                    color: appModelTheme.darkTheme
+                                        ? Colors.grey[800]
+                                        : Colors.grey[300],
+                                    height: 1,
+                                  );
                                 },
                                 itemBuilder: (context, index) {
                                   return Container(
-                                    color: notificationListSnapshot
-                                                .data!.data![index].status ==
-                                            '1'
-                                        ? grayE6E6E5
-                                        : greycolo.withOpacity(0.5),
+                                    color: appModelTheme.darkTheme
+                                        ? (notificationListSnapshot.data!
+                                                    .data![index].status ==
+                                                '1'
+                                            ? Color(0xff2a2a2a)
+                                            : Color(0xff1e1e1e))
+                                        : (notificationListSnapshot.data!
+                                                    .data![index].status ==
+                                                '1'
+                                            ? grayE6E6E5
+                                            : greycolo.withOpacity(0.5)),
                                     child: ListTile(
                                       isThreeLine: true,
                                       onTap: () async {
-                                        if (notificationListSnapshot
-                                                .data!.data![index].status ==
-                                            '0') {
-                                          bool response = await NotificationApi
-                                              .updateNotificationStatus(
-                                                  notificationListSnapshot
-                                                      .data!.data![index]);
-                                          log('$response');
-                                        }
+                                        try {
+                                          if (notificationListSnapshot
+                                                  .data!.data![index].status ==
+                                              '0') {
+                                            bool response =
+                                                await NotificationApi
+                                                    .updateNotificationStatus(
+                                                        notificationListSnapshot
+                                                            .data!
+                                                            .data![index]);
+                                            log('Notification status updated: $response');
+                                          }
 
-                                        String? str = notificationListSnapshot
-                                            .data!.data![index].title!;
-                                        String? jobNo = notificationListSnapshot
-                                            .data!.data![index].jobNo;
-                                        Utils.handleNotificationNavigation(
-                                            context, null, str, jobNo);
+                                          String? str = notificationListSnapshot
+                                              .data!.data![index].title!;
+                                          String? jobNo =
+                                              notificationListSnapshot
+                                                  .data!.data![index].jobNo;
+                                          Utils.handleNotificationNavigation(
+                                              context, null, str, jobNo);
+                                        } catch (e) {
+                                          log('Error handling notification tap: $e');
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text('Error occurred'),
+                                              backgroundColor: red,
+                                            ),
+                                          );
+                                        }
                                       },
                                       title: Row(
                                         children: [
@@ -146,7 +296,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                 context),
                                             style: TextStyle(
                                                 fontSize: 11,
-                                                fontFamily: 'Poppins3'),
+                                                fontFamily: 'Poppins3',
+                                                color: appModelTheme.darkTheme
+                                                    ? white
+                                                    : black,
+                                                fontWeight: FontWeight.w600),
                                           ),
                                           Flexible(
                                               fit: FlexFit.tight,
@@ -160,7 +314,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                         .updatedAt!)),
                                             style: TextStyle(
                                                 fontSize: 10,
-                                                fontFamily: 'Poppins3'),
+                                                fontFamily: 'Poppins3',
+                                                color: appModelTheme.darkTheme
+                                                    ? Colors.grey[300]
+                                                    : Colors.grey[600]),
                                           ),
                                         ],
                                       ),
@@ -172,6 +329,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                 .message!
                                                 .removeAllWhitespace,
                                             context),
+                                        style: TextStyle(
+                                          color: appModelTheme.darkTheme
+                                              ? Colors.grey[200]
+                                              : Colors.grey[700],
+                                          fontSize: 12,
+                                        ),
                                       ),
                                       leading: Image(
                                           height: 10,
@@ -212,7 +375,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
         Expanded(
           child: Text(
             getTranslated("notification", context),
-            style: TextStyle(fontSize: 17.sp),
+            style: TextStyle(
+              fontSize: 17.sp,
+              color: appModelTheme.darkTheme ? white : black,
+            ),
           ),
         ),
         IconButton(
@@ -223,31 +389,62 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     return ConfirmationDialog(
                         message: 'delete all notifications?',
                         onYesPressed: () async {
-                          Loader().showLoader(context);
-                          bool response =
-                              await NotificationApi.deleteAllNotifications();
-                          if (response) {
-                            await Provider.of<NotificationCountProvider>(
-                                    context,
-                                    listen: false)
-                                .setNotifications();
-                            if (PrefObj.preferences!
-                                .containsKey(PrefKeys.USER_ID)) {
-                              await customerNotificationListBloc
-                                  .notificationListSinck(PrefObj.preferences!
-                                      .get(PrefKeys.USER_ID));
-                              setState(() {});
+                          try {
+                            Loader().showLoader(context);
+                            bool response =
+                                await NotificationApi.deleteAllNotifications();
+                            if (response) {
+                              await Provider.of<NotificationCountProvider>(
+                                      context,
+                                      listen: false)
+                                  .setNotifications();
+                              if (PrefObj.preferences!
+                                  .containsKey(PrefKeys.USER_ID)) {
+                                await customerNotificationListBloc
+                                    .notificationListSinck(PrefObj.preferences!
+                                        .get(PrefKeys.USER_ID));
+                                setState(() {});
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Notifications deleted successfully'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content:
+                                      Text('Failed to delete notifications'),
+                                  backgroundColor: red,
+                                ),
+                              );
                             }
+                          } catch (e) {
+                            log('Error deleting notifications: $e');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Error occurred'),
+                                backgroundColor: red,
+                              ),
+                            );
+                          } finally {
+                            Loader().hideLoader(context);
+                            Navigator.pop(context);
                           }
-
-                          Loader().hideLoader(context);
-                          Navigator.pop(context);
                         });
                   });
             },
             icon: Icon(Icons.delete, color: red)),
         Switch(
-          activeColor: Colors.blue,
+          activeColor: logoBlue,
+          activeTrackColor: logoBlue.withOpacity(0.3),
+          inactiveThumbColor:
+              appModelTheme.darkTheme ? greycolo : Colors.grey[400],
+          inactiveTrackColor: appModelTheme.darkTheme
+              ? greycolo.withOpacity(0.3)
+              : Colors.grey[300],
           value: isSwitch,
           onChanged: (value) {
             setState(() {
