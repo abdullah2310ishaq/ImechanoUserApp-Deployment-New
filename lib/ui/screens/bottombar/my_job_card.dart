@@ -32,7 +32,7 @@ class _MyJobCardState extends State<MyJobCard>
   dynamic appModelTheme;
   String search = "";
   String fromdate = DateTime.now().toString().split(' ')[0];
-  String fromTime = DateTime.now().toString().split(' ')[1].split('.')[0];
+  String fromTime = DateFormat('hh:mm a').format(DateTime.now());
   int selectTab = 0;
   var userStr;
   bool showFilter = false;
@@ -197,6 +197,7 @@ class _MyJobCardState extends State<MyJobCard>
           appBar: WidgetAppBar(
             title: getTranslated("jobcarddetails", context),
             menuItem: 'assets/svg/Menu.svg',
+            imageicon: 'assets/svg/Arrow_alt_left.svg',
             // action: 'assets/svg/shopping-cart.svg',
             action2: 'assets/svg/ball.svg',
           ),

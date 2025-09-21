@@ -192,7 +192,7 @@ class _MySelectionPageState extends State<MySelectionPage>
       appBar: WidgetAppBar(
         title: getTranslated('myselections', context),
         menuItem: 'assets/svg/Menu.svg',
-        // imageicon: 'assets/svg/Arrow_alt_left.svg',
+        imageicon: 'assets/svg/Arrow_alt_left.svg',
         home: 'assets/svg/homeicon.svg',
         action2: 'assets/svg/ball.svg',
         flag: false,
@@ -909,7 +909,7 @@ class _MySelectionPageState extends State<MySelectionPage>
 
   Widget _bookAppoinment() {
     return Padding(
-      padding: const EdgeInsets.only(left: 25, right: 20),
+      padding: const EdgeInsets.only(left: 26, right: 20),
       child: GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
@@ -947,44 +947,55 @@ class _MySelectionPageState extends State<MySelectionPage>
           }
         },
         child: Container(
-          height: 48.h,
+          height: 50,
           width: double.infinity,
-          margin: EdgeInsets.symmetric(horizontal: 16.w),
           decoration: BoxDecoration(
             color: logoBlue,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: logoBlue.withOpacity(0.3),
+              width: 1,
+            ),
           ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    "${globals.currentCount} " +
-                        getTranslated("Selected", context) +
-                        " " +
-                        getTranslated('Service', context),
-                    style: TextStyle(
-                      fontFamily: 'Poppins1',
-                      color: Colors.white,
-                      fontSize: 12.sp,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Icon(
+                  Icons.calendar_today,
+                  color: Colors.white,
+                  size: 20,
                 ),
-                SizedBox(width: 8.w),
-                Text(
-                  getTranslated('BookApointment', context),
+              ),
+              SizedBox(width: 10),
+              Text(
+                '${globals.currentCount} ' + getTranslated('Selected', context),
+                style: TextStyle(
+                  fontFamily: 'Poppins1',
+                  color: white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  getTranslated('BookAppointment', context),
                   style: TextStyle(
-                    fontFamily: 'Poppins1',
-                    color: Colors.white,
-                    fontSize: 14.sp,
+                    fontFamily: 'Poppins2',
+                    color: white,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-              ],
-            ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: white,
+                size: 16,
+              ),
+            ],
           ),
         ),
       ),

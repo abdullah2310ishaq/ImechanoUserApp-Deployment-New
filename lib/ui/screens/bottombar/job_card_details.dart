@@ -365,8 +365,14 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                             height: 50,
                                             width: 165,
                                             child: ElevatedButton(
-                                              child: Text(getTranslated(
-                                                  'PayandConfirm', context)),
+                                              child: Text(
+                                                  getTranslated(
+                                                      'PayandConfirm', context),
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14,
+                                                      fontFamily: "Poppins1")),
                                               onPressed: () {
                                                 // _asyncConfirmDialog(
                                                 //     context,

@@ -1806,7 +1806,7 @@ Widget _cardList(ItemData data) {
                   style: TextStyle(
                     fontSize: 11.sp,
                     fontFamily: 'Poppins1',
-                    color: appModel.darkTheme ? white : Colors.grey,
+                    color: appModel.darkTheme ? white : Colors.black,
                   ),
                 ),
               ),
@@ -1825,7 +1825,7 @@ Widget _cardList(ItemData data) {
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontFamily: 'Poppins1',
-                        color: Colors.grey,
+                        color: appModel.darkTheme ? Colors.grey : Colors.black,
                       ),
                     ),
                     SizedBox(
@@ -1836,7 +1836,8 @@ Widget _cardList(ItemData data) {
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontFamily: 'Poppins3',
-                        color: Colors.black38,
+                        color:
+                            appModel.darkTheme ? Colors.black38 : Colors.black,
                       ),
                     ),
                   ],
@@ -1859,7 +1860,7 @@ Widget _cardList(ItemData data) {
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontFamily: 'Poppins3',
-                        color: Colors.grey,
+                        color: appModel.darkTheme ? Colors.grey : Colors.black,
                       ),
                     ),
                   ],
@@ -1884,7 +1885,7 @@ Widget _cardList(ItemData data) {
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontFamily: 'Poppins3',
-                        color: Colors.grey,
+                        color: appModel.darkTheme ? Colors.grey : Colors.black,
                       ),
                     ),
                   ],
@@ -1910,7 +1911,7 @@ Widget _cardList(ItemData data) {
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontFamily: 'Poppins3',
-                        color: Colors.grey,
+                        color: appModel.darkTheme ? Colors.grey : Colors.black,
                       ),
                     ),
                   ],
@@ -1937,7 +1938,7 @@ Widget _cardList(ItemData data) {
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontFamily: 'Poppins3',
-                        color: Colors.grey,
+                        color: appModel.darkTheme ? Colors.grey : Colors.black,
                       ),
                     ),
                   ],
@@ -1951,7 +1952,7 @@ Widget _cardList(ItemData data) {
                   style: TextStyle(
                     fontSize: 9.sp,
                     fontFamily: 'Poppins1',
-                    color: Colors.grey,
+                    color: appModel.darkTheme ? Colors.grey : Colors.black,
                   ),
                 ),
               ),
@@ -1968,6 +1969,7 @@ Widget _cardList(ItemData data) {
 
 Widget _delChange() {
   return Builder(builder: (context) {
+    final appModel = Provider.of<AppModel>(context);
     return Padding(
       padding: const EdgeInsets.only(left: 27, right: 20),
       child: Row(
@@ -1979,6 +1981,7 @@ Widget _delChange() {
             style: TextStyle(
               fontSize: 10.sp,
               fontFamily: 'Poppins1',
+              color: appModel.darkTheme ? white : Colors.black,
             ),
           ),
           // ========================by jenish==========================
@@ -2011,6 +2014,7 @@ Widget _customDivider() {
 
 Widget _delTotal(ItemData data) {
   return Builder(builder: (context) {
+    final appModel = Provider.of<AppModel>(context);
     return Padding(
       // ========================by jenish==========================
       padding: const EdgeInsets.only(left: 27, right: 20),
@@ -2023,6 +2027,7 @@ Widget _delTotal(ItemData data) {
             style: TextStyle(
               fontSize: 13.sp,
               fontFamily: 'Poppins1',
+              color: appModel.darkTheme ? white : Colors.black,
             ),
           ),
           Text(
@@ -2055,8 +2060,7 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(right: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Colors.lightBlueAccent, // This is what you need!
+                backgroundColor: Colors.green, // Changed to green color
               ),
               child: Text(
                 'Approve',

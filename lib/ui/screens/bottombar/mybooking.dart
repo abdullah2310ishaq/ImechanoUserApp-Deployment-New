@@ -38,6 +38,7 @@ class _MyBookingState extends State<MyBooking> {
           appBar: WidgetAppBar(
             title: 'My Booking',
             menuItem: 'assets/svg/Menu.svg',
+            imageicon: 'assets/svg/Arrow_alt_left.svg',
             action: 'assets/svg/shopping-cart.svg',
             action2: 'assets/svg/ball.svg',
           ),
@@ -220,7 +221,11 @@ class _MyBookingState extends State<MyBooking> {
                         child: Text(
                           "Car Delivery back",
                           style: TextStyle(
-                              fontFamily: "Poppins1", fontSize: 13.sp),
+                              fontFamily: "Poppins1",
+                              fontSize: 13.sp,
+                              color: appModelTheme.darkTheme
+                                  ? Colors.white
+                                  : Colors.black),
                         ),
                       ),
                       Container(
@@ -249,7 +254,7 @@ class _MyBookingState extends State<MyBooking> {
                         child: ElevatedButton(
                           style: ButtonStyle(
                               backgroundColor: MaterialStateProperty.all<Color>(
-                                  Color(0xe165d456)),
+                                  Colors.green),
                               shape: MaterialStateProperty.all<
                                       RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
@@ -344,16 +349,25 @@ class _MyBookingState extends State<MyBooking> {
 }
 
 Widget cardPoint(String title) {
-  return Container(
-    margin: EdgeInsets.only(left: 17.w, top: 3.h),
-    child: Row(
-      children: [
-        Image(
-            height: 10.h,
-            image: AssetImage("assets/icons/My Account/Ellipse 27.png")),
-        SizedBox(width: 7.w),
-        Text(title, style: TextStyle(fontFamily: 'Poppins3', fontSize: 10))
-      ],
-    ),
+  return Consumer<AppModel>(
+    builder: (context, appModel, child) {
+      return Container(
+        margin: EdgeInsets.only(left: 17.w, top: 3.h),
+        child: Row(
+          children: [
+            Image(
+                height: 10.h,
+                image: AssetImage("assets/icons/My Account/Ellipse 27.png")),
+            SizedBox(width: 7.w),
+            Text(title,
+                style: TextStyle(
+                  fontFamily: 'Poppins3',
+                  fontSize: 10,
+                  color: appModel.darkTheme ? Colors.white70 : Colors.black87,
+                ))
+          ],
+        ),
+      );
+    },
   );
 }

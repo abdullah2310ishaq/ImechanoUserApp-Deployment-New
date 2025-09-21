@@ -159,7 +159,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                             fontSize: 11,
                             fontFamily: 'Poppins1',
                             color:
-                                appModelTheme.darkTheme ? white : Colors.grey,
+                                appModelTheme.darkTheme ? white : Colors.black,
                           ),
                         )
                       : Text(
@@ -172,7 +172,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                             fontSize: 11,
                             fontFamily: 'Poppins1',
                             color:
-                                appModelTheme.darkTheme ? white : Colors.grey,
+                                appModelTheme.darkTheme ? white : Colors.black,
                           ),
                         ),
                 ),
@@ -191,7 +191,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                         style: TextStyle(
                           fontSize: 10,
                           fontFamily: 'Poppins1',
-                          color: appModelTheme.darkTheme ? white : Colors.grey,
+                          color: appModelTheme.darkTheme ? white : Colors.black,
                         ),
                       ),
                       SizedBox(
@@ -204,7 +204,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                           fontFamily: 'Poppins3',
                           color: appModelTheme.darkTheme
                               ? Colors.white70
-                              : Colors.black38,
+                              : Colors.black,
                         ),
                       ),
                     ],
@@ -218,7 +218,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                     style: TextStyle(
                       fontSize: 9,
                       fontFamily: 'Poppins1',
-                      color: appModelTheme.darkTheme ? white : Colors.grey,
+                      color: appModelTheme.darkTheme ? white : Colors.black,
                     ),
                   ),
                 ),
@@ -275,7 +275,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
         right: 20,
       ),
       child: Divider(
-        color: appModelTheme.darkTheme ? white : Colors.black38,
+        color: appModelTheme.darkTheme ? white : Colors.black,
       ),
     );
   }
@@ -329,7 +329,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
               padding: EdgeInsets.only(right: 6.0),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightBlueAccent,
+                  backgroundColor: Colors.green,
                 ),
                 child: Text(
                   getTranslated('approve', context),

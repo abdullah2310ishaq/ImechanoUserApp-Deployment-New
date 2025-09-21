@@ -118,6 +118,7 @@ class _ProfilePageState extends State<ProfilePage> {
           appBar: WidgetAppBar(
             title: getTranslated('myprofile', context),
             menuItem: 'assets/svg/Menu.svg',
+            imageicon: 'assets/svg/Arrow_alt_left.svg',
             action: 'assets/svg/shopping-cart.svg',
             action2: 'assets/svg/ball.svg',
           ),
@@ -259,65 +260,70 @@ class _ProfilePageState extends State<ProfilePage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SimpleDialogOption(
-                              child: InkWell(
-                                onTap: () async {
-                                  image = await _picker.pickImage(
-                                      source: ImageSource.camera);
-                                  onUploadAPI(
-                                      PrefObj.preferences!
-                                          .get(PrefKeys.USER_ID),
-                                      File(image!.path));
-                                  setState(() {
-                                    temp = image;
-                                  });
-                                },
-                                child: Container(
-                                  height: 60.h,
-                                  width: 100.w,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: logoBlue,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      "Camera",
-                                      style: TextStyle(
-                                          fontSize: 18.sp,
-                                          color: Colors.white,
-                                          fontFamily: "Poppins1"),
+                            Expanded(
+                              child: SimpleDialogOption(
+                                child: InkWell(
+                                  onTap: () async {
+                                    image = await _picker.pickImage(
+                                        source: ImageSource.camera);
+                                    onUploadAPI(
+                                        PrefObj.preferences!
+                                            .get(PrefKeys.USER_ID),
+                                        File(image!.path));
+                                    setState(() {
+                                      temp = image;
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 60.h,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: logoBlue,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Camera",
+                                        style: TextStyle(
+                                            fontSize: 18.sp,
+                                            color: Colors.white,
+                                            fontFamily: "Poppins1"),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            SimpleDialogOption(
-                              child: InkWell(
-                                onTap: () async {
-                                  image = await _picker.pickImage(
-                                      source: ImageSource.gallery);
-                                  onUploadAPI(
-                                      PrefObj.preferences!
-                                          .get(PrefKeys.USER_ID),
-                                      File(image!.path));
-                                  setState(() {
-                                    temp = image;
-                                  });
-                                },
-                                child: Container(
-                                  height: 60.h,
-                                  width: 100.w,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: logoBlue,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      "Gallery",
-                                      style: TextStyle(
-                                          fontSize: 18.sp,
-                                          color: Colors.white,
-                                          fontFamily: "Poppins1"),
+                            SizedBox(width: 10.w),
+                            Expanded(
+                              child: SimpleDialogOption(
+                                child: InkWell(
+                                  onTap: () async {
+                                    image = await _picker.pickImage(
+                                        source: ImageSource.gallery);
+                                    onUploadAPI(
+                                        PrefObj.preferences!
+                                            .get(PrefKeys.USER_ID),
+                                        File(image!.path));
+                                    setState(() {
+                                      temp = image;
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 60.h,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: logoBlue,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Gallery",
+                                        style: TextStyle(
+                                            fontSize: 18.sp,
+                                            color: Colors.white,
+                                            fontFamily: "Poppins1"),
+                                      ),
                                     ),
                                   ),
                                 ),

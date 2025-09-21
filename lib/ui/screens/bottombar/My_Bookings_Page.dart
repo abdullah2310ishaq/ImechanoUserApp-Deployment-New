@@ -212,6 +212,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
           appBar: WidgetAppBar(
             title: getTranslated('MyBookings', context),
             menuItem: 'assets/svg/Menu.svg',
+            imageicon: 'assets/svg/Arrow_alt_left.svg',
             // action: 'assets/svg/shopping-cart.svg',
             action2: 'assets/svg/ball.svg',
           ),
