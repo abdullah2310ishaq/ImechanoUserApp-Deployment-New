@@ -49,11 +49,11 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
     final appModel = Provider.of<AppModel>(context);
     appModelTheme = appModel;
     return ScreenUtilInit(
-      // designSize: Size(500, 896),
+      designSize: Size(414, 896),
       builder: (context, child) => AppBar(
         key: _key,
-        toolbarHeight: preferredSize.height,
-        leadingWidth: preferredSize.width,
+        toolbarHeight: 60.h,
+        leadingWidth: 120.w,
         iconTheme: IconThemeData(
           color: textIconColor,
         ),
@@ -80,13 +80,13 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
                   }
                 },
                 child: Container(
-                    padding: appModelTheme.appLocal == Locale("en")
-                        ? EdgeInsets.only(
-                            top: 15, bottom: 15, left: 10, right: 10)
-                        : EdgeInsets.only(
-                            top: 15, bottom: 15, left: 17, right: 17),
+                    width: 50.w,
+                    height: 50.h,
+                    padding: EdgeInsets.all(12.w),
                     child: SvgPicture.asset(
                       '${menuItem}',
+                      width: 24.w,
+                      height: 24.h,
                     )),
               ),
               InkWell(
@@ -105,9 +105,14 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
                   }
                 },
                 child: Container(
-                    padding: EdgeInsets.only(
-                        top: 15, left: 20, right: 5, bottom: 15),
-                    child: SvgPicture.asset('${imageicon}')),
+                    width: 50.w,
+                    height: 50.h,
+                    padding: EdgeInsets.all(12.w),
+                    child: SvgPicture.asset(
+                      '${imageicon}',
+                      width: 24.w,
+                      height: 24.h,
+                    )),
               ),
             ],
           ),
@@ -122,11 +127,13 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
                         (Route<dynamic> route) => false);
                   },
                   child: Container(
-                      padding: EdgeInsets.only(
-                          top: 15, right: 17, bottom: 15, left: 13),
+                      width: 50.w,
+                      height: 50.h,
+                      padding: EdgeInsets.all(12.w),
                       child: SvgPicture.asset(
                         "${home}",
-                        height: 20,
+                        width: 24.w,
+                        height: 24.h,
                         color: Colors.white,
                       )),
                 )
@@ -142,11 +149,14 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
             }, child: Consumer<NotificationCountProvider>(
                 builder: (context, value, child) {
               return value.notifications == 0
-                  ? Padding(
-                      padding: EdgeInsets.only(
-                          top: 15, right: 17, bottom: 15, left: 13),
+                  ? Container(
+                      width: 50.w,
+                      height: 50.h,
+                      padding: EdgeInsets.all(12.w),
                       child: SvgPicture.asset(
                         "${action2}",
+                        width: 24.w,
+                        height: 24.h,
                       ),
                     )
                   : badges.Badge(
@@ -158,11 +168,14 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
                         style: TextStyle(color: Colors.white),
                       ),
                       position: badges.BadgePosition.topEnd(top: 5, end: 10),
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                            top: 15, right: 17, bottom: 15, left: 13),
+                      child: Container(
+                        width: 50.w,
+                        height: 50.h,
+                        padding: EdgeInsets.all(12.w),
                         child: SvgPicture.asset(
                           "${action2}",
+                          width: 24.w,
+                          height: 24.h,
                         ),
                       ));
             })),
@@ -177,9 +190,10 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
         title: Text(
           title!,
           style: TextStyle(
-            fontSize: 15.w,
+            fontSize: 16.sp,
             fontFamily: 'Poppins1',
             color: textIconColor,
+            fontWeight: FontWeight.w600,
           ),
         ),
         backgroundColor: appModelTheme.darkTheme ? black : logoBlue,

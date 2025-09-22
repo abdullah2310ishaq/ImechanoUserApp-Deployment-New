@@ -160,7 +160,7 @@ class JobsState extends State<Jobs> {
             title: getTranslated('Searchservice', context),
             menuItem: 'assets/svg/Menu.svg',
             home: 'assets/svg/homeicon.svg',
-
+            imageicon: 'assets/svg/Arrow_alt_left.svg',
             // action: 'assets/svg/shopping-cart.svg',
             action2: 'assets/svg/ball.svg',
           ),
@@ -178,7 +178,8 @@ class JobsState extends State<Jobs> {
                   child: Column(
                     children: <Widget>[
                       Container(
-                        padding: EdgeInsets.all(15),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 15.w, vertical: 15.h),
                         child: TextField(
                           focusNode: FocusNode(),
                           textInputAction: TextInputAction.search,
@@ -200,10 +201,19 @@ class JobsState extends State<Jobs> {
                               ),
                             ),
                             suffixIcon: InkWell(
-                              child: Icon(Icons.search),
+                              child: Icon(Icons.search, size: 20.w),
                             ),
-                            contentPadding: EdgeInsets.all(15.0),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 15.w, vertical: 15.h),
                             hintText: getTranslated("search", context),
+                            hintStyle: TextStyle(
+                              fontSize: 14.sp,
+                              fontFamily: 'Poppins1',
+                            ),
+                          ),
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontFamily: 'Poppins1',
                           ),
                           onChanged: (value) {
                             _runFilter(value);
@@ -218,32 +228,41 @@ class JobsState extends State<Jobs> {
                             if (!categoriesSnapshot.hasData) {
                               return Center(
                                 child: Container(
-                                  height: 100,
-                                  width: 100,
+                                  height: 100.h,
+                                  width: 100.w,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.all(
-                                      Radius.circular(15),
+                                      Radius.circular(15.r),
                                     ),
                                     color: Colors.white,
                                   ),
                                   child: Center(
                                       child: CircularProgressIndicator(
                                     color: Colors.blue,
+                                    strokeWidth: 3.w,
                                   )),
                                 ),
                               );
                             }
                             if (categoriesSnapshot.data!.data!.length == 0) {
                               return Container(
-                                  height: 280,
+                                  height: 280.h,
                                   alignment: Alignment.center,
-                                  child: Text("No Service Found"));
+                                  child: Text(
+                                    "No Service Found",
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontFamily: 'Poppins1',
+                                      color: appModelTheme.darkTheme
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                  ));
                             }
 
                             if (categoriesSnapshot.data!.data!.length == 1) {
                               return Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 10, right: 10),
+                                padding: EdgeInsets.symmetric(horizontal: 10.w),
                                 child: Column(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
@@ -256,10 +275,10 @@ class JobsState extends State<Jobs> {
 
                             return Column(
                               children: [
-                                SizedBox(height: 14),
+                                SizedBox(height: 14.h),
                                 Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 10, right: 10),
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 10.w),
                                   child: Column(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceAround,
@@ -332,34 +351,32 @@ class JobsState extends State<Jobs> {
         itemBuilder: (BuildContext context, int index) {
           return GestureDetector(
               child: Padding(
-                padding: const EdgeInsets.all(4.0),
+                padding: EdgeInsets.all(4.w),
                 child: Container(
-                  // height: 110,
-                  // width: 118,
-                  // margin: EdgeInsets.only(top: 4.h, bottom: 5.h, left: 7.h, right: 5.h),
+                  height: 60.h,
+                  width: double.infinity,
                   decoration: BoxDecoration(
                     color: appModelTheme.darkTheme
                         ? darkmodeColor
                         : Color(0xfff4f5f7),
-                    // color: colorOne[index],
                     borderRadius: BorderRadius.all(
-                      Radius.circular(10),
+                      Radius.circular(10.r),
                     ),
                   ),
                   child: Row(
                     children: [
                       SizedBox(
-                        width: 20,
-                      ),
-                      SizedBox(
-                        height: 35,
+                        width: 20.w,
                       ),
                       Icon(
                         Icons.search,
-                        size: 10,
+                        size: 16.w,
+                        color: appModelTheme.darkTheme
+                            ? Colors.white
+                            : Colors.black,
                       ),
                       SizedBox(
-                        width: 5,
+                        width: 8.w,
                       ),
                       Row(
                         children: [
@@ -371,16 +388,24 @@ class JobsState extends State<Jobs> {
                                       .item_name!.removeAllWhitespace,
                                   context),
                               style: TextStyle(
-                                  fontSize: 10.w, fontFamily: 'Poppins1'),
+                                fontSize: 12.sp,
+                                fontFamily: 'Poppins1',
+                                color: appModelTheme.darkTheme
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
                             ),
                           SizedBox(
-                            width: 3,
+                            width: 3.w,
                           ),
                           if (categoriesSnapshot.data!.data![index].item_name !=
                               "")
                             Icon(
                               Icons.arrow_forward_ios_rounded,
-                              size: 12,
+                              size: 12.w,
+                              color: appModelTheme.darkTheme
+                                  ? Colors.white
+                                  : Colors.black,
                             ),
                           if (categoriesSnapshot
                                   .data!.data![index].subcategory_Name !=
@@ -391,20 +416,28 @@ class JobsState extends State<Jobs> {
                                       .subcategory_Name!.removeAllWhitespace,
                                   context),
                               style: TextStyle(
-                                  fontSize: 10.w, fontFamily: 'Poppins1'),
+                                fontSize: 12.sp,
+                                fontFamily: 'Poppins1',
+                                color: appModelTheme.darkTheme
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
                             ),
                           SizedBox(
-                            width: 2,
+                            width: 2.w,
                           ),
                           if (categoriesSnapshot
                                   .data!.data![index].subcategory_Name !=
                               "")
                             Icon(
                               Icons.arrow_forward_ios_rounded,
-                              size: 12,
+                              size: 12.w,
+                              color: appModelTheme.darkTheme
+                                  ? Colors.white
+                                  : Colors.black,
                             ),
                           SizedBox(
-                            width: 2,
+                            width: 2.w,
                           ),
                           Text(
                             getTranslated(
@@ -412,7 +445,12 @@ class JobsState extends State<Jobs> {
                                     .categoryName!.removeAllWhitespace,
                                 context),
                             style: TextStyle(
-                                fontSize: 10.w, fontFamily: 'Poppins1'),
+                              fontSize: 12.sp,
+                              fontFamily: 'Poppins1',
+                              color: appModelTheme.darkTheme
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
                           ),
                         ],
                       ),
@@ -496,7 +534,7 @@ class JobsState extends State<Jobs> {
                     builder: (context) => StatefulBuilder(
                       builder: (context, setState) => Container(
                         height: MediaQuery.of(context).size.height / 1.5,
-                        padding: EdgeInsets.only(top: 5),
+                        padding: EdgeInsets.only(top: 5.h),
                         child: StreamBuilder<OilChangeModel>(
                             stream: oilchnageListBloc.OilchnageListStream,
                             builder: (context,
@@ -517,7 +555,7 @@ class JobsState extends State<Jobs> {
                                 child: SingleChildScrollView(
                                   child: Container(
                                     margin: EdgeInsets.only(
-                                        left: 25, right: 25, top: 5),
+                                        left: 25.w, right: 25.w, top: 5.h),
                                     child: Column(
                                       children: [
                                         Column(
@@ -551,12 +589,17 @@ class JobsState extends State<Jobs> {
                                                           .removeAllWhitespace,
                                                       context),
                                                   style: TextStyle(
-                                                      fontFamily: "Poppins1",
-                                                      fontSize: 12),
+                                                    fontFamily: "Poppins1",
+                                                    fontSize: 14.sp,
+                                                    color:
+                                                        appModelTheme.darkTheme
+                                                            ? Colors.white
+                                                            : Colors.black,
+                                                  ),
                                                 ),
                                               ],
                                             ),
-                                            SizedBox(height: 10),
+                                            SizedBox(height: 10.h),
                                             ListView.builder(
                                               shrinkWrap: true,
                                               padding: EdgeInsets.zero,
@@ -565,9 +608,8 @@ class JobsState extends State<Jobs> {
                                                   .data!.data!.length,
                                               itemBuilder: (context, index) {
                                                 return Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 15.0),
+                                                  padding: EdgeInsets.only(
+                                                      bottom: 15.h),
                                                   child: Container(
                                                       decoration: BoxDecoration(
                                                         color: appModelTheme
@@ -576,7 +618,7 @@ class JobsState extends State<Jobs> {
                                                             : Color(0xfff4f5f7),
                                                         borderRadius:
                                                             BorderRadius
-                                                                .circular(10),
+                                                                .circular(10.r),
                                                       ),
                                                       child: ListTile(
                                                         onTap: () {
@@ -613,13 +655,24 @@ class JobsState extends State<Jobs> {
                                                           style: TextStyle(
                                                               color: blueCOlor),
                                                         ),
-                                                        title: Text(getTranslated(
-                                                            listSnapshot
-                                                                .data!
-                                                                .data![index]
-                                                                .name!
-                                                                .removeAllWhitespace,
-                                                            context)),
+                                                        title: Text(
+                                                          getTranslated(
+                                                              listSnapshot
+                                                                  .data!
+                                                                  .data![index]
+                                                                  .name!
+                                                                  .removeAllWhitespace,
+                                                              context),
+                                                          style: TextStyle(
+                                                            fontSize: 14.sp,
+                                                            fontFamily:
+                                                                'Poppins1',
+                                                            color: appModelTheme
+                                                                    .darkTheme
+                                                                ? Colors.white
+                                                                : Colors.black,
+                                                          ),
+                                                        ),
                                                       )),
                                                 );
                                               },

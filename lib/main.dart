@@ -129,18 +129,101 @@ class _IMechanoAppState extends State<IMechanoApp> {
   Box prefs;
   AppModel appModel = new AppModel();
   void notification() async {
+    // Initialize local notifications for iOS
+    if (Platform.isIOS) {
+      await _initializeLocalNotifications();
+    }
+
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
       announcement: false,
       badge: true,
       carPlay: false,
       criticalAlert: false,
-      provisional: false,
+      provisional:
+          false, // Set to true for iOS to avoid repeated permission requests
       sound: true,
     );
 
     log('User granted permission: ${settings.authorizationStatus}');
+
+    // Handle different authorization statuses
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      log('User granted notification permission');
+    } else if (settings.authorizationStatus == AuthorizationStatus.denied) {
+      log('User denied notification permission');
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.notDetermined) {
+      log('User has not yet granted or denied permission');
+    }
+
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  }
+
+  // Initialize local notifications for iOS
+  Future<void> _initializeLocalNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
+    );
+
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        log('Notification tapped: ${response.payload}');
+      },
+    );
+
+    // Create notification channel for Android
+    if (Platform.isAndroid) {
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(channel);
+    }
+  }
+
+  // Show local notification for iOS
+  Future<void> _showLocalNotification(RemoteMessage message) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'high_importance_channel',
+      'High Importance Notifications',
+      channelDescription: 'This channel is used for important notifications.',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    const DarwinNotificationDetails iOSPlatformChannelSpecifics =
+        DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: iOSPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      message.hashCode,
+      message.notification?.title ?? 'New Notification',
+      message.notification?.body ?? 'You have a new message',
+      platformChannelSpecifics,
+      payload: message.data.toString(),
+    );
   }
 
   @override
@@ -165,16 +248,24 @@ class _IMechanoAppState extends State<IMechanoApp> {
 
     // onMessage: When the app is open and it receives a push notification
     // Ensure iOS shows alerts when app is in foreground
-    FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    if (Platform.isIOS) {
+      FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    }
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
       log("onMessage data: ${message.data}");
       log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~cdfdfds~~~~~~~~~~~~~~~~~~~~");
+
+      // Handle iOS notifications differently
+      if (Platform.isIOS) {
+        await _showLocalNotification(message);
+      }
+
       Utils.handleNotificationNavigation(context, message, null);
     });
 
