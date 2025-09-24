@@ -250,39 +250,40 @@ class _MyJobCardState extends State<MyJobCard>
                     ),
                     Container(
                       height: screenSize!.height * 0.05,
-                      margin: appModelTheme.appLocal == Locale("en")
-                          ? EdgeInsets.only(right: 10.w)
-                          : EdgeInsets.only(left: 10.w),
-                      padding: EdgeInsets.fromLTRB(1.w, 8.w, 10.w, 8.w),
-                      decoration: BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: GestureDetector(
-                        onTap: () {
+                      margin:
+                          EdgeInsetsDirectional.only(end: 10.w, start: 10.w),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.all<Color>(white),
+                            elevation: WidgetStateProperty.all<double>(0),
+                            shape:
+                                WidgetStateProperty.all<RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)))),
+                        onPressed: () {
                           showFilter = !showFilter;
-                          // Refresh the UI
                           setState(() {});
                         },
-                        child: Container(
-                          margin: EdgeInsets.only(left: 10.w, right: 10.w),
-                          child: Row(
-                            children: [
-                              Icon(
-                                  showFilter
-                                      ? Icons.filter_alt_outlined
-                                      : Icons.filter_alt_off_outlined,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                                showFilter
+                                    ? Icons.filter_alt_outlined
+                                    : Icons.filter_alt_off_outlined,
+                                color: Colors.black,
+                                size: 20.w),
+                            SizedBox(width: 8.w),
+                            Text(
+                              getTranslated("filter", context),
+                              style: TextStyle(
                                   color: Colors.black,
-                                  size: 20.w),
-                              SizedBox(width: 8.w),
-                              Text(
-                                getTranslated("filter", context),
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins3'),
-                              )
-                            ],
-                          ),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins3'),
+                            )
+                          ],
                         ),
                       ),
                     ),
@@ -323,9 +324,9 @@ class _MyJobCardState extends State<MyJobCard>
 
   Widget _filterwidget() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             flex: 3,
@@ -335,9 +336,8 @@ class _MyJobCardState extends State<MyJobCard>
                 setState(() {});
               },
               child: Container(
-                margin: EdgeInsets.only(left: 15.w),
                 width: 100.w,
-                height: 30,
+                height: 40, // align with TabBar height
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.white),
@@ -347,9 +347,9 @@ class _MyJobCardState extends State<MyJobCard>
                   children: [
                     Text(
                       "${formatter.format(fromDate)}",
-                      style: TextStyle(fontSize: 11, fontFamily: 'Poppins3'),
+                      style: TextStyle(fontSize: 12, fontFamily: 'Poppins3'),
                     ),
-                    Icon(Icons.keyboard_arrow_down_outlined, size: 14),
+                    Icon(Icons.keyboard_arrow_down_outlined, size: 18),
                   ],
                 ),
               ),
@@ -366,7 +366,7 @@ class _MyJobCardState extends State<MyJobCard>
               },
               child: Container(
                 width: 90.w,
-                height: 30,
+                height: 40, // align with TabBar height
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.white),
@@ -377,17 +377,49 @@ class _MyJobCardState extends State<MyJobCard>
                     Text(
                       "${formatter.format(toDate)}",
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         fontFamily: 'Poppins3',
                       ),
                     ),
-                    Icon(Icons.keyboard_arrow_down_outlined, size: 14),
+                    Icon(Icons.keyboard_arrow_down_outlined, size: 18),
                   ],
                 ),
               ),
             ),
           ),
           SizedBox(width: 10.w),
+          InkWell(
+            onTap: () {
+              setState(() {
+                fromDate = DateTime(DateTime.now().year, DateTime.now().month,
+                    DateTime.now().day);
+                toDate = DateTime(DateTime.now().year, DateTime.now().month,
+                    DateTime.now().day);
+
+                if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+                  final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+                  jobcardsListbloc
+                      .jobcardslistsink(userId, currentJobcardTab.toString())
+                      .then((value) {
+                    flag = false;
+                    showFilter = false;
+                    setState(() {});
+                  });
+                }
+              });
+            },
+            child: Container(
+                height: 40,
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5)),
+                alignment: Alignment.center,
+                child: Text(
+                  "Clear",
+                  style: TextStyle(fontSize: 12, fontFamily: 'Poppins3'),
+                )),
+          )
         ],
       ),
     );

@@ -988,26 +988,34 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                             });
                           }
                         },
-                        child: Row(
-                          children: [
-                            loader_download
-                                ? Container(
-                                    height: 10,
-                                    width: 10,
-                                    child: Center(
-                                        child: CircularProgressIndicator()))
-                                : Text(
-                                    getTranslated("download", context),
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: 'Poppins1',
-                                        fontSize: 12.sp),
-                                  ),
-                            Icon(
-                              Icons.download,
-                              color: Colors.white,
-                            )
-                          ],
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              loader_download
+                                  ? SizedBox(
+                                      height: 12,
+                                      width: 12,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2, color: Colors.white),
+                                    )
+                                  : Text(
+                                      getTranslated("download", context),
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Poppins1',
+                                          fontSize: 12.sp),
+                                    ),
+                              SizedBox(width: 6),
+                              Icon(
+                                Icons.download,
+                                color: Colors.white,
+                                size: 16,
+                              )
+                            ],
+                          ),
                         )),
                   ),
                 ],
@@ -1363,10 +1371,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                 spacing: 16,
                 runSpacing: 10,
                 children: [
-                  Image(
-                      image:
-                          AssetImage("assets/icons/My Vehicle/Group 9254.png"),
-                      height: 50.h),
+                  _buildProfileImage(),
                   carddivider(
                       getTranslated("CXname", context), profileData["name"]),
                   carddivider(getTranslated("Address", context),
@@ -1388,10 +1393,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                 spacing: 16,
                 runSpacing: 10,
                 children: [
-                  Image(
-                      image:
-                          AssetImage("assets/icons/My Vehicle/Group 9253.png"),
-                      height: 50.h),
+                  _buildCarImage(),
                   carddivider(getTranslated("Make", context),
                       widget.invoiceData!.car!.carBrand!),
                   carddivider(getTranslated("Model", context),
@@ -1479,6 +1481,52 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
         textAlign: TextAlign.center,
         style: TextStyle(
             color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+
+  Widget _buildProfileImage() {
+    final String? avatar =
+        (profileData != null) ? profileData['profile']?.toString() : null;
+    final bool hasAvatar =
+        avatar != null && avatar.isNotEmpty && !avatar.contains('null');
+    final String? url = hasAvatar
+        ? (avatar.startsWith('http') ? avatar : (Config.profileurl + avatar))
+        : null;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(25),
+      child: SizedBox(
+        height: 50.h,
+        width: 50.h,
+        child: url == null
+            ? Image.asset('assets/images/profil.jpg', fit: BoxFit.cover)
+            : Image.network(url, fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                return Image.asset('assets/images/profil.jpg',
+                    fit: BoxFit.cover);
+              }),
+      ),
+    );
+  }
+
+  Widget _buildCarImage() {
+    final String? carImageUrl = widget.invoiceData?.car?.carImage;
+    final String? url = (carImageUrl != null && carImageUrl.isNotEmpty)
+        ? (carImageUrl.startsWith('http')
+            ? carImageUrl
+            : (Config.imageurl + carImageUrl))
+        : null;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(6),
+      child: SizedBox(
+        height: 50.h,
+        width: 80.w,
+        child: url == null
+            ? Image.asset('assets/images/car.png', fit: BoxFit.cover)
+            : Image.network(url, fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                return Image.asset('assets/images/car.png', fit: BoxFit.cover);
+              }),
       ),
     );
   }

@@ -73,6 +73,29 @@ class _MyInvoiceState extends State<MyInvoice>
   bool flag = true;
   Repository repository = Repository();
 
+  String? _profileImageUrl() {
+    // Prefer stored profile path combined with Config.profileurl; fallback to PREF_PROFILE_IMG absolute URL
+    try {
+      final profileJson = PrefObj.preferences!.get(PrefKeys.PROFILE_DATA);
+      if (profileJson != null) {
+        final map = json.decode(profileJson);
+        final String? profile = map['profile']?.toString();
+        if (profile != null &&
+            profile.isNotEmpty &&
+            !profile.contains('null')) {
+          return profile.startsWith('http')
+              ? profile
+              : (Config.profileurl + profile);
+        }
+      }
+    } catch (_) {}
+    if (PrefObj.preferences!.containsKey(PrefKeys.PROFILE_IMG)) {
+      final dynamic val = PrefObj.preferences!.get(PrefKeys.PROFILE_IMG);
+      if (val is String && val.isNotEmpty) return val;
+    }
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -728,23 +751,21 @@ class _MyInvoiceState extends State<MyInvoice>
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
                                 children: [
-                                  PrefObj.preferences!
-                                          .containsKey(PrefKeys.PROFILE_IMG)
-                                      ? Center(
-                                          child: CircleAvatar(
-                                            radius: size.width * 0.07,
-                                            backgroundImage: NetworkImage(
-                                                PrefObj.preferences!
-                                                    .get(PrefKeys.PROFILE_IMG)),
-                                          ),
-                                        )
-                                      : Center(
-                                          child: CircleAvatar(
-                                            radius: size.width * 0.07,
-                                            child: Icon(Icons.person,
-                                                size: size.width * 0.1),
-                                          ),
-                                        ),
+                                  Builder(builder: (context) {
+                                    final url = _profileImageUrl();
+                                    return Center(
+                                      child: CircleAvatar(
+                                        radius: size.width * 0.07,
+                                        backgroundImage: url != null
+                                            ? NetworkImage(url)
+                                            : null,
+                                        child: url == null
+                                            ? Icon(Icons.person,
+                                                size: size.width * 0.1)
+                                            : null,
+                                      ),
+                                    );
+                                  }),
                                   Spacer(),
                                   carddivider(getTranslated('Name', context),
                                       profileData['name'].toString()),
@@ -973,23 +994,21 @@ class _MyInvoiceState extends State<MyInvoice>
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
                                 children: [
-                                  PrefObj.preferences!
-                                          .containsKey(PrefKeys.PROFILE_IMG)
-                                      ? Center(
-                                          child: CircleAvatar(
-                                            radius: size.width * 0.07,
-                                            backgroundImage: NetworkImage(
-                                                PrefObj.preferences!
-                                                    .get(PrefKeys.PROFILE_IMG)),
-                                          ),
-                                        )
-                                      : Center(
-                                          child: CircleAvatar(
-                                            radius: size.width * 0.07,
-                                            child: Icon(Icons.person,
-                                                size: size.width * 0.1),
-                                          ),
-                                        ),
+                                  Builder(builder: (context) {
+                                    final url = _profileImageUrl();
+                                    return Center(
+                                      child: CircleAvatar(
+                                        radius: size.width * 0.07,
+                                        backgroundImage: url != null
+                                            ? NetworkImage(url)
+                                            : null,
+                                        child: url == null
+                                            ? Icon(Icons.person,
+                                                size: size.width * 0.1)
+                                            : null,
+                                      ),
+                                    );
+                                  }),
                                   Spacer(),
                                   carddivider(getTranslated('Name', context),
                                       profileData['name'].toString()),

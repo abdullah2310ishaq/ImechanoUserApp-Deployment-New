@@ -259,7 +259,7 @@ class _BookingListShowState extends State<BookingListShow>
           SizedBox(height: 15),
           _backButton(),
           SizedBox(height: 15),
-          _bookAppoinment(),
+          
           SizedBox(height: 20),
           dynamicBottomCard(),
           SizedBox(height: 15),
@@ -838,77 +838,6 @@ class _BookingListShowState extends State<BookingListShow>
                   fontFamily: "Poppins2",
                   fontWeight: FontWeight.w600,
                 ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _bookAppoinment() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 26, right: 20),
-      child: GestureDetector(
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (_) => Dialog(
-              backgroundColor: Colors.transparent,
-              insetPadding: EdgeInsets.all(20),
-              child: Container(
-                height: hh * 0.57,
-                child: _DateTime(),
-              ),
-            ),
-          );
-        },
-        child: Container(
-          height: 50,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: logoBlue,
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(
-              color: logoBlue.withOpacity(0.3),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Icon(
-                  Icons.calendar_today,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: Text(
-                  '${widget.data.items?.length ?? 0} ' +
-                      getTranslated('Selected', context) +
-                      ' ' +
-                      getTranslated('Service', context) +
-                      '... ' +
-                      getTranslated('BookAppointment', context),
-                  style: TextStyle(
-                    fontFamily: 'Poppins2',
-                    color: white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: white,
-                size: 16,
               ),
             ],
           ),

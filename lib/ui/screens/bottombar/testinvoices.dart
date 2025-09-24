@@ -282,21 +282,27 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
                           ),
                         ),
                         onPressed: () {},
-                        child: Row(
-                          children: [
-                            Text(
-                              "Download",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'Poppins1',
-                                  fontSize: 12.sp),
-                            ),
-                            // SizedBox(width: 2.w),
-                            Icon(
-                              Icons.download,
-                              color: Colors.white,
-                            )
-                          ],
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "Download",
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Poppins1',
+                                    fontSize: 12.sp),
+                              ),
+                              SizedBox(width: 6),
+                              Icon(
+                                Icons.download,
+                                color: Colors.white,
+                                size: 16,
+                              )
+                            ],
+                          ),
                         )),
                   ),
                 ],

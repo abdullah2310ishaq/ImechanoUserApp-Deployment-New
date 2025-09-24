@@ -992,11 +992,14 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 CircleAvatar(
                   radius: 33.sp,
+                  backgroundColor: Colors.white,
                   foregroundColor: Colors.transparent,
-                  child: ClipOval(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
                     child: Image(
-                      height: 150.h,
                       image: AssetImage(imageUrl),
+                      height: imageUrl.contains('upholstery') ? 36.sp : 42.sp,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
@@ -1050,18 +1053,25 @@ class _HomeScreenState extends State<HomeScreen> {
                             appModelTheme.darkTheme
                                 ? Color(0xff3e9ee0)
                                 : buttoncolor),
+                        alignment: Alignment.center,
                         shape:
                             MaterialStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(13.0),
                         ))),
                     // textColor: Colors.white,
-                    child: Text(
-                      button,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 10.8.sp,
-                          color: appModelTheme.darkTheme ? white : colors),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        button,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 10.8.sp,
+                            color: appModelTheme.darkTheme ? white : colors),
+                      ),
                     ),
                     // color:
                     //     appModelTheme.darkTheme ? Color(0xff3e9ee0) : buttoncolor,
@@ -2041,18 +2051,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.white, fontSize: 10.sp, fontFamily: "Poppins3"),
             ),
           ),
-          Container(
-            margin: EdgeInsets.only(left: 20.w, top: 6.h),
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.white),
-                color: Color(0xff1840db),
-                borderRadius: BorderRadius.all(Radius.circular(5))),
-            height: 20.h,
+          Align(
+            alignment: Alignment.centerLeft,
             child: Container(
-              margin: EdgeInsets.only(top: 2.5.h, left: 5.w, right: 5.w),
-              child: Text(
-                "Get 30% OFF",
-                style: TextStyle(color: Colors.white, fontSize: 12.sp),
+              margin: EdgeInsets.only(left: 20.w, top: 6.h),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Color(0xff1840db)),
+                      padding: MaterialStateProperty.all<EdgeInsets>(
+                          EdgeInsets.symmetric(
+                              horizontal: 12.w, vertical: 4.h)),
+                      minimumSize: MaterialStateProperty.all<Size>(Size(0, 0)),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity:
+                          VisualDensity(horizontal: -4, vertical: -4),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              side: BorderSide(color: Colors.white)))),
+                  onPressed: () {},
+                  child: Text(
+                    "Get 30% OFF",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontSize: 12.sp),
+                  ),
+                ),
               ),
             ),
           )

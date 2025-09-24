@@ -980,7 +980,7 @@ class _MySelectionPageState extends State<MySelectionPage>
               SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  getTranslated('BookAppointment', context),
+                  getTranslated('Book Appointment', context),
                   style: TextStyle(
                     fontFamily: 'Poppins2',
                     color: white,

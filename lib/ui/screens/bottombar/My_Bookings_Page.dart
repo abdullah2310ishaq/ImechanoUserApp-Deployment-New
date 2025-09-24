@@ -266,41 +266,39 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                   ),
                   Container(
                     height: screenSize!.height * 0.05,
-                    margin: appModelTheme.appLocal == Locale("en")
-                        ? EdgeInsets.only(right: 10.w)
-                        : EdgeInsets.only(left: 10.w),
-                    padding: EdgeInsets.fromLTRB(1.w, 8.w, 10.w, 8.w),
-                    decoration: BoxDecoration(
-                        color: white, borderRadius: BorderRadius.circular(10)),
-                    child: GestureDetector(
-                      onTap: () {
+                    margin: EdgeInsetsDirectional.only(start: 10.w, end: 10.w),
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              WidgetStateProperty.all<Color>(white),
+                          elevation: WidgetStateProperty.all<double>(0),
+                          shape:
+                              WidgetStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(10)))),
+                      onPressed: () {
                         showFilter = !showFilter;
-                        // Refresh the UI
                         setState(() {});
-                        print("Container was tapped");
                       },
-                      child: Container(
-                        margin: EdgeInsets.only(left: 10.w, right: 10.w),
-                        child: Row(
-                          children: [
-                            Icon(
-                                showFilter
-                                    ? Icons.filter_alt_outlined
-                                    : Icons.filter_alt_off_outlined,
-                                color: appModelTheme.darkTheme
-                                    ? Colors.black
-                                    : Colors.black,
-                                size: 20.w),
-                            SizedBox(width: 8.w),
-                            Text(
-                              getTranslated('filter', context),
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 12,
-                                  fontFamily: 'Poppins3'),
-                            )
-                          ],
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                              showFilter
+                                  ? Icons.filter_alt_outlined
+                                  : Icons.filter_alt_off_outlined,
+                              color: Colors.black,
+                              size: 20.w),
+                          SizedBox(width: 8.w),
+                          Text(
+                            getTranslated('filter', context),
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontFamily: 'Poppins3'),
+                          )
+                        ],
                       ),
                     ),
                   ),
@@ -308,7 +306,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
               ),
               if (showFilter) ...[
                 // These children are only visible if condition is true
-                SizedBox(height: 15.h),
+                SizedBox(height: 12),
                 _filterwidget(),
               ],
               SizedBox(height: 15),
@@ -338,11 +336,27 @@ class _MyBookingsPageState extends State<MyBookingsPage>
         ));
   }
 
+  String formatTo12hWithDMY(String? value) {
+    if (value == null || value.isEmpty) return '';
+    try {
+      final DateTime parsed = DateTime.parse(value);
+      return DateFormat('hh:mm a, dd/MM/yyyy').format(parsed);
+    } catch (_) {
+      try {
+        // Fallback common pattern
+        final DateTime parsed = DateFormat('yyyy-MM-dd HH:mm:ss').parse(value);
+        return DateFormat('hh:mm a, dd/MM/yyyy').format(parsed);
+      } catch (_) {
+        return value;
+      }
+    }
+  }
+
   Widget _filterwidget() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             flex: 3,
@@ -352,9 +366,8 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                 setState(() {});
               },
               child: Container(
-                margin: EdgeInsets.only(left: 13.w),
                 width: 100.w,
-                height: 32,
+                height: 40, // match TabBar height
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.white),
@@ -383,7 +396,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
               },
               child: Container(
                 width: 90.w,
-                height: 32,
+                height: 40, // match TabBar height
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.white),
@@ -429,12 +442,15 @@ class _MyBookingsPageState extends State<MyBookingsPage>
               });
             },
             child: Container(
+                height: 40, // align with tabs height
+                padding: EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(5)),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text("Clear "),
+                alignment: Alignment.center,
+                child: Text(
+                  "Clear",
+                  style: TextStyle(fontSize: 12, fontFamily: 'Poppins3'),
                 )),
           )
         ],
@@ -885,7 +901,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                         ),
                       ),
                       Text(
-                        data.bookingTime!,
+                        formatTo12hWithDMY(data.bookingTime),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -914,7 +930,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                       ),
                     ),
                     Text(
-                      data.timeDate!,
+                      formatTo12hWithDMY(data.timeDate),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -1137,25 +1153,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                             child: Container(
                               height: 30,
                               width: 90.w,
-                              child: Center(
-                                child: Text(
-                                  getTranslated("PayandConfirm", context),
-                                  style: TextStyle(
-                                      fontSize: 9,
-                                      fontFamily: 'Poppins1',
-                                      color: (data.paymentStatus != "1")
-                                          ? appModelTheme.darkTheme
-                                              ? currentBookingTab == 2
-                                                  ? Colors.white
-                                                  : Colors.white
-                                              : currentBookingTab == 2
-                                                  ? Colors.white
-                                                  : Colors.white
-                                          : appModelTheme.darkTheme
-                                              ? white
-                                              : Colors.white),
-                                ),
-                              ),
+                              alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 color: (data.paymentStatus != "1")
                                     ? currentBookingTab == 2
@@ -1167,6 +1165,17 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                                         ? white
                                         : Colors.black38),
                                 borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  getTranslated("PayandConfirm", context),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 9,
+                                      fontFamily: 'Poppins1',
+                                      color: Colors.white),
+                                ),
                               ),
                             ),
                           ),
