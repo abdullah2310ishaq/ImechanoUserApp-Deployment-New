@@ -60,6 +60,8 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
 int? initScreen;
+// Global navigator key to access provider from FCM callbacks
+final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -266,6 +268,15 @@ class _IMechanoAppState extends State<IMechanoApp> {
         await _showLocalNotification(message);
       }
 
+      try {
+        final ctx = appNavigatorKey.currentContext;
+        if (ctx != null) {
+          Provider.of<NotificationCountProvider>(ctx, listen: false)
+              .setNotifications();
+        }
+      } catch (e) {
+        log('Failed to update notification count onMessage: $e');
+      }
       Utils.handleNotificationNavigation(context, message, null);
     });
 
@@ -274,6 +285,15 @@ class _IMechanoAppState extends State<IMechanoApp> {
       log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
       log('onMessageOpenedApp data: $message');
       log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+      try {
+        final ctx = appNavigatorKey.currentContext;
+        if (ctx != null) {
+          Provider.of<NotificationCountProvider>(ctx, listen: false)
+              .setNotifications();
+        }
+      } catch (e) {
+        log('Failed to update notification count onMessageOpenedApp: $e');
+      }
       Utils.handleNotificationNavigation(context, message, null);
     });
   }
@@ -304,6 +324,7 @@ class _IMechanoAppState extends State<IMechanoApp> {
                 ],
                 child: GetMaterialApp(
                   title: 'iMechano',
+                  navigatorKey: appNavigatorKey,
                   locale: appModel.appLocal,
                   localizationsDelegates: [
                     AppLocalization.delegate,
