@@ -1030,8 +1030,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Text(
                           sub,
                           textAlign: TextAlign.center,
-                          maxLines: 2,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          softWrap: false,
                           style: TextStyle(
                               color: subcolor,
                               fontSize: 10.sp,

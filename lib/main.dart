@@ -237,6 +237,19 @@ class _IMechanoAppState extends State<IMechanoApp> {
     _firebaseMessaging.getToken().then((value) => log(value.toString()));
     notification();
 
+    // Initialize notification count on app startup
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        final ctx = appNavigatorKey.currentContext;
+        if (ctx != null) {
+          Provider.of<NotificationCountProvider>(ctx, listen: false)
+              .setNotifications();
+        }
+      } catch (e) {
+        log('Failed to initialize notification count: $e');
+      }
+    });
+
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage? message) async {
