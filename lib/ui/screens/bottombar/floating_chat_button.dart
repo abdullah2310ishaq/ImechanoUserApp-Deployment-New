@@ -701,16 +701,43 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   openWhatsapp() async {
-    String whatsapp = '+97455929250';
-    String whatsappURlAndroid =
-        "whatsapp://send?phone=$whatsapp&text=Hi imechano, It's emergency";
-    await launchUrl(Uri.parse(whatsappURlAndroid));
-    String whatsappURLIos =
-        "https://wa.me/$whatsapp?text=${Uri.parse("Hi imechano, Its emergency")}";
-    if (Platform.isIOS) {
-      await launchUrl(Uri.parse(whatsappURLIos));
-    } else {
-      await launchUrl(Uri.parse(whatsappURlAndroid));
+    final String phoneRaw = '+97455929250';
+    final String phoneWaMe = phoneRaw.replaceAll('+', '');
+    final String message = "Hi imechano, It's emergency";
+    final String encodedMessage = Uri.encodeComponent(message);
+
+    final Uri androidUri =
+        Uri.parse('whatsapp://send?phone=$phoneRaw&text=$encodedMessage');
+    final Uri iosUri =
+        Uri.parse('whatsapp://send?phone=$phoneRaw&text=$encodedMessage');
+    final Uri iosBusinessUri = Uri.parse(
+        'whatsapp-business://send?phone=$phoneRaw&text=$encodedMessage');
+    final Uri webFallback =
+        Uri.parse('https://wa.me/$phoneWaMe?text=$encodedMessage');
+
+    try {
+      if (Platform.isIOS) {
+        if (await canLaunchUrl(iosUri)) {
+          await launchUrl(iosUri,
+              mode: LaunchMode.externalNonBrowserApplication);
+          return;
+        }
+        if (await canLaunchUrl(iosBusinessUri)) {
+          await launchUrl(iosBusinessUri,
+              mode: LaunchMode.externalNonBrowserApplication);
+          return;
+        }
+        await launchUrl(webFallback, mode: LaunchMode.externalApplication);
+      } else {
+        if (await canLaunchUrl(androidUri)) {
+          await launchUrl(androidUri,
+              mode: LaunchMode.externalNonBrowserApplication);
+        } else {
+          await launchUrl(webFallback, mode: LaunchMode.externalApplication);
+        }
+      }
+    } catch (e) {
+      await launchUrl(webFallback, mode: LaunchMode.externalApplication);
     }
   }
 
