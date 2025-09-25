@@ -182,6 +182,7 @@ class _MyInvoiceState extends State<MyInvoice>
             builder: (context, child) => SafeArea(
               child: Column(children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
                       child: Container(
@@ -223,40 +224,42 @@ class _MyInvoiceState extends State<MyInvoice>
                         ),
                       ),
                     ),
-                    Container(
+                    SizedBox(
                       height: screenSize!.height * 0.05,
-                      margin: appModelTheme.appLocal == Locale("en")
-                          ? EdgeInsets.only(right: 10.w)
-                          : EdgeInsets.only(left: 10.w),
-                      padding: EdgeInsets.fromLTRB(1.w, 8.w, 10.w, 8.w),
-                      decoration: BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: GestureDetector(
-                        onTap: () {
-                          showFilter = !showFilter;
-                          // Refresh the UI
-                          setState(() {});
-                        },
-                        child: Container(
-                          margin: EdgeInsets.only(left: 10.w, right: 10.w),
-                          child: Row(
-                            children: [
-                              Icon(
-                                  showFilter
-                                      ? Icons.filter_alt_outlined
-                                      : Icons.filter_alt_off_outlined,
-                                  color: Colors.black,
-                                  size: 20.w),
-                              SizedBox(width: 8.w),
-                              Text(
-                                getTranslated("filter", context),
-                                style: TextStyle(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(10),
+                          onTap: () {
+                            showFilter = !showFilter;
+                            setState(() {});
+                          },
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 10.w),
+                            padding: EdgeInsets.symmetric(horizontal: 12.w),
+                            decoration: BoxDecoration(
+                                color: white,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                    showFilter
+                                        ? Icons.filter_alt_outlined
+                                        : Icons.filter_alt_off_outlined,
                                     color: Colors.black,
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins3'),
-                              )
-                            ],
+                                    size: 20.w),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  getTranslated("filter", context),
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                      fontFamily: 'Poppins3'),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -298,9 +301,9 @@ class _MyInvoiceState extends State<MyInvoice>
 
   Widget _filterwidget() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             flex: 3,
@@ -310,9 +313,8 @@ class _MyInvoiceState extends State<MyInvoice>
                 setState(() {});
               },
               child: Container(
-                margin: EdgeInsets.only(left: 15.w),
                 width: 100.w,
-                height: 30,
+                height: 40,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.white),
@@ -322,9 +324,9 @@ class _MyInvoiceState extends State<MyInvoice>
                   children: [
                     Text(
                       "${formatter.format(fromDate)}",
-                      style: TextStyle(fontSize: 11, fontFamily: 'Poppins3'),
+                      style: TextStyle(fontSize: 12, fontFamily: 'Poppins3'),
                     ),
-                    Icon(Icons.keyboard_arrow_down_outlined, size: 14),
+                    Icon(Icons.keyboard_arrow_down_outlined, size: 18),
                   ],
                 ),
               ),
@@ -336,12 +338,11 @@ class _MyInvoiceState extends State<MyInvoice>
             child: GestureDetector(
               onTap: () async {
                 toDate = await selectToDate(context, toDate, 'fromDate');
-
                 setState(() {});
               },
               child: Container(
                 width: 90.w,
-                height: 30,
+                height: 40,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.white),
@@ -352,17 +353,42 @@ class _MyInvoiceState extends State<MyInvoice>
                     Text(
                       "${formatter.format(toDate)}",
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         fontFamily: 'Poppins3',
                       ),
                     ),
-                    Icon(Icons.keyboard_arrow_down_outlined, size: 14),
+                    Icon(Icons.keyboard_arrow_down_outlined, size: 18),
                   ],
                 ),
               ),
             ),
           ),
           SizedBox(width: 10.w),
+          InkWell(
+            onTap: () {
+              setState(() {
+                fromDate = DateTime(DateTime.now().year - 1,
+                    DateTime.now().month, DateTime.now().day);
+                toDate = DateTime(DateTime.now().year + 1, DateTime.now().month,
+                    DateTime.now().day);
+                bookingInvoicesBloc.bookinginvoicesink(
+                    PrefObj.preferences!.get(PrefKeys.USER_ID),
+                    formatter.format(fromDate),
+                    formatter.format(toDate));
+              });
+            },
+            child: Container(
+                height: 40,
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5)),
+                alignment: Alignment.center,
+                child: Text(
+                  getTranslated('Clear', context),
+                  style: TextStyle(fontSize: 12, fontFamily: 'Poppins3'),
+                )),
+          )
         ],
       ),
     );

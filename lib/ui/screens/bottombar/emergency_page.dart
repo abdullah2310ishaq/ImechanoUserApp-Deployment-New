@@ -94,16 +94,40 @@ class _EmergencyPageState extends State<EmergencyPage> {
   }
 
   openWhatsapp() async {
-    String whatsapp = '+97455929250';
-    String whatsappURlAndroid =
-        "whatsapp://send?phone=$whatsapp&text=Hi imechano, It's emergency";
-    await launchUrl(Uri.parse(whatsappURlAndroid));
-    String whatsappURLIos =
-        "https://wa.me/$whatsapp?text=${Uri.parse("Hi imechano, Its emergency")}";
-    if (Platform.isIOS) {
-      await launchUrl(Uri.parse(whatsappURLIos));
-    } else {
-      await launchUrl(Uri.parse(whatsappURlAndroid));
+    try {
+      String whatsapp = '+97455929250';
+      String message = Uri.encodeComponent("Hi imechano, It's emergency");
+
+      // First try WhatsApp app scheme
+      String whatsappUrl = "whatsapp://send?phone=$whatsapp&text=$message";
+
+      // Check if WhatsApp can be launched
+      bool canLaunchWhatsApp = await canLaunchUrl(Uri.parse(whatsappUrl));
+
+      if (canLaunchWhatsApp) {
+        // Launch WhatsApp app directly
+        await launchUrl(
+          Uri.parse(whatsappUrl),
+          mode: LaunchMode.externalApplication, // Force external app
+        );
+      } else {
+        // Fallback to WhatsApp Web
+        String whatsappWebUrl = "https://wa.me/$whatsapp?text=$message";
+        await launchUrl(
+          Uri.parse(whatsappWebUrl),
+          mode: LaunchMode.externalApplication,
+        );
+      }
+    } catch (e) {
+      print('WhatsApp launch error: $e');
+      // Show user-friendly error
+      Get.snackbar(
+        'Error',
+        'WhatsApp could not be opened. Please check if WhatsApp is installed.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: Duration(seconds: 3),
+      );
     }
   }
 
@@ -816,11 +840,38 @@ class _EmergencyPageState extends State<EmergencyPage> {
   }
 
   Future<void> _makePhoneCall(String phoneNumber) async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
-    await launchUrl(launchUri);
+    try {
+      final Uri launchUri = Uri(
+        scheme: 'tel',
+        path: phoneNumber,
+      );
+
+      bool canMakeCall = await canLaunchUrl(launchUri);
+
+      if (canMakeCall) {
+        await launchUrl(
+          launchUri,
+          mode: LaunchMode.externalApplication, // Force external app (dialer)
+        );
+      } else {
+        Get.snackbar(
+          'Error',
+          'Phone dialer could not be opened',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: Duration(seconds: 3),
+        );
+      }
+    } catch (e) {
+      print('Phone call error: $e');
+      Get.snackbar(
+        'Error',
+        'Unable to make phone call',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: Duration(seconds: 3),
+      );
+    }
   }
 
   Widget _DateTime() {

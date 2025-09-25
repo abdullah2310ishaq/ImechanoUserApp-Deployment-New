@@ -1485,25 +1485,55 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
     );
   }
 
+  String? _profileImageUrl() {
+    // Prefer stored profile path combined with Config.profileurl; fallback to PREF_PROFILE_IMG absolute URL
+    try {
+      final profileJson = PrefObj.preferences!.get(PrefKeys.PROFILE_DATA);
+      if (profileJson != null) {
+        final map = json.decode(profileJson);
+        final String? profile = map['profile']?.toString();
+        if (profile != null &&
+            profile.isNotEmpty &&
+            !profile.contains('null')) {
+          return profile.startsWith('http')
+              ? profile
+              : (Config.profileurl + profile);
+        }
+      }
+    } catch (_) {}
+    if (PrefObj.preferences!.containsKey(PrefKeys.PROFILE_IMG)) {
+      final dynamic val = PrefObj.preferences!.get(PrefKeys.PROFILE_IMG);
+      if (val is String && val.isNotEmpty) return val;
+    }
+    return null;
+  }
+
   Widget _buildProfileImage() {
-    final String? avatar =
-        (profileData != null) ? profileData['profile']?.toString() : null;
-    final bool hasAvatar =
-        avatar != null && avatar.isNotEmpty && !avatar.contains('null');
-    final String? url = hasAvatar
-        ? (avatar.startsWith('http') ? avatar : (Config.profileurl + avatar))
-        : null;
+    final String? url = _profileImageUrl();
     return ClipRRect(
       borderRadius: BorderRadius.circular(25),
       child: SizedBox(
         height: 50.h,
         width: 50.h,
         child: url == null
-            ? Image.asset('assets/images/profil.jpg', fit: BoxFit.cover)
+            ? Container(
+                color: Colors.grey[300],
+                child: Icon(
+                  Icons.person,
+                  size: 30.h,
+                  color: Colors.grey[600],
+                ),
+              )
             : Image.network(url, fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                return Image.asset('assets/images/profil.jpg',
-                    fit: BoxFit.cover);
+                return Container(
+                  color: Colors.grey[300],
+                  child: Icon(
+                    Icons.person,
+                    size: 30.h,
+                    color: Colors.grey[600],
+                  ),
+                );
               }),
       ),
     );

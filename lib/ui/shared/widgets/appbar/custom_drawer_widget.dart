@@ -107,7 +107,17 @@ class _drawerpageState extends State<drawerpage> {
           json.decode(PrefObj.preferences!.get(PrefKeys.PROFILE_DATA));
       profilename = profileData['name'].toString();
       userphoneno = profileData['mobile_number'].toString();
-      profileurl = Config.profileurl + profileData['profile'].toString();
+      // Build profile image URL from stored profile path and cache it for global use
+      final String profilePath = profileData['profile']?.toString() ?? '';
+      if (profilePath.isNotEmpty && !profilePath.contains('null')) {
+        profileurl = profilePath.startsWith('http')
+            ? profilePath
+            : (Config.profileurl + profilePath);
+        // Ensure drawer can show image without needing to open profile screen first
+        PrefObj.preferences!.put(PrefKeys.PROFILE_IMG, profileurl);
+      } else {
+        profileurl = '';
+      }
 
       drawerTitle = [
         "Home",
@@ -193,21 +203,28 @@ class _drawerpageState extends State<drawerpage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          PrefObj.preferences!.containsKey(PrefKeys.PROFILE_IMG)
-                              ? Center(
-                                  child: CircleAvatar(
-                                    radius: 55.h,
-                                    backgroundImage: NetworkImage(PrefObj
-                                        .preferences!
-                                        .get(PrefKeys.PROFILE_IMG)),
-                                  ),
-                                )
-                              : Center(
-                                  child: CircleAvatar(
-                                    radius: 55.h,
-                                    child: Icon(Icons.person, size: 50.sp),
-                                  ),
-                                ),
+                          Builder(builder: (context) {
+                            final bool hasPrefImg = PrefObj.preferences!
+                                .containsKey(PrefKeys.PROFILE_IMG);
+                            final String? cachedUrl = hasPrefImg
+                                ? PrefObj.preferences!
+                                    .get(PrefKeys.PROFILE_IMG)
+                                : null;
+                            final String? derivedUrl = (profileurl.isNotEmpty)
+                                ? profileurl
+                                : null;
+                            final String? url = cachedUrl ?? derivedUrl;
+                            return Center(
+                              child: CircleAvatar(
+                                radius: 55.h,
+                                backgroundImage:
+                                    url != null ? NetworkImage(url) : null,
+                                child: url == null
+                                    ? Icon(Icons.person, size: 50.sp)
+                                    : null,
+                              ),
+                            );
+                          }),
                           SizedBox(
                             width: 20.w,
                           ),

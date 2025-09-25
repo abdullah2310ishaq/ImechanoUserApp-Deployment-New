@@ -148,36 +148,47 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
               globals.screenstack++;
             }, child: Consumer<NotificationCountProvider>(
                 builder: (context, value, child) {
-              return value.notifications == 0
-                  ? Container(
-                      width: 50.w,
-                      height: 50.h,
-                      padding: EdgeInsets.all(12.w),
+              final hasNotifications = value.notifications > 0;
+              return Container(
+                width: 50.w,
+                height: 50.h,
+                alignment: Alignment.center,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Bell icon centered
+                    Align(
+                      alignment: Alignment.center,
                       child: SvgPicture.asset(
                         "${action2}",
                         width: 24.w,
                         height: 24.h,
                       ),
-                    )
-                  : badges.Badge(
-                      // toAnimate: false,
-                      badgeContent: Text(
-                        value.notifications > 99
-                            ? '99+'
-                            : '${value.notifications}',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      position: badges.BadgePosition.topEnd(top: 5, end: 10),
-                      child: Container(
-                        width: 50.w,
-                        height: 50.h,
-                        padding: EdgeInsets.all(12.w),
-                        child: SvgPicture.asset(
-                          "${action2}",
-                          width: 24.w,
-                          height: 24.h,
+                    ),
+                    // Badge pinned to top-right of the icon area
+                    if (hasNotifications)
+                      Positioned(
+                        top: 6,
+                        right: 8,
+                        child: badges.Badge(
+                          position: badges.BadgePosition.topEnd(top: 0, end: 0),
+                          badgeStyle: badges.BadgeStyle(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 2),
+                            elevation: 0,
+                          ),
+                          badgeContent: Text(
+                            value.notifications > 99
+                                ? '99+'
+                                : '${value.notifications}',
+                            style: TextStyle(color: Colors.white, fontSize: 9),
+                          ),
+                          child: SizedBox(width: 0, height: 0),
                         ),
-                      ));
+                      ),
+                  ],
+                ),
+              );
             })),
           //   Container(
           //       padding:
