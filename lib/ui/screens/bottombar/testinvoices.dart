@@ -1,6 +1,11 @@
 // ignore_for_file: non_constant_identifier_names, deprecated_member_use, unused_element
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
 import 'package:imechano/ui/shared/widgets/appbar/custom_appbar_widget.dart';
@@ -27,6 +32,37 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
 
   dynamic appModelTheme;
 
+  final GlobalKey previewContainer = GlobalKey();
+
+  Future<void> captureAndSaveScreenshot() async {
+    try {
+      final boundary = previewContainer.currentContext?.findRenderObject()
+          as RenderRepaintBoundary?;
+      if (boundary == null) return;
+      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return;
+      final Uint8List pngBytes = byteData.buffer.asUint8List();
+
+      final directory = (await getApplicationDocumentsDirectory()).path;
+      final now = DateTime.now();
+      final fileName =
+          'ImechanoInvoiceScreenshot_${now.millisecondsSinceEpoch}.png';
+      final filePath = '$directory/$fileName';
+      final file = File(filePath);
+      await file.writeAsBytes(pngBytes);
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        duration: Duration(seconds: 4),
+        backgroundColor: Colors.green[400],
+        content: Text('Screenshot saved'),
+      ));
+    } catch (e) {
+      // ignore
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final appModel = Provider.of<AppModel>(context);
@@ -51,166 +87,170 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
                 children: [
                   // _blankContainer(),
                   Center(
-                    child: Container(
-                      margin: EdgeInsets.only(left: 15, right: 15),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          color:
-                              appModelTheme.darkTheme ? darkmodeColor : white,
-                          borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(25.0),
-                              topLeft: Radius.circular(25.0))),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: NotificationListener<
-                            OverscrollIndicatorNotification>(
-                          onNotification: (notification) {
-                            notification.disallowIndicator();
-                            return true;
-                          },
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  height: 64.h,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(15.0),
-                                          topLeft: Radius.circular(15.0)),
-                                      image: DecorationImage(
-                                        fit: BoxFit.fitWidth,
-                                        image: AssetImage(
-                                            "assets/icons/My Vehicle/Group 9252.png"),
-                                      )),
-                                  margin:
-                                      EdgeInsets.only(left: 10.w, right: 10.w),
-                                  child: Container(
+                    child: RepaintBoundary(
+                      key: previewContainer,
+                      child: Container(
+                        margin: EdgeInsets.only(left: 15, right: 15),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            color:
+                                appModelTheme.darkTheme ? darkmodeColor : white,
+                            borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(25.0),
+                                topLeft: Radius.circular(25.0))),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: NotificationListener<
+                              OverscrollIndicatorNotification>(
+                            onNotification: (notification) {
+                              notification.disallowIndicator();
+                              return true;
+                            },
+                            child: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
                                     width: double.infinity,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        CRNo(),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Image(
-                                              height: 30.h,
-                                              image: AssetImage(
-                                                  "assets/icons/splash/logo.png"),
-                                              color: Colors.white,
-                                            ),
-                                            Text(
-                                              'Powered by Company',
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 8.sp,
-                                                  fontFamily: "Poppins1"),
-                                            )
-                                          ],
-                                        ),
-                                        mobileNumber(),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                schedule(),
-                                Divider(
-                                    indent: 10.w,
-                                    endIndent: 10.w,
-                                    color: Colors.grey),
-                                SizedBox(height: 8),
-                                customerDetails(),
-                                Divider(
-                                  indent: 10.w,
-                                  endIndent: 10.w,
-                                  color: Colors.grey,
-                                ),
-                                SizedBox(height: 8),
-                                dataCard(),
-                                SizedBox(height: 8),
-                                Container(
-                                  margin:
-                                      EdgeInsets.only(left: 10.w, right: 10.w),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            left: 10.w, right: 10.w),
-                                        child: Text(
-                                          "Car Information",
-                                          style:
-                                              TextStyle(fontFamily: "Poppins2"),
-                                        ),
-                                      ),
-                                      SizedBox(height: 10.h),
-                                      carDetails(),
-                                      Divider(
-                                        indent: 10.w,
-                                        endIndent: 10.w,
-                                        color: Colors.grey,
-                                      ),
-                                      SizedBox(
-                                        height: 10.h,
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            left: 10.w, right: 10.w),
-                                        child: Text(
-                                          "Parts Repairs-Spares Elimate:",
-                                          style: TextStyle(
-                                            fontFamily: "Poppins2",
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 10.h),
-                                      table(),
-                                      SizedBox(height: 15.h),
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            left: 10.w, right: 10.w),
-                                        child: Text(
-                                          "Labour Estimates",
-                                          style: TextStyle(
-                                              fontFamily: "Poppins2",
-                                              fontSize: 13.sp),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10.h,
-                                      ),
-                                      tableSecond(),
-                                      Row(
+                                    height: 64.h,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(15.0),
+                                            topLeft: Radius.circular(15.0)),
+                                        image: DecorationImage(
+                                          fit: BoxFit.fitWidth,
+                                          image: AssetImage(
+                                              "assets/icons/My Vehicle/Group 9252.png"),
+                                        )),
+                                    margin: EdgeInsets.only(
+                                        left: 10.w, right: 10.w),
+                                    child: Container(
+                                      width: double.infinity,
+                                      child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            "Date: 24-10-2021",
-                                            style: TextStyle(
-                                                fontSize: 13.sp,
-                                                fontFamily: "Poppins1"),
+                                          CRNo(),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Image(
+                                                height: 30.h,
+                                                image: AssetImage(
+                                                    "assets/icons/splash/logo.png"),
+                                                color: Colors.white,
+                                              ),
+                                              Text(
+                                                'Powered by Company',
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 8.sp,
+                                                    fontFamily: "Poppins1"),
+                                              )
+                                            ],
                                           ),
-                                          totalPart(),
+                                          mobileNumber(),
                                         ],
                                       ),
-                                      SizedBox(
-                                        height: 2.h,
-                                      ),
-                                      totalLabour(),
-                                      SizedBox(
-                                        height: 2.h,
-                                      ),
-                                      estBalance(),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  schedule(),
+                                  Divider(
+                                      indent: 10.w,
+                                      endIndent: 10.w,
+                                      color: Colors.grey),
+                                  SizedBox(height: 8),
+                                  customerDetails(),
+                                  Divider(
+                                    indent: 10.w,
+                                    endIndent: 10.w,
+                                    color: Colors.grey,
+                                  ),
+                                  SizedBox(height: 8),
+                                  dataCard(),
+                                  SizedBox(height: 8),
+                                  Container(
+                                    margin: EdgeInsets.only(
+                                        left: 10.w, right: 10.w),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 10.w, right: 10.w),
+                                          child: Text(
+                                            "Car Information",
+                                            style: TextStyle(
+                                                fontFamily: "Poppins2"),
+                                          ),
+                                        ),
+                                        SizedBox(height: 10.h),
+                                        carDetails(),
+                                        Divider(
+                                          indent: 10.w,
+                                          endIndent: 10.w,
+                                          color: Colors.grey,
+                                        ),
+                                        SizedBox(
+                                          height: 10.h,
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 10.w, right: 10.w),
+                                          child: Text(
+                                            "Parts Repairs-Spares Elimate:",
+                                            style: TextStyle(
+                                              fontFamily: "Poppins2",
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 10.h),
+                                        table(),
+                                        SizedBox(height: 15.h),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 10.w, right: 10.w),
+                                          child: Text(
+                                            "Labour Estimates",
+                                            style: TextStyle(
+                                                fontFamily: "Poppins2",
+                                                fontSize: 13.sp),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 10.h,
+                                        ),
+                                        tableSecond(),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Date: 24-10-2021",
+                                              style: TextStyle(
+                                                  fontSize: 13.sp,
+                                                  fontFamily: "Poppins1"),
+                                            ),
+                                            totalPart(),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 2.h,
+                                        ),
+                                        totalLabour(),
+                                        SizedBox(
+                                          height: 2.h,
+                                        ),
+                                        estBalance(),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -1064,6 +1104,7 @@ class _ViewDataPageState extends State<ViewDataPage> {
                           ],
                         )),
                   ),
+                  // Screenshot button temporarily hidden per request (keep download only)
                 ],
               ),
             )

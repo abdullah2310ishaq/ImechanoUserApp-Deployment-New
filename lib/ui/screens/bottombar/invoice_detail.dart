@@ -6,6 +6,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:imechano/localization/language_constrants.dart';
@@ -26,6 +27,7 @@ import 'package:imechano/ui/styling/config.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:flutter/rendering.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../bloc/view_services_bloc.dart';
@@ -700,17 +702,20 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
 
   Future<void> captureAndSaveScreenshot() async {
     try {
-      final boundary = previewContainer.currentContext?.findRenderObject() as ui.RenderRepaintBoundary?;
+      final boundary = previewContainer.currentContext?.findRenderObject()
+          as RenderRepaintBoundary?;
       if (boundary == null) return;
       final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) return;
       final Uint8List pngBytes = byteData.buffer.asUint8List();
 
       final directory = (await getApplicationDocumentsDirectory()).path;
       final currentTime = DateFormat('HHmmss').format(DateTime.now());
       final currentDate = DateFormat('yyyyMMdd').format(DateTime.now());
-      final fileName = 'ImechanoInvoiceScreenshot_${currentDate}_$currentTime.png';
+      final fileName =
+          'ImechanoInvoiceScreenshot_${currentDate}_$currentTime.png';
       final filePath = '$directory/$fileName';
       final file = File(filePath);
       await file.writeAsBytes(pngBytes);
@@ -1102,43 +1107,43 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                           ),
                         )),
                   ),
-                  SizedBox(width: 8.w),
-                  Container(
-                    width: 120.w,
-                    child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            width: 1.0,
-                            color: Colors.white,
-                            style: BorderStyle.solid,
-                          ),
-                        ),
-                        onPressed: () async {
-                          await captureAndSaveScreenshot();
-                        },
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                getTranslated("screenshot", context),
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Poppins1',
-                                    fontSize: 12.sp),
-                              ),
-                              SizedBox(width: 6),
-                              Icon(
-                                Icons.camera_alt,
-                                color: Colors.white,
-                                size: 16,
-                              )
-                            ],
-                          ),
-                        )),
-                  ),
+                  // SizedBox(width: 8.w),
+                  // Container(
+                  //   width: 120.w,
+                  //   child: OutlinedButton(
+                  //       style: OutlinedButton.styleFrom(
+                  //         side: BorderSide(
+                  //           width: 1.0,
+                  //           color: Colors.white,
+                  //           style: BorderStyle.solid,
+                  //         ),
+                  //       ),
+                  //       onPressed: () async {
+                  //         await captureAndSaveScreenshot();
+                  //       },
+                  //       child: FittedBox(
+                  //         fit: BoxFit.scaleDown,
+                  //         child: Row(
+                  //           mainAxisSize: MainAxisSize.min,
+                  //           children: [
+                  //             Text(
+                  //               getTranslated("screenshot", context),
+                  //               overflow: TextOverflow.ellipsis,
+                  //               style: TextStyle(
+                  //                   color: Colors.white,
+                  //                   fontFamily: 'Poppins1',
+                  //                   fontSize: 12.sp),
+                  //             ),
+                  //             SizedBox(width: 6),
+                  //             Icon(
+                  //               Icons.camera_alt,
+                  //               color: Colors.white,
+                  //               size: 16,
+                  //             )
+                  //           ],
+                  //         ),
+                  //       )),
+                  // ),
                 ],
               ),
             )

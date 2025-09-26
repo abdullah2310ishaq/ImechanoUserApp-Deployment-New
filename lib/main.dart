@@ -73,10 +73,9 @@ Future<void> main() async {
   // // Pass all uncaught "fatal" errors from the framework to Crashlytics
   // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   // FirebaseCrashlytics.instance.crash();
-  FlutterNativeSplash.removeAfter(initialization);
+  FlutterNativeSplash.remove();
 
   Provider.debugCheckInvalidValueType = null;
-  WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences preferences = await SharedPreferences.getInstance();
   initScreen = await preferences.getInt('initScreen');
   await preferences.setInt('initScreen', 1);
@@ -98,17 +97,7 @@ Future<void> main() async {
 }
 
 Future<void> initialization(BuildContext context) async {
-  // This is where you can initialize the resources needed by your app while
-  // the splash screen is displayed.  Remove the following example because
-  // delaying the user experience is a bad design practice!
-  // ignore_for_file: avoid_print
-  log('ready in 3...');
-  await Future.delayed(const Duration(milliseconds: 500));
-  log('ready in 2...');
-  await Future.delayed(const Duration(milliseconds: 500));
-  log('ready in 1...');
-  await Future.delayed(const Duration(milliseconds: 500));
-  log('go!');
+  // No-op: native splash is removed immediately; avoid artificial delays
 }
 
 class IMechanoApp extends StatefulWidget {
