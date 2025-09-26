@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -80,6 +81,52 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
 
   List<ServicesData> servicess = <ServicesData>[];
   late ServicesDataSource servicesDataSource;
+
+  String formatDateDMY(String? value) {
+    if (value == null || value.isEmpty) return '';
+    try {
+      final dt = DateTime.parse(value);
+      return DateFormat('dd-MM-yyyy').format(dt);
+    } catch (_) {
+      final patterns = [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm:ss',
+        'yyyy/MM/dd',
+        "yyyy-MM-dd'T'HH:mm:ss",
+        'dd-MM-yyyy HH:mm:ss',
+      ];
+      for (final p in patterns) {
+        try {
+          final dt = DateFormat(p).parse(value);
+          return DateFormat('dd-MM-yyyy').format(dt);
+        } catch (_) {}
+      }
+      return value;
+    }
+  }
+
+  String formatDateTime12hDMY(String? value) {
+    if (value == null || value.isEmpty) return '';
+    try {
+      final dt = DateTime.parse(value);
+      return DateFormat('hh:mm a, dd-MM-yyyy').format(dt);
+    } catch (_) {
+      final patterns = [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm',
+        "yyyy-MM-dd'T'HH:mm:ss",
+        'dd-MM-yyyy HH:mm:ss',
+      ];
+      for (final p in patterns) {
+        try {
+          final dt = DateFormat(p).parse(value);
+          return DateFormat('hh:mm a, dd-MM-yyyy').format(dt);
+        } catch (_) {}
+      }
+      return value;
+    }
+  }
 
   void initState() {
     super.initState();
@@ -215,7 +262,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                                     pw.SizedBox(width: 5.w),
                                     pw.Text(
                                       getTranslated("OrderAt", context) +
-                                          '\n${widget.invoiceData!.createdAt!.substring(0, 10)}',
+                                          '\n${formatDateDMY(widget.invoiceData!.createdAt)}',
                                       textDirection: pw.TextDirection.rtl,
                                       textAlign: pw.TextAlign.right,
                                       style: arabicTextStyle,
@@ -223,7 +270,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                                     pw.Spacer(),
                                     pw.Text(
                                       getTranslated('PaidAt', context) +
-                                          '\n${widget.invoiceData!.updatedAt!.substring(0, 10)}',
+                                          '\n${formatDateDMY(widget.invoiceData!.updatedAt)}',
                                       textDirection: pw.TextDirection.rtl,
                                       textAlign: pw.TextAlign.right,
                                       style: arabicTextStyle,
@@ -231,7 +278,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                                     pw.Spacer(),
                                     pw.Text(
                                       getTranslated("OrderAt", context) +
-                                          '\n${widget.invoiceData!.updatedAt!.substring(0, 10)}',
+                                          '\n${formatDateDMY(widget.invoiceData!.updatedAt)}',
                                       textDirection: pw.TextDirection.rtl,
                                       textAlign: pw.TextAlign.right,
                                       style: arabicTextStyle,
@@ -468,7 +515,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                                             alignment: pw.Alignment.centerRight,
                                             child: pw.Text(
                                               getTranslated("date", context) +
-                                                  ': ${widget.invoiceData!.updatedAt!.substring(0, 10)}',
+                                                  ': ${formatDateDMY(widget.invoiceData!.updatedAt)}',
                                               style: arabicTextStyle,
                                               textDirection:
                                                   pw.TextDirection.rtl,
@@ -634,9 +681,9 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
     await file.writeAsBytes(await pdf.save());
 
     final snackBar = SnackBar(
-      duration: Duration(seconds: 10),
+      duration: Duration(seconds: 4),
       backgroundColor: Colors.green[400],
-      content: Text('Saved to $filePath'),
+      content: Text('Invoice saved'),
       action: SnackBarAction(
         label: 'Open',
         textColor: Color.fromARGB(255, 255, 255, 255),
@@ -649,6 +696,43 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
     setState(() {
       loader_download = false;
     });
+  }
+
+  Future<void> captureAndSaveScreenshot() async {
+    try {
+      final boundary = previewContainer.currentContext?.findRenderObject() as ui.RenderRepaintBoundary?;
+      if (boundary == null) return;
+      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return;
+      final Uint8List pngBytes = byteData.buffer.asUint8List();
+
+      final directory = (await getApplicationDocumentsDirectory()).path;
+      final currentTime = DateFormat('HHmmss').format(DateTime.now());
+      final currentDate = DateFormat('yyyyMMdd').format(DateTime.now());
+      final fileName = 'ImechanoInvoiceScreenshot_${currentDate}_$currentTime.png';
+      final filePath = '$directory/$fileName';
+      final file = File(filePath);
+      await file.writeAsBytes(pngBytes);
+
+      final snackBar = SnackBar(
+        duration: Duration(seconds: 4),
+        backgroundColor: Colors.green[400],
+        content: Text('Screenshot saved'),
+        action: SnackBarAction(
+          label: 'Open',
+          textColor: Color.fromARGB(255, 255, 255, 255),
+          onPressed: () {
+            OpenFile.open(file.path);
+          },
+        ),
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    } catch (e) {
+      log('Failed to capture screenshot: $e');
+    }
   }
 
   void scrollToBottom() {
@@ -1011,6 +1095,43 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                               SizedBox(width: 6),
                               Icon(
                                 Icons.download,
+                                color: Colors.white,
+                                size: 16,
+                              )
+                            ],
+                          ),
+                        )),
+                  ),
+                  SizedBox(width: 8.w),
+                  Container(
+                    width: 120.w,
+                    child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            width: 1.0,
+                            color: Colors.white,
+                            style: BorderStyle.solid,
+                          ),
+                        ),
+                        onPressed: () async {
+                          await captureAndSaveScreenshot();
+                        },
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                getTranslated("screenshot", context),
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Poppins1',
+                                    fontSize: 12.sp),
+                              ),
+                              SizedBox(width: 6),
+                              Icon(
+                                Icons.camera_alt,
                                 color: Colors.white,
                                 size: 16,
                               )
@@ -1432,13 +1553,13 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
       children: [
         SizedBox(width: 5.w),
         carddivider(getTranslated("OrderAt", context),
-            widget.invoiceData!.createdAt!.substring(0, 10)),
+            formatDateDMY(widget.invoiceData!.createdAt)),
         Spacer(),
         carddivider(getTranslated('PaidAt', context),
-            widget.invoiceData!.updatedAt!.substring(0, 10)),
+            formatDateDMY(widget.invoiceData!.updatedAt)),
         Spacer(),
         carddivider(getTranslated("date", context),
-            '${widget.invoiceData!.updatedAt!.substring(0, 10)}'),
+            formatDateDMY(widget.invoiceData!.updatedAt)),
         SizedBox(width: 5.w),
       ],
     );

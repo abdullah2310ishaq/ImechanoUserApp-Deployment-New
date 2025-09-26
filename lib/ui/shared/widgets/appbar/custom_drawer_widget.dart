@@ -207,12 +207,10 @@ class _drawerpageState extends State<drawerpage> {
                             final bool hasPrefImg = PrefObj.preferences!
                                 .containsKey(PrefKeys.PROFILE_IMG);
                             final String? cachedUrl = hasPrefImg
-                                ? PrefObj.preferences!
-                                    .get(PrefKeys.PROFILE_IMG)
+                                ? PrefObj.preferences!.get(PrefKeys.PROFILE_IMG)
                                 : null;
-                            final String? derivedUrl = (profileurl.isNotEmpty)
-                                ? profileurl
-                                : null;
+                            final String? derivedUrl =
+                                (profileurl.isNotEmpty) ? profileurl : null;
                             final String? url = cachedUrl ?? derivedUrl;
                             return Center(
                               child: CircleAvatar(
@@ -334,23 +332,19 @@ class _drawerpageState extends State<drawerpage> {
                                         ? list[index]
                                         : null;
                                 if (target != null) {
-                                  if (index == 0) {
-                                    Navigator.of(context).pushAndRemoveUntil(
-                                        MaterialPageRoute(
-                                            builder: (context) => target),
-                                        (Route<dynamic> route) => false);
-                                  } else {
-                                    Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => target));
-                                  }
+                                  // Always replace stack with the selected target
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) => target),
+                                      (Route<dynamic> route) => false);
                                 }
                               },
                               child: index == changeLangIndex
                                   ? ListTile(
                                       trailing: Switch(
                                         value: langSwitch,
+                                        activeColor: Colors.black,
+                                        activeTrackColor: Color(0xFF9AF3EE),
                                         onChanged: (value) {
                                           setState(() {
                                             if (langSwitch) {
@@ -436,6 +430,8 @@ class _drawerpageState extends State<drawerpage> {
   Widget languageSwitch() {
     return Switch(
       value: appModelTheme.darkTheme,
+      activeColor: Color(0xFF40E0D0),
+      activeTrackColor: Color(0xFF9AF3EE),
       onChanged: (value) {
         setState(() {
           appModelTheme.darkTheme = !appModelTheme.darkTheme;
@@ -459,6 +455,8 @@ class _drawerpageState extends State<drawerpage> {
   Widget switchButton() {
     return Switch(
       value: appModelTheme.darkTheme,
+      activeColor: Colors.black,
+      activeTrackColor: Color(0xFF9AF3EE),
       onChanged: (value) {
         setState(() {
           appModelTheme.darkTheme = !appModelTheme.darkTheme;

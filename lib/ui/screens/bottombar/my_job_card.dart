@@ -38,7 +38,7 @@ class _MyJobCardState extends State<MyJobCard>
   bool showFilter = false;
   TabController? _tabController;
   bool flag = false;
-  var formatter = new DateFormat('dd/MM/yyyy');
+  var formatter = new DateFormat('dd-MM-yyyy');
   DateTime fromDate =
       DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   DateTime toDate =
@@ -724,19 +724,15 @@ class _MyJobCardState extends State<MyJobCard>
                                                           .data![index]
                                                           .jobDate !=
                                                       null
-                                                  ? jobcardslistsnapshot.data!
-                                                      .data![index].jobDate
-                                                      .toString()
-                                                      .substring(
-                                                          0,
+                                                  ? DateFormat('dd-MM-yyyy')
+                                                      .format(DateTime.parse(
                                                           jobcardslistsnapshot
-                                                                  .data!
-                                                                  .data![index]
-                                                                  .jobDate
-                                                                  .toString()
-                                                                  .length -
-                                                              16)
-                                                  : fromdate),
+                                                              .data!
+                                                              .data![index]
+                                                              .jobDate!))
+                                                  : DateFormat('dd-MM-yyyy')
+                                                      .format(DateTime.parse(
+                                                          fromdate))),
                                           Spacer(),
                                           carddivider(
                                               getTranslated('time', context),

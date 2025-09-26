@@ -63,6 +63,28 @@ class _BookingListShowState extends State<BookingListShow>
   // Create a NumberFormat instance for formatting
   var numberFormat = NumberFormat('#,##0.00', 'en_US');
   String formattedGrossTotal = '';
+  String _formatDateTime(String? value) {
+    if (value == null || value.isEmpty) return '';
+    try {
+      final dt = DateTime.parse(value);
+      return DateFormat('hh:mm a, dd-MM-yyyy').format(dt);
+    } catch (_) {
+      final patterns = [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm',
+        "yyyy-MM-dd'T'HH:mm:ss",
+        'dd-MM-yyyy HH:mm:ss',
+      ];
+      for (final p in patterns) {
+        try {
+          final dt = DateFormat(p).parse(value);
+          return DateFormat('hh:mm a, dd-MM-yyyy').format(dt);
+        } catch (_) {}
+      }
+      return value;
+    }
+  }
 
   @override
   void initState() {
@@ -259,7 +281,7 @@ class _BookingListShowState extends State<BookingListShow>
           SizedBox(height: 15),
           _backButton(),
           SizedBox(height: 15),
-          
+
           SizedBox(height: 20),
           dynamicBottomCard(),
           SizedBox(height: 15),
@@ -565,7 +587,7 @@ class _BookingListShowState extends State<BookingListShow>
               Text(
                 getTranslated('AppointmentTime', context) +
                     " : " +
-                    widget.data.timeDate.toString(),
+                    _formatDateTime(widget.data.timeDate),
                 style: TextStyle(
                   fontSize: 12,
                   fontFamily: 'Poppins1',
@@ -575,7 +597,7 @@ class _BookingListShowState extends State<BookingListShow>
               Text(
                 getTranslated('BookingTime', context) +
                     " : " +
-                    widget.data.bookingTime.toString(),
+                    _formatDateTime(widget.data.bookingTime),
                 style: TextStyle(
                   fontSize: 12,
                   fontFamily: 'Poppins1',

@@ -710,11 +710,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 18.w,
                     )),
               ),
-              Expanded(
+              // Shorter search field with fixed max width for consistent feel
+              Flexible(
                 child: Container(
-                  height: (screenSize?.height ??
-                          MediaQuery.of(context).size.height) *
-                      0.045,
+                  height: 40.h,
+                  constraints: BoxConstraints(maxWidth: 0.72.sw),
                   margin: appModelTheme.appLocal == Locale("en")
                       ? EdgeInsets.only(left: 15.w, right: 2.w)
                       : EdgeInsets.only(left: 2.w, right: 15.w),
@@ -741,7 +741,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       hintText: getTranslated('Searchservice', context),
                       hintStyle: TextStyle(
-                          fontSize: 11,
+                          fontSize: 12,
                           fontFamily: 'Poppins3',
                           color: appModelTheme.darkTheme
                               ? Color(0xff252525)
@@ -754,59 +754,67 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       filled: true,
-                      contentPadding: EdgeInsets.only(top: 5, bottom: 5),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                     ),
                   ),
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) {
-                      return NotificationScreen();
-                    },
-                  ));
-                },
-                child: Consumer<NotificationCountProvider>(
-                    builder: (context, value, child) {
-                  return value.notifications == 0
-                      ? Container(
-                          padding: appModelTheme.appLocal == Locale("en")
-                              ? EdgeInsets.only(
-                                  top: 20, bottom: 20, right: 1.w, left: 15.w)
-                              : EdgeInsets.only(
-                                  top: 20, bottom: 20, left: 1.w, right: 15.w),
-                          child: SvgPicture.asset("assets/svg/ball.svg",
-                              height: 20.h, width: 20.w))
-                      : badges.Badge(
-                          // toAnimate: false,
-                          badgeContent: Text(
-                            value.notifications > 99
-                                ? '99+'
-                                : '${value.notifications}',
-                            style: TextStyle(color: Colors.white),
+              // Bell icon aligned and consistent with shared app bar
+              GestureDetector(
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) {
+                        return NotificationScreen();
+                      },
+                    ));
+                  },
+                  child: Selector<NotificationCountProvider, int>(
+                      selector: (context, provider) => provider.notifications,
+                      builder: (context, count, child) {
+                        final hasNotifications = count > 0;
+                        return Container(
+                          width: 50.w,
+                          height: 50.h,
+                          alignment: Alignment.center,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Align(
+                                alignment: Alignment.center,
+                                child: SvgPicture.asset(
+                                  "assets/svg/ball.svg",
+                                  width: 24.w,
+                                  height: 24.h,
+                                ),
+                              ),
+                              if (hasNotifications)
+                                Positioned(
+                                  top: 6,
+                                  right: 8,
+                                  child: badges.Badge(
+                                    position: badges.BadgePosition.topEnd(
+                                        top: 0, end: 0),
+                                    badgeStyle: badges.BadgeStyle(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 2),
+                                      elevation: 0,
+                                    ),
+                                    badgeContent: Text(
+                                      count > 99 ? '99+' : '$count',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 9),
+                                    ),
+                                    child: SizedBox(width: 0, height: 0),
+                                  ),
+                                ),
+                            ],
                           ),
-                          position:
-                              badges.BadgePosition.topEnd(top: 5, end: -8),
-                          child: Container(
-                              padding: appModelTheme.appLocal == Locale("en")
-                                  ? EdgeInsets.only(
-                                      top: 20,
-                                      bottom: 20,
-                                      right: 1.w,
-                                      left: 15.w)
-                                  : EdgeInsets.only(
-                                      top: 20,
-                                      bottom: 20,
-                                      left: 1.w,
-                                      right: 15.w),
-                              child: SvgPicture.asset("assets/svg/ball.svg",
-                                  height: 20.h, width: 20.w)),
                         );
-                }),
-              ),
+                      })),
             ],
           ),
+          SizedBox(height: 10.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

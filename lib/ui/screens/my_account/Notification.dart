@@ -232,9 +232,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 separatorBuilder: (context, index) {
                                   return Divider(
                                     color: appModelTheme.darkTheme
-                                        ? Colors.grey[800]
-                                        : Colors.grey[300],
-                                    height: 1,
+                                        ? Colors.grey[700]
+                                        : Colors.grey[400],
+                                    thickness: 1.0,
+                                    height: 1.0,
                                   );
                                 },
                                 itemBuilder: (context, index) {
@@ -242,14 +243,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                     color: appModelTheme.darkTheme
                                         ? (notificationListSnapshot.data!
                                                     .data![index].status ==
-                                                '1'
-                                            ? Color(0xff2a2a2a)
-                                            : Color(0xff1e1e1e))
+                                                '1' // read
+                                            ? Color(0xff1e1e1e)
+                                            : Color(0xff2a2a2a))
                                         : (notificationListSnapshot.data!
                                                     .data![index].status ==
-                                                '1'
-                                            ? grayE6E6E5
-                                            : greycolo.withOpacity(0.5)),
+                                                '1' // read
+                                            ? Colors.white
+                                            : Color(0xFFE6E6E5)),
                                     child: ListTile(
                                       isThreeLine: true,
                                       onTap: () async {

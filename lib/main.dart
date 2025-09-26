@@ -125,7 +125,7 @@ class IMechanoApp extends StatefulWidget {
   _IMechanoAppState createState() => _IMechanoAppState(prefs: prefs);
 }
 
-class _IMechanoAppState extends State<IMechanoApp> {
+class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   _IMechanoAppState({required this.prefs});
   Box prefs;
@@ -231,6 +231,7 @@ class _IMechanoAppState extends State<IMechanoApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initAppTheme();
 
     log("Printing TOKEN");
@@ -309,6 +310,21 @@ class _IMechanoAppState extends State<IMechanoApp> {
       }
       Utils.handleNotificationNavigation(context, message, null);
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      try {
+        final ctx = appNavigatorKey.currentContext;
+        if (ctx != null) {
+          Provider.of<NotificationCountProvider>(ctx, listen: false)
+              .setNotifications();
+        }
+      } catch (e) {
+        log('Failed to refresh notification count on resume: $e');
+      }
+    }
   }
 
   void _initAppTheme() async {

@@ -60,7 +60,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
   dynamic appModelTheme;
   TabController? _tabController;
 
-  var formatter = new DateFormat('dd/MM/yyyy');
+  var formatter = new DateFormat('dd-MM-yyyy');
   DateTime fromDate = DateTime(2023, 01, 01);
   DateTime toDate =
       DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
@@ -340,15 +340,23 @@ class _MyBookingsPageState extends State<MyBookingsPage>
     if (value == null || value.isEmpty) return '';
     try {
       final DateTime parsed = DateTime.parse(value);
-      return DateFormat('hh:mm a, dd/MM/yyyy').format(parsed);
+      return DateFormat('hh:mm a, dd-MM-yyyy').format(parsed);
     } catch (_) {
-      try {
-        // Fallback common pattern
-        final DateTime parsed = DateFormat('yyyy-MM-dd HH:mm:ss').parse(value);
-        return DateFormat('hh:mm a, dd/MM/yyyy').format(parsed);
-      } catch (_) {
-        return value;
+      // Try common alternative patterns
+      final patterns = [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm',
+        "yyyy-MM-dd'T'HH:mm:ss",
+        'dd-MM-yyyy HH:mm:ss',
+      ];
+      for (final p in patterns) {
+        try {
+          final DateTime parsed = DateFormat(p).parse(value);
+          return DateFormat('hh:mm a, dd-MM-yyyy').format(parsed);
+        } catch (_) {}
       }
+      return value;
     }
   }
 
@@ -887,37 +895,35 @@ class _MyBookingsPageState extends State<MyBookingsPage>
           ),
           SizedBox(height: 10),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Booking Time',
                         style: TextStyle(
-                          fontSize: 9,
+                          fontSize: 10,
                           fontFamily: 'Poppins1',
                         ),
                       ),
+                      SizedBox(height: 2),
                       Text(
                         formatTo12hWithDMY(data.bookingTime),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 9,
+                          fontSize: 10,
                           fontFamily: 'Poppins1',
                         ),
                       ),
                     ]),
               ),
-              SizedBox(width: 7),
               Container(
+                  margin: EdgeInsets.symmetric(horizontal: 8),
                   color:
                       appModelTheme.darkTheme ? Colors.white70 : Colors.black45,
-                  height: 25,
+                  height: 28,
                   width: 1),
-              SizedBox(width: 7),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -925,16 +931,15 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                     Text(
                       'Appointment Time',
                       style: TextStyle(
-                        fontSize: 9,
+                        fontSize: 10,
                         fontFamily: 'Poppins1',
                       ),
                     ),
+                    SizedBox(height: 2),
                     Text(
                       formatTo12hWithDMY(data.timeDate),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 9,
+                        fontSize: 10,
                         fontFamily: 'Poppins1',
                       ),
                     ),
@@ -1738,7 +1743,7 @@ Widget _cardList(ItemData data) {
               Padding(
                 padding: EdgeInsets.only(left: 17, top: 15.h),
                 child: Text(
-                  DateFormat('hh:mm a dd-MM-yy')
+                  DateFormat('hh:mm a dd-MM-yyyy')
                       .format(DateTime.parse(data.updatedAt!)),
                   style: TextStyle(
                     fontSize: 9.sp,

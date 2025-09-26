@@ -282,15 +282,18 @@ class _MoreServiciesState extends State<MoreServicies> {
                                                 " " +
                                                 getTranslated(
                                                     'Service', context),
-                                            style: TextStyle(fontSize: 12),
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.white),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                         Text(
                                           getTranslated(
                                               'Viewselections', context),
-                                          style:
-                                              TextStyle(fontFamily: "Poppins2"),
+                                          style: TextStyle(
+                                              fontFamily: "Poppins2",
+                                              color: Colors.white),
                                         ),
                                       ],
                                     ),

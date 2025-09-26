@@ -214,9 +214,10 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                         title: getTranslated(
                                             'jobnumber', context)),
                                     LabelListTile(
-                                        subtitle: custjoblistSnapshot
-                                            .data!.data![0].dateTime!
-                                            .split(' ')[0],
+                                        subtitle: DateFormat('dd-MM-yyyy')
+                                            .format(DateTime.parse(
+                                                custjoblistSnapshot
+                                                    .data!.data![0].dateTime!)),
                                         title:
                                             '${getTranslated('JobCard', context)} ${getTranslated('date', context)}'),
                                   ],
@@ -303,9 +304,12 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                         MainAxisAlignment.spaceAround,
                                     children: [
                                       LabelListTile(
-                                        subtitle: custjoblistSnapshot
-                                            .data!.data![0].dateTime!
-                                            .split('.')[0],
+                                        subtitle:
+                                            DateFormat('dd-MM-yyyy HH:mm:ss')
+                                                .format(DateTime.parse(
+                                                    custjoblistSnapshot.data!
+                                                        .data![0].dateTime!
+                                                        .split('.')[0])),
                                         title:
                                             '${getTranslated('JobCard', context)} ${getTranslated('date', context)} ${getTranslated('time', context)}',
                                         widthFactor: 0.87,
@@ -491,10 +495,16 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                                 getTranslated(
                                                         'paidat', context) +
                                                     ' : ' +
-                                                    custjoblistSnapshot
-                                                        .data!.data![0].dateTime
-                                                        .toString()
-                                                        .substring(0, 19),
+                                                    DateFormat(
+                                                            'dd-MM-yyyy HH:mm:ss')
+                                                        .format(DateTime.parse(
+                                                            custjoblistSnapshot
+                                                                .data!
+                                                                .data![0]
+                                                                .dateTime!
+                                                                .toString()
+                                                                .substring(
+                                                                    0, 19))),
                                                 style: TextStyle(
                                                     fontFamily: "Poppins1",
                                                     fontSize: 15,

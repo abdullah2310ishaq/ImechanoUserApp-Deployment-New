@@ -70,6 +70,52 @@ class _MyInvoiceState extends State<MyInvoice>
   dynamic appModelTheme;
   TabController? _tabController;
 
+  String formatDateDMY(String? value) {
+    if (value == null || value.isEmpty) return '';
+    try {
+      final dt = DateTime.parse(value);
+      return DateFormat('dd-MM-yyyy').format(dt);
+    } catch (_) {
+      final patterns = [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm:ss',
+        'yyyy/MM/dd',
+        "yyyy-MM-dd'T'HH:mm:ss",
+        'dd-MM-yyyy HH:mm:ss',
+      ];
+      for (final p in patterns) {
+        try {
+          final dt = DateFormat(p).parse(value);
+          return DateFormat('dd-MM-yyyy').format(dt);
+        } catch (_) {}
+      }
+      return value;
+    }
+  }
+
+  String formatDateTime12hDMY(String? value) {
+    if (value == null || value.isEmpty) return '';
+    try {
+      final dt = DateTime.parse(value);
+      return DateFormat('hh:mm a, dd-MM-yyyy').format(dt);
+    } catch (_) {
+      final patterns = [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm',
+        "yyyy-MM-dd'T'HH:mm:ss",
+        'dd-MM-yyyy HH:mm:ss',
+      ];
+      for (final p in patterns) {
+        try {
+          final dt = DateFormat(p).parse(value);
+          return DateFormat('hh:mm a, dd-MM-yyyy').format(dt);
+        } catch (_) {}
+      }
+      return value;
+    }
+  }
+
   bool flag = true;
   Repository repository = Repository();
 
@@ -768,7 +814,7 @@ class _MyInvoiceState extends State<MyInvoice>
                                     ),
                                   ),
                                   carddivider(getTranslated('date', context),
-                                      '${invoice.updatedAt!.substring(0, 10)}'),
+                                      formatDateDMY(invoice.updatedAt)),
                                 ],
                               ),
                             ),
@@ -1011,7 +1057,7 @@ class _MyInvoiceState extends State<MyInvoice>
                                     ),
                                   ),
                                   carddivider(getTranslated('date', context),
-                                      '${invoice.updatedAt!.substring(0, 10)}'),
+                                      formatDateDMY(invoice.updatedAt)),
                                 ],
                               ),
                             ),
@@ -1992,7 +2038,7 @@ Widget _cardList(ItemData data) {
               Padding(
                 padding: EdgeInsets.only(left: 17, top: 15.h),
                 child: Text(
-                  DateFormat('hh:mm a dd-MM-yy')
+                  DateFormat('hh:mm a, dd-MM-yyyy')
                       .format(DateTime.parse(data.updatedAt!)),
                   style: TextStyle(
                     fontSize: 9.sp,
