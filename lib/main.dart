@@ -68,6 +68,10 @@ Future<void> main() async {
       statusBarIconBrightness: Brightness.dark));
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  
+  // Initialize local notifications plugin
+  flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  
   // //===========CRASHLYTICS==========
 
   // // Pass all uncaught "fatal" errors from the framework to Crashlytics
@@ -120,10 +124,8 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
   Box prefs;
   AppModel appModel = new AppModel();
   void notification() async {
-    // Initialize local notifications for iOS
-    if (Platform.isIOS) {
-      await _initializeLocalNotifications();
-    }
+    // Initialize local notifications for both platforms
+    await _initializeLocalNotifications();
 
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
@@ -266,10 +268,8 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
       log("onMessage data: ${message.data}");
       log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~cdfdfds~~~~~~~~~~~~~~~~~~~~");
 
-      // Handle iOS notifications differently
-      if (Platform.isIOS) {
-        await _showLocalNotification(message);
-      }
+      // Show local notification for both platforms when app is in foreground
+      await _showLocalNotification(message);
 
       try {
         final ctx = appNavigatorKey.currentContext;

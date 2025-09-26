@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -61,6 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool checkExpansionTile = false;
   bool isCarAdded = false;
   var profileData;
+  Timer? _notificationTimer;
 
   testfunc() async {
     var prefs = await SharedPreferences.getInstance();
@@ -114,6 +116,14 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Initialize notification count provider early
+      try {
+        Provider.of<NotificationCountProvider>(context, listen: false)
+            .setNotifications();
+      } catch (e) {
+        log('Failed to initialize notification count in home: $e');
+      }
+      
       // Avoid double prompts on iOS: request directly via FirebaseMessaging
       if (Platform.isIOS) {
         await FirebaseMessaging.instance.requestPermission(
@@ -139,6 +149,23 @@ class _HomeScreenState extends State<HomeScreen> {
         PrefObj.preferences!.containsKey(PrefKeys.CARNAME) ? true : false;
     categoriesListBloc.categoriesSinck("null");
     oilchnageListBloc.oilChnageSinck('1');
+    
+    // Start periodic notification count refresh
+    _startNotificationTimer();
+  }
+  
+  void _startNotificationTimer() {
+    _notificationTimer?.cancel();
+    _notificationTimer = Timer.periodic(Duration(seconds: 5), (timer) {
+      if (mounted && userStr == true) {
+        try {
+          Provider.of<NotificationCountProvider>(context, listen: false)
+              .setNotifications();
+        } catch (e) {
+          log('Failed to refresh notification count: $e');
+        }
+      }
+    });
   }
 
   void refreshCarStatus() {
@@ -158,6 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     print("disposing");
+    _notificationTimer?.cancel();
     super.dispose();
   }
 

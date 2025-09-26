@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -34,39 +32,57 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   bool isSwitch = true;
-  dynamic appModelTheme;
+  AppModel? appModelTheme;
   bool isLoading = false;
   String? errorMessage;
+  bool _isDisposed = false;
 
   @override
   void initState() {
     super.initState();
-    print("Notification page");
+    log("Notification page");
     _loadNotifications();
   }
 
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
+
   Future<void> _loadNotifications() async {
+    if (_isDisposed) return;
+    
     try {
-      setState(() {
-        isLoading = true;
-        errorMessage = null;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+          errorMessage = null;
+        });
+      }
 
       await Provider.of<NotificationCountProvider>(context, listen: false)
           .setNotifications();
-      if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
-        await customerNotificationListBloc
-            .notificationListSinck(PrefObj.preferences!.get(PrefKeys.USER_ID));
+      
+      if (PrefObj.preferences?.containsKey(PrefKeys.USER_ID) == true) {
+        final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+        if (userId != null) {
+          await customerNotificationListBloc.notificationListSinck(userId);
+        }
       }
     } catch (e) {
       log('Error loading notifications: $e');
-      setState(() {
-        errorMessage = 'Failed to load notifications';
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = 'Failed to load notifications. Please try again.';
+        });
+      }
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -83,7 +99,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           home: 'assets/svg/homeicon.svg',
         ),
         drawer: drawerpage(),
-        backgroundColor: appModelTheme.darkTheme ? black : Color(0xff70bdf1),
+        backgroundColor: appModelTheme?.darkTheme == true ? black : const Color(0xff70bdf1),
         body: ScreenUtilInit(
           designSize: Size(414, 896),
           builder: (context, child) =>
@@ -97,10 +113,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 Expanded(
                     child: Container(
                   decoration: BoxDecoration(
-                      color: appModelTheme.darkTheme
-                          ? Color(0xff252525)
+                      color: appModelTheme?.darkTheme == true
+                          ? const Color(0xff252525)
                           : Colors.white,
-                      borderRadius: BorderRadius.only(
+                      borderRadius: const BorderRadius.only(
                           topRight: Radius.circular(25.0),
                           topLeft: Radius.circular(25.0))),
                   child: SingleChildScrollView(
@@ -134,21 +150,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                         size: 50,
                                         color: red,
                                       ),
-                                      SizedBox(height: 16),
+                                      const SizedBox(height: 16),
                                       Text(
                                         errorMessage!,
                                         style: TextStyle(
-                                          color: appModelTheme.darkTheme
+                                          color: appModelTheme?.darkTheme == true
                                               ? white
                                               : black,
                                           fontSize: 14,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
-                                      SizedBox(height: 16),
+                                      const SizedBox(height: 16),
                                       ElevatedButton(
                                         onPressed: _loadNotifications,
-                                        child: Text('Retry'),
+                                        child: const Text('Retry'),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: logoBlue,
                                           foregroundColor: white,
@@ -169,21 +185,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                         size: 50,
                                         color: red,
                                       ),
-                                      SizedBox(height: 16),
+                                      const SizedBox(height: 16),
                                       Text(
                                         'Error loading notifications',
                                         style: TextStyle(
-                                          color: appModelTheme.darkTheme
+                                          color: appModelTheme?.darkTheme == true
                                               ? white
                                               : black,
                                           fontSize: 14,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
-                                      SizedBox(height: 16),
+                                      const SizedBox(height: 16),
                                       ElevatedButton(
                                         onPressed: _loadNotifications,
-                                        child: Text('Retry'),
+                                        child: const Text('Retry'),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: logoBlue,
                                           foregroundColor: white,
@@ -195,9 +211,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               }
 
                               if (!notificationListSnapshot.hasData ||
-                                  notificationListSnapshot.data!.data == null ||
-                                  notificationListSnapshot
-                                      .data!.data!.isEmpty) {
+                                  notificationListSnapshot.data?.data == null ||
+                                  notificationListSnapshot.data!.data!.isEmpty) {
                                 return Center(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -205,15 +220,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                       Icon(
                                         Icons.notifications_none,
                                         size: 50,
-                                        color: appModelTheme.darkTheme
+                                        color: appModelTheme?.darkTheme == true
                                             ? greycolo
                                             : Colors.grey[400],
                                       ),
-                                      SizedBox(height: 16),
+                                      const SizedBox(height: 16),
                                       Text(
                                         'No notifications yet',
                                         style: TextStyle(
-                                          color: appModelTheme.darkTheme
+                                          color: appModelTheme?.darkTheme == true
                                               ? white
                                               : black,
                                           fontSize: 16,
@@ -225,13 +240,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               }
                               return ListView.separated(
                                 scrollDirection: Axis.vertical,
-                                physics: BouncingScrollPhysics(),
+                                physics: const BouncingScrollPhysics(),
                                 itemCount:
                                     notificationListSnapshot.data!.data!.length,
                                 shrinkWrap: true,
                                 separatorBuilder: (context, index) {
                                   return Divider(
-                                    color: appModelTheme.darkTheme
+                                    color: appModelTheme?.darkTheme == true
                                         ? Colors.grey[700]
                                         : Colors.grey[400],
                                     thickness: 1.0,
@@ -239,84 +254,69 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   );
                                 },
                                 itemBuilder: (context, index) {
+                                  final notification = notificationListSnapshot.data!.data![index];
+                                  final isRead = notification.status == '1';
+                                  
                                   return Container(
-                                    color: appModelTheme.darkTheme
-                                        ? (notificationListSnapshot.data!
-                                                    .data![index].status ==
-                                                '1' // read
-                                            ? Color(0xff1e1e1e)
-                                            : Color(0xff2a2a2a))
-                                        : (notificationListSnapshot.data!
-                                                    .data![index].status ==
-                                                '1' // read
+                                    color: appModelTheme?.darkTheme == true
+                                        ? (isRead
+                                            ? const Color(0xff1e1e1e)
+                                            : const Color(0xff2a2a2a))
+                                        : (isRead
                                             ? Colors.white
-                                            : Color(0xFFE6E6E5)),
+                                            : const Color(0xFFE6E6E5)),
                                     child: ListTile(
                                       isThreeLine: true,
                                       onTap: () async {
                                         try {
-                                          if (notificationListSnapshot
-                                                  .data!.data![index].status ==
-                                              '0') {
+                                          if (!isRead) {
                                             bool response =
                                                 await NotificationApi
-                                                    .updateNotificationStatus(
-                                                        notificationListSnapshot
-                                                            .data!
-                                                            .data![index]);
+                                                    .updateNotificationStatus(notification);
                                             log('Notification status updated: $response');
                                           }
 
-                                          String? str = notificationListSnapshot
-                                              .data!.data![index].title!;
-                                          String? jobNo =
-                                              notificationListSnapshot
-                                                  .data!.data![index].jobNo;
+                                          final title = notification.title;
+                                          final jobNo = notification.jobNo;
                                           Utils.handleNotificationNavigation(
-                                              context, null, str, jobNo);
+                                              context, null, title, jobNo);
                                         } catch (e) {
                                           log('Error handling notification tap: $e');
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text('Error occurred'),
-                                              backgroundColor: red,
-                                            ),
-                                          );
+                                          if (mounted) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: const Text('Error occurred'),
+                                                backgroundColor: red,
+                                              ),
+                                            );
+                                          }
                                         }
                                       },
                                       title: Row(
                                         children: [
-                                          Text(
-                                            getTranslated(
-                                                notificationListSnapshot
-                                                    .data!
-                                                    .data![index]
-                                                    .title!
-                                                    .removeAllWhitespace,
-                                                context),
-                                            style: TextStyle(
-                                                fontSize: 11,
-                                                fontFamily: 'Poppins3',
-                                                color: appModelTheme.darkTheme
-                                                    ? white
-                                                    : black,
-                                                fontWeight: FontWeight.w600),
+                                          Expanded(
+                                            child: Text(
+                                              getTranslated(
+                                                  notification.title ?? '',
+                                                  context),
+                                              style: TextStyle(
+                                                  fontSize: 11,
+                                                  fontFamily: 'Poppins3',
+                                                  color: appModelTheme?.darkTheme == true
+                                                      ? white
+                                                      : black,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
                                           ),
-                                          Flexible(
-                                              fit: FlexFit.tight,
-                                              child: SizedBox()),
                                           Text(
                                             DateFormat('hh:mm a dd-MM-yy')
                                                 .format(DateTime.parse(
-                                                    notificationListSnapshot
-                                                        .data!
-                                                        .data![index]
-                                                        .updatedAt!)),
+                                                    notification.updatedAt ?? DateTime.now().toIso8601String())),
                                             style: TextStyle(
                                                 fontSize: 10,
                                                 fontFamily: 'Poppins3',
-                                                color: appModelTheme.darkTheme
+                                                color: appModelTheme?.darkTheme == true
                                                     ? Colors.grey[300]
                                                     : Colors.grey[600]),
                                           ),
@@ -324,14 +324,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                       ),
                                       subtitle: Text(
                                         getTranslated(
-                                            notificationListSnapshot
-                                                .data!
-                                                .data![index]
-                                                .message!
-                                                .removeAllWhitespace,
+                                            notification.message ?? '',
                                             context),
                                         style: TextStyle(
-                                          color: appModelTheme.darkTheme
+                                          color: appModelTheme?.darkTheme == true
                                               ? Colors.grey[200]
                                               : Colors.grey[700],
                                           fontSize: 12,
@@ -339,12 +335,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                       ),
                                       leading: Image(
                                           height: 10,
-                                          image: notificationListSnapshot.data!
-                                                      .data![index].status ==
-                                                  '1'
-                                              ? AssetImage(
+                                          image: isRead
+                                              ? const AssetImage(
                                                   "assets/icons/My Account/Ellipse 27.png")
-                                              : AssetImage(
+                                              : const AssetImage(
                                                   "assets/icons/My Account/Ellipse 27-1.png")),
                                     ),
                                   );
@@ -368,7 +362,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           height: 20.h,
           child: Image(
             height: 25.h,
-            image: AssetImage(
+            image: const AssetImage(
                 "assets/icons/My Account/notifications_black_24dp.png"),
           ),
           margin: EdgeInsets.only(left: 20.w, right: 20.w),
@@ -378,7 +372,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             getTranslated("notification", context),
             style: TextStyle(
               fontSize: 17.sp,
-              color: appModelTheme.darkTheme ? white : black,
+              color: appModelTheme?.darkTheme == true ? white : black,
             ),
           ),
         ),
@@ -399,40 +393,49 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                       context,
                                       listen: false)
                                   .setNotifications();
-                              if (PrefObj.preferences!
-                                  .containsKey(PrefKeys.USER_ID)) {
-                                await customerNotificationListBloc
-                                    .notificationListSinck(PrefObj.preferences!
-                                        .get(PrefKeys.USER_ID));
-                                setState(() {});
+                              if (PrefObj.preferences?.containsKey(PrefKeys.USER_ID) == true) {
+                                final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+                                if (userId != null) {
+                                  await customerNotificationListBloc
+                                      .notificationListSinck(userId);
+                                  if (mounted) {
+                                    setState(() {});
+                                  }
+                                }
                               }
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      'Notifications deleted successfully'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Notifications deleted successfully'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              }
                             } else {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Failed to delete notifications'),
+                                    backgroundColor: red,
+                                  ),
+                                );
+                              }
+                            }
+                          } catch (e) {
+                            log('Error deleting notifications: $e');
+                            if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content:
-                                      Text('Failed to delete notifications'),
+                                const SnackBar(
+                                  content: Text('Error occurred'),
                                   backgroundColor: red,
                                 ),
                               );
                             }
-                          } catch (e) {
-                            log('Error deleting notifications: $e');
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Error occurred'),
-                                backgroundColor: red,
-                              ),
-                            );
                           } finally {
                             Loader().hideLoader(context);
-                            Navigator.pop(context);
+                            if (mounted) {
+                              Navigator.pop(context);
+                            }
                           }
                         });
                   });
@@ -442,15 +445,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
           activeColor: logoBlue,
           activeTrackColor: logoBlue.withOpacity(0.3),
           inactiveThumbColor:
-              appModelTheme.darkTheme ? greycolo : Colors.grey[400],
-          inactiveTrackColor: appModelTheme.darkTheme
+              appModelTheme?.darkTheme == true ? greycolo : Colors.grey[400],
+          inactiveTrackColor: appModelTheme?.darkTheme == true
               ? greycolo.withOpacity(0.3)
               : Colors.grey[300],
           value: isSwitch,
           onChanged: (value) {
-            setState(() {
-              isSwitch = value;
-            });
+            if (mounted) {
+              setState(() {
+                isSwitch = value;
+              });
+            }
           },
         )
       ],

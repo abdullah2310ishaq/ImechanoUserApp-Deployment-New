@@ -19,8 +19,14 @@ class Utils {
       var str = title ?? message!.data.toString();
       log('Notification Message : ' + str);
       log('GOT DATA FROM APPROVE JOB CARD ${message?.data}, JOB NO:  ${message?.data['job_number']}');
-      Provider.of<NotificationCountProvider>(Get.context!, listen: false)
-          .setNotifications();
+      
+      // Use the provided context instead of Get.context
+      try {
+        Provider.of<NotificationCountProvider>(context, listen: false)
+            .setNotifications();
+      } catch (e) {
+        log('Failed to update notification count in handleNotificationNavigation: $e');
+      }
       if (str.contains('Invoice is Ready!')) {
         Get.to(() => MyInvoice());
       }
