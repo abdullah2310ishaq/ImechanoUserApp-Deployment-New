@@ -340,7 +340,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
     if (value == null || value.isEmpty) return '';
     try {
       final DateTime parsed = DateTime.parse(value);
-      return DateFormat('hh:mm a, dd-MM-yyyy').format(parsed);
+      return DateFormat('hh:mm a dd-MM-yyyy').format(parsed);
     } catch (_) {
       // Try common alternative patterns
       final patterns = [
@@ -349,14 +349,16 @@ class _MyBookingsPageState extends State<MyBookingsPage>
         'yyyy/MM/dd HH:mm',
         "yyyy-MM-dd'T'HH:mm:ss",
         'dd-MM-yyyy HH:mm:ss',
+        'hh:mm a, dd-MM-yyyy',
       ];
       for (final p in patterns) {
         try {
           final DateTime parsed = DateFormat(p).parse(value);
-          return DateFormat('hh:mm a, dd-MM-yyyy').format(parsed);
+          return DateFormat('hh:mm a dd-MM-yyyy').format(parsed);
         } catch (_) {}
       }
-      return value;
+      // Fallback: remove any comma after time if present
+      return value.replaceAll(', ', ' ');
     }
   }
 
