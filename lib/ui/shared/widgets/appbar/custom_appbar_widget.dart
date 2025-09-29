@@ -1,5 +1,7 @@
 // ignore_for_file: must_be_immutable, unnecessary_brace_in_string_interps
 
+import 'dart:async';
+import 'dart:developer';
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -49,8 +51,11 @@ class _WidgetAppBarState extends State<WidgetAppBar> {
   int count = 1;
   int _lastNotifiedCount = -1;
   bool _isInitialized = false;
+  Timer? _notificationTimer;
 
   final GlobalKey<ScaffoldState> _key = GlobalKey();
+
+  // Removed local timer in favor of one global timer started in main.dart
 
   @override
   Widget build(BuildContext context) {
@@ -207,10 +212,10 @@ class _WidgetAppBarState extends State<WidgetAppBar> {
                                         height: 24.h,
                                       ),
                                     ),
-                                    // Badge pinned to top-right of the icon area
-                                    Positioned(
+                                    // Badge pinned to the logical top-end of the icon area (RTL aware)
+                                    PositionedDirectional(
                                       top: 6,
-                                      right: 8,
+                                      end: 8,
                                       child: badges.Badge(
                                         position: badges.BadgePosition.topEnd(
                                             top: 0, end: 0),

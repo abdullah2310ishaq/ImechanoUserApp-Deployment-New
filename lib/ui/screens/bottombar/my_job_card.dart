@@ -44,6 +44,19 @@ class _MyJobCardState extends State<MyJobCard>
   DateTime toDate =
       DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
+  // Helpers to format server timestamps consistently (local device time)
+  DateTime _toLocal(String raw) {
+    try {
+      final base = raw.contains('.') ? raw.split('.')[0] : raw;
+      return DateTime.parse(base).toLocal();
+    } catch (_) {
+      return DateTime.now();
+    }
+  }
+
+  String _fmtDate(String raw) => DateFormat('dd-MM-yyyy').format(_toLocal(raw));
+  String _fmtTime(String raw) => DateFormat('hh:mm a').format(_toLocal(raw));
+
   Future<DateTime> selectDate(
       BuildContext context, DateTime _date, String type) async {
     final DateTime? picked = await showDatePicker(
@@ -724,12 +737,11 @@ class _MyJobCardState extends State<MyJobCard>
                                                           .data![index]
                                                           .jobDate !=
                                                       null
-                                                  ? DateFormat('dd-MM-yyyy')
-                                                      .format(DateTime.parse(
-                                                          jobcardslistsnapshot
-                                                              .data!
-                                                              .data![index]
-                                                              .jobDate!))
+                                                  ? _fmtDate(
+                                                      jobcardslistsnapshot
+                                                          .data!
+                                                          .data![index]
+                                                          .jobDate!)
                                                   : DateFormat('dd-MM-yyyy')
                                                       .format(DateTime.parse(
                                                           fromdate))),
@@ -741,20 +753,10 @@ class _MyJobCardState extends State<MyJobCard>
                                                           .data![index]
                                                           .dateTime !=
                                                       null
-                                                  ? convertTo12HourFormat(
+                                                  ? _fmtTime(
                                                       jobcardslistsnapshot.data!
                                                           .data![index].dateTime
-                                                          .toString()
-                                                          .substring(
-                                                              10,
-                                                              jobcardslistsnapshot
-                                                                      .data!
-                                                                      .data![
-                                                                          index]
-                                                                      .jobDate
-                                                                      .toString()
-                                                                      .length -
-                                                                  7))
+                                                          .toString())
                                                   : fromTime),
                                           SizedBox(width: 10.w),
                                         ],

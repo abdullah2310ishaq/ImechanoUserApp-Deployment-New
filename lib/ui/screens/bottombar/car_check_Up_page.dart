@@ -272,11 +272,24 @@ class _CarCheckupPageState extends State<CarCheckupPage> {
                       return SimpleDialog(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20)),
-                        title: Center(
-                          child: Text(
-                            "SELECT ANY ONE",
-                            style: TextStyle(fontFamily: "Poppins2"),
-                          ),
+                        titlePadding: EdgeInsets.only(
+                            left: 16, right: 8, top: 12, bottom: 0),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Center(
+                                child: Text(
+                                  "SELECT ANY ONE",
+                                  style: TextStyle(fontFamily: "Poppins2"),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.close),
+                              onPressed: () => Navigator.of(context).pop(),
+                            )
+                          ],
                         ),
                         children: [
                           Row(

@@ -17,6 +17,7 @@ import 'package:imechano/ui/privacy_disp.dart';
 import 'package:imechano/ui/provider/invoice_balance_provider.dart';
 import 'package:imechano/ui/provider/notification_count_provider.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
+import 'package:imechano/ui/services/notification_service.dart';
 import 'package:imechano/ui/screens/my_account/home.dart';
 import 'package:imechano/ui/screens/select_car/view/edit_details_screen.dart';
 import 'package:imechano/ui/share_preferences/pref_key.dart';
@@ -68,10 +69,10 @@ Future<void> main() async {
       statusBarIconBrightness: Brightness.dark));
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  
+
   // Initialize local notifications plugin
   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  
+
   // //===========CRASHLYTICS==========
 
   // // Pass all uncaught "fatal" errors from the framework to Crashlytics
@@ -340,57 +341,69 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
                   ChangeNotifierProvider(
                       create: (_) => InvoiceBalanceProvider())
                 ],
-                child: GetMaterialApp(
-                  title: 'iMechano',
-                  navigatorKey: appNavigatorKey,
-                  locale: appModel.appLocal,
-                  localizationsDelegates: [
-                    AppLocalization.delegate,
-                    GlobalMaterialLocalizations.delegate,
-                    GlobalWidgetsLocalizations.delegate,
-                    GlobalCupertinoLocalizations.delegate,
-                  ],
-                  supportedLocales: [
-                    const Locale('ar'), // Arabic
-                    const Locale('en'), // English
-                  ],
-                  debugShowCheckedModeBanner: false,
-                  home: _dicedeScreen(prefs),
-                  theme:
-                      appModel.darkTheme ? buildDarkTheme() : buildLightTheme(),
-                  // theme: ThemeData(
-                  //   //fontFamily: 'Poppins',
-                  //   primarySwatch: customBlueSwatch,
-                  //   // visualDensity: VisualDensity.adaptivePlatformDensity,
-                  // ),
-                  getPages: [
-                    GetPage(name: '/', page: () => SplashScreen()),
-                    GetPage(name: '/sign-in', page: () => SignInScreen()),
-                    GetPage(name: '/sign-up', page: () => SignUpScreen()),
-                    GetPage(
-                        name: '/on-boarding', page: () => OnBoardingScreen()),
-                    GetPage(
-                        name: '/choose-language',
-                        page: () => LanguageChooseScreen()),
-                    GetPage(
-                        name: '/PrivacyPolicyScreene',
-                        // page: () => PrivacyPolicyScreen()),
-                        page: () =>
-                            PolicyScreen(mdFileName: 'term_privacy.md')),
-                    GetPage(
-                        name: '/EditDetailsScreene',
-                        page: () => EditDetailsScreen(id: '')),
-                    GetPage(
-                      name: '/sign-in-sign-up-landing',
-                      page: () => SignInSignUpLandingScreen(),
-                    ),
-                    GetPage(
-                        name: '/select-your-car',
-                        page: () => SelectYourCarScreen(type: AddCarType.add)),
-                  ],
-                  routes: {
-                    'home': (context) => SignInSignUpLandingScreen(),
-                    'onboard': (context) => SplashScreen(),
+                child: Builder(
+                  builder: (context) {
+                    // Initialize global notification service
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      NotificationService.startGlobalTimer(context);
+                    });
+
+                    return GetMaterialApp(
+                      title: 'iMechano',
+                      navigatorKey: appNavigatorKey,
+                      locale: appModel.appLocal,
+                      localizationsDelegates: [
+                        AppLocalization.delegate,
+                        GlobalMaterialLocalizations.delegate,
+                        GlobalWidgetsLocalizations.delegate,
+                        GlobalCupertinoLocalizations.delegate,
+                      ],
+                      supportedLocales: [
+                        const Locale('ar'), // Arabic
+                        const Locale('en'), // English
+                      ],
+                      debugShowCheckedModeBanner: false,
+                      home: _dicedeScreen(prefs),
+                      theme: appModel.darkTheme
+                          ? buildDarkTheme()
+                          : buildLightTheme(),
+                      // theme: ThemeData(
+                      //   //fontFamily: 'Poppins',
+                      //   primarySwatch: customBlueSwatch,
+                      //   // visualDensity: VisualDensity.adaptivePlatformDensity,
+                      // ),
+                      getPages: [
+                        GetPage(name: '/', page: () => SplashScreen()),
+                        GetPage(name: '/sign-in', page: () => SignInScreen()),
+                        GetPage(name: '/sign-up', page: () => SignUpScreen()),
+                        GetPage(
+                            name: '/on-boarding',
+                            page: () => OnBoardingScreen()),
+                        GetPage(
+                            name: '/choose-language',
+                            page: () => LanguageChooseScreen()),
+                        GetPage(
+                            name: '/PrivacyPolicyScreene',
+                            // page: () => PrivacyPolicyScreen()),
+                            page: () =>
+                                PolicyScreen(mdFileName: 'term_privacy.md')),
+                        GetPage(
+                            name: '/EditDetailsScreene',
+                            page: () => EditDetailsScreen(id: '')),
+                        GetPage(
+                          name: '/sign-in-sign-up-landing',
+                          page: () => SignInSignUpLandingScreen(),
+                        ),
+                        GetPage(
+                            name: '/select-your-car',
+                            page: () =>
+                                SelectYourCarScreen(type: AddCarType.add)),
+                      ],
+                      routes: {
+                        'home': (context) => SignInSignUpLandingScreen(),
+                        'onboard': (context) => SplashScreen(),
+                      },
+                    );
                   },
                 ),
               );

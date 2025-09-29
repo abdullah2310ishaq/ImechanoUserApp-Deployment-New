@@ -990,11 +990,7 @@ class _MySelectionPageState extends State<MySelectionPage>
                   textAlign: TextAlign.center,
                 ),
               ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: white,
-                size: 16,
-              ),
+              // Removed trailing arrow icon as requested
             ],
           ),
         ),

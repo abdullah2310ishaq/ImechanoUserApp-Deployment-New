@@ -13,6 +13,7 @@ import 'package:imechano/ui/shared/widgets/appbar/custom_drawer_widget.dart';
 import 'package:imechano/ui/styling/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imechano/ui/styling/config.dart';
+import 'package:imechano/ui/utils/price_calculator.dart';
 import 'package:provider/provider.dart';
 
 class MyInvoiceTest extends StatefulWidget {
@@ -365,41 +366,45 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
   }
 
   Widget table() {
-    List partno = [
-      '1',
-      '2',
-      '3',
-    ];
+    // Dynamic data from cart or API using PriceCalculator
+    bool hasCartItems = PriceCalculator.hasItems();
+    int cartItemCount = PriceCalculator.getCartItemCount();
 
-    List ptype = [
-      'New Org',
-      'Used Org',
-      'New Org',
-    ];
+    List partno = hasCartItems
+        ? List.generate(cartItemCount, (index) => '${index + 1}')
+        : ['1', '2', '3'];
 
-    List pdesc = [
-      'Break Liner',
-      'Spring Liner',
-      'Ball Joint Curk',
-    ];
+    List ptype = hasCartItems
+        ? ['New Org', 'Used Org', 'New Org'] // Default types
+        : ['New Org', 'Used Org', 'New Org'];
 
-    List qty = [
-      '4',
-      '2',
-      '1',
-    ];
+    List pdesc = hasCartItems
+        ? [
+            'Service Item 1',
+            'Service Item 2',
+            'Service Item 3'
+          ] // Default descriptions
+        : ['Break Liner', 'Spring Liner', 'Ball Joint Curk'];
 
-    List ecost = [
-      '2.000',
-      '1.000',
-      '4.000',
-    ];
+    List qty = hasCartItems
+        ? ['1', '1', '1'] // Default quantity
+        : ['4', '2', '1'];
 
-    List total = [
-      '0.00',
-      '0.00',
-      '0.00',
-    ];
+    List ecost = hasCartItems
+        ? [
+            PriceCalculator.getTotalPrice() / 3,
+            PriceCalculator.getTotalPrice() / 3,
+            PriceCalculator.getTotalPrice() / 3
+          ].map((price) => price.toStringAsFixed(3)).toList()
+        : ['2.000', '1.000', '4.000'];
+
+    List total = hasCartItems
+        ? [
+            PriceCalculator.getTotalPrice() / 3,
+            PriceCalculator.getTotalPrice() / 3,
+            PriceCalculator.getTotalPrice() / 3
+          ].map((price) => price.toStringAsFixed(2)).toList()
+        : ['0.00', '0.00', '0.00'];
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
       scrollDirection: Axis.horizontal,
@@ -529,24 +534,27 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
                       fontSize: 12.sp))),
         ],
         rows: List.generate(2, (index) {
+          // Calculate dynamic labour cost using PriceCalculator
+          double labourCost = PriceCalculator.getLabourCost();
+
           return DataRow(cells: [
             DataCell(
               Center(
                 child: Text(
-                  '1',
-                  style: TextStyle(fontFamily: 'Popp  ins1', fontSize: 11.sp),
+                  '${index + 1}',
+                  style: TextStyle(fontFamily: 'Poppins1', fontSize: 11.sp),
                 ),
               ),
             ),
             DataCell(Center(
               child: Text(
-                'Lorem Ipsum is simply dummy text of the',
+                'Labour Work Description ${index + 1}',
                 style: TextStyle(fontFamily: 'Poppins1', fontSize: 11.sp),
               ),
             )),
             DataCell(Center(
               child: Text(
-                'KWD 2000',
+                'KWD ${labourCost.toStringAsFixed(0)}',
                 style: TextStyle(fontFamily: 'Poppins1', fontSize: 11.sp),
               ),
             )),

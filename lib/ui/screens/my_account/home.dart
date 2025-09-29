@@ -123,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
       } catch (e) {
         log('Failed to initialize notification count in home: $e');
       }
-      
+
       // Avoid double prompts on iOS: request directly via FirebaseMessaging
       if (Platform.isIOS) {
         await FirebaseMessaging.instance.requestPermission(
@@ -149,11 +149,11 @@ class _HomeScreenState extends State<HomeScreen> {
         PrefObj.preferences!.containsKey(PrefKeys.CARNAME) ? true : false;
     categoriesListBloc.categoriesSinck("null");
     oilchnageListBloc.oilChnageSinck('1');
-    
-    // Start periodic notification count refresh
+
+    // Ensure real-time updates via local timer on Home as a backup
     _startNotificationTimer();
   }
-  
+
   void _startNotificationTimer() {
     _notificationTimer?.cancel();
     _notificationTimer = Timer.periodic(Duration(seconds: 5), (timer) {
@@ -430,6 +430,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       height: 5.h,
                                                       width: 1.w,
                                                     ),
+                                              SizedBox(width: 10.w),
                                               checkup.contains(
                                                           enteredKeyword!) ||
                                                       enteredKeyword == ""
@@ -480,7 +481,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       height: 5.h,
                                                       width: 1.w,
                                                     ),
-                                              SizedBox(width: 5.w),
+                                              SizedBox(width: 10.w),
                                               quick.contains(enteredKeyword!) ||
                                                       enteredKeyword == ""
                                                   ? GestureDetector(
@@ -526,7 +527,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       height: 5.h,
                                                       width: 1.w,
                                                     ),
-                                              SizedBox(width: 5.w),
+                                              SizedBox(width: 10.w),
                                               detailing.contains(
                                                           enteredKeyword!) ||
                                                       enteredKeyword == ""
@@ -588,7 +589,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           "No Booking Found")),
                                                 )
                                               ],
-                                              SizedBox(width: 10),
+                                              SizedBox(width: 10.w),
                                             ],
                                           ),
                                         ),
@@ -817,9 +818,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               if (hasNotifications)
-                                Positioned(
+                                PositionedDirectional(
                                   top: 6,
-                                  right: 8,
+                                  end: 8,
                                   child: badges.Badge(
                                     position: badges.BadgePosition.topEnd(
                                         top: 0, end: 0),
@@ -1576,11 +1577,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 8.h,
                         ),
                         Text(
-                          getTranslated(
-                              categoriesSnapshot.data!.data![index + 2]
-                                  .categoryName!.removeAllWhitespace
-                                  .toLowerCase(),
-                              context),
+                          (() {
+                            final String catKey = categoriesSnapshot
+                                .data!
+                                .data![index + 2]
+                                .categoryName!
+                                .removeAllWhitespace
+                                .toLowerCase();
+                            final String title = getTranslated(catKey, context);
+                            return catKey == 'checkbytestdrive'
+                                ? 'Check by\nTest drive'
+                                : title;
+                          })(),
                           style: TextStyle(
                               fontSize: 12.sp, fontFamily: 'Poppins1'),
                           textAlign: TextAlign.center,
@@ -1748,14 +1756,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                     .arrow_forward_ios_outlined,
                                                                 size: 16),
                                                             title: Text(
-                                                                getTranslated(
+                                                              (() {
+                                                                final raw =
                                                                     listSnapshot
                                                                         .data!
                                                                         .data![
                                                                             i]
-                                                                        .name!
-                                                                        .removeAllWhitespace,
-                                                                    context)),
+                                                                        .name!;
+                                                                final key = raw
+                                                                    .trim()
+                                                                    .replaceAll(
+                                                                        ' ', '')
+                                                                    .toLowerCase();
+                                                                final localized =
+                                                                    getTranslated(
+                                                                        key,
+                                                                        context);
+                                                                // If translation returns the key back, show backend text
+                                                                return (localized ==
+                                                                        key)
+                                                                    ? raw.replaceAll(
+                                                                        'BookaTestDrive',
+                                                                        'Book a Test Drive')
+                                                                    : localized;
+                                                              })(),
+                                                            ),
                                                           )),
                                                     );
                                                   },

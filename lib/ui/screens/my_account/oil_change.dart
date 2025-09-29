@@ -95,7 +95,18 @@ class _oil_ChangeState extends State<oil_Change>
     appModelTheme = appModel;
     return Scaffold(
       appBar: WidgetAppBar(
-        title: getTranslated(widget.categoryName.removeAllWhitespace, context),
+        title: (() {
+          final raw = widget.categoryName;
+          final key = raw.trim().replaceAll(' ', '').toLowerCase();
+          final localized = getTranslated(key, context);
+          if (localized == key) {
+            // Fallback: show readable English if backend sent compact text
+            if (raw == 'BookaTestDrive') return 'Book a Test Drive';
+            if (raw == 'CheckbyTestDrive') return 'Check by Test Drive';
+            return raw; // default to backend text
+          }
+          return localized;
+        })(),
         imageicon: 'assets/svg/Arrow_alt_left.svg',
         action: 'assets/svg/shopping-cart.svg',
         action2: 'assets/svg/ball.svg',

@@ -252,6 +252,9 @@ class _MyvehicalscreenState extends State<Myvehicalscreen> {
                             ]),
                         child: Card(
                           elevation: 0,
+                          color: appModelTheme.darkTheme
+                              ? Color(0xff252525)
+                              : Colors.white,
                           child: Padding(
                             padding: const EdgeInsets.only(left: 12, right: 12),
                             child: Column(

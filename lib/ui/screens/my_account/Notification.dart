@@ -37,6 +37,26 @@ class _NotificationScreenState extends State<NotificationScreen> {
   String? errorMessage;
   bool _isDisposed = false;
 
+  DateTime _parseToLocal(String? raw) {
+    try {
+      if (raw == null) return DateTime.now();
+      final trimmed = raw.trim();
+      // Epoch seconds or milliseconds
+      final isNumeric = RegExp(r'^\d{10,13}$').hasMatch(trimmed);
+      if (isNumeric) {
+        final intVal = int.tryParse(trimmed) ?? 0;
+        // Heuristic: 13 digits = ms, 10 = s
+        final millis = trimmed.length >= 13 ? intVal : intVal * 1000;
+        return DateTime.fromMillisecondsSinceEpoch(millis, isUtc: true)
+            .toLocal();
+      }
+      // ISO-8601
+      return DateTime.parse(trimmed).toLocal();
+    } catch (_) {
+      return DateTime.now();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -52,7 +72,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Future<void> _loadNotifications() async {
     if (_isDisposed) return;
-    
+
     try {
       if (mounted) {
         setState(() {
@@ -63,7 +83,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
       await Provider.of<NotificationCountProvider>(context, listen: false)
           .setNotifications();
-      
+
       if (PrefObj.preferences?.containsKey(PrefKeys.USER_ID) == true) {
         final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
         if (userId != null) {
@@ -99,7 +119,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
           home: 'assets/svg/homeicon.svg',
         ),
         drawer: drawerpage(),
-        backgroundColor: appModelTheme?.darkTheme == true ? black : const Color(0xff70bdf1),
+        backgroundColor:
+            appModelTheme?.darkTheme == true ? black : const Color(0xff70bdf1),
         body: ScreenUtilInit(
           designSize: Size(414, 896),
           builder: (context, child) =>
@@ -154,9 +175,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                       Text(
                                         errorMessage!,
                                         style: TextStyle(
-                                          color: appModelTheme?.darkTheme == true
-                                              ? white
-                                              : black,
+                                          color:
+                                              appModelTheme?.darkTheme == true
+                                                  ? white
+                                                  : black,
                                           fontSize: 14,
                                         ),
                                         textAlign: TextAlign.center,
@@ -189,9 +211,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                       Text(
                                         'Error loading notifications',
                                         style: TextStyle(
-                                          color: appModelTheme?.darkTheme == true
-                                              ? white
-                                              : black,
+                                          color:
+                                              appModelTheme?.darkTheme == true
+                                                  ? white
+                                                  : black,
                                           fontSize: 14,
                                         ),
                                         textAlign: TextAlign.center,
@@ -212,7 +235,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
                               if (!notificationListSnapshot.hasData ||
                                   notificationListSnapshot.data?.data == null ||
-                                  notificationListSnapshot.data!.data!.isEmpty) {
+                                  notificationListSnapshot
+                                      .data!.data!.isEmpty) {
                                 return Center(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -228,9 +252,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                       Text(
                                         'No notifications yet',
                                         style: TextStyle(
-                                          color: appModelTheme?.darkTheme == true
-                                              ? white
-                                              : black,
+                                          color:
+                                              appModelTheme?.darkTheme == true
+                                                  ? white
+                                                  : black,
                                           fontSize: 16,
                                         ),
                                       ),
@@ -254,9 +279,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   );
                                 },
                                 itemBuilder: (context, index) {
-                                  final notification = notificationListSnapshot.data!.data![index];
+                                  final notification = notificationListSnapshot
+                                      .data!.data![index];
                                   final isRead = notification.status == '1';
-                                  
+
                                   return Container(
                                     color: appModelTheme?.darkTheme == true
                                         ? (isRead
@@ -272,7 +298,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                           if (!isRead) {
                                             bool response =
                                                 await NotificationApi
-                                                    .updateNotificationStatus(notification);
+                                                    .updateNotificationStatus(
+                                                        notification);
                                             log('Notification status updated: $response');
                                           }
 
@@ -286,7 +313,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               SnackBar(
-                                                content: const Text('Error occurred'),
+                                                content: const Text(
+                                                    'Error occurred'),
                                                 backgroundColor: red,
                                               ),
                                             );
@@ -303,7 +331,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                               style: TextStyle(
                                                   fontSize: 11,
                                                   fontFamily: 'Poppins3',
-                                                  color: appModelTheme?.darkTheme == true
+                                                  color: appModelTheme
+                                                              ?.darkTheme ==
+                                                          true
                                                       ? white
                                                       : black,
                                                   fontWeight: FontWeight.w600),
@@ -311,14 +341,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                           ),
                                           Text(
                                             DateFormat('hh:mm a dd-MM-yy')
-                                                .format(DateTime.parse(
-                                                    notification.updatedAt ?? DateTime.now().toIso8601String())),
+                                                .format(_parseToLocal(
+                                                    notification.updatedAt)),
                                             style: TextStyle(
                                                 fontSize: 10,
                                                 fontFamily: 'Poppins3',
-                                                color: appModelTheme?.darkTheme == true
-                                                    ? Colors.grey[300]
-                                                    : Colors.grey[600]),
+                                                color:
+                                                    appModelTheme?.darkTheme ==
+                                                            true
+                                                        ? Colors.grey[300]
+                                                        : Colors.grey[600]),
                                           ),
                                         ],
                                       ),
@@ -327,9 +359,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                             notification.message ?? '',
                                             context),
                                         style: TextStyle(
-                                          color: appModelTheme?.darkTheme == true
-                                              ? Colors.grey[200]
-                                              : Colors.grey[700],
+                                          color:
+                                              appModelTheme?.darkTheme == true
+                                                  ? Colors.grey[200]
+                                                  : Colors.grey[700],
                                           fontSize: 12,
                                         ),
                                       ),
@@ -393,8 +426,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                       context,
                                       listen: false)
                                   .setNotifications();
-                              if (PrefObj.preferences?.containsKey(PrefKeys.USER_ID) == true) {
-                                final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+                              if (PrefObj.preferences
+                                      ?.containsKey(PrefKeys.USER_ID) ==
+                                  true) {
+                                final userId =
+                                    PrefObj.preferences!.get(PrefKeys.USER_ID);
                                 if (userId != null) {
                                   await customerNotificationListBloc
                                       .notificationListSinck(userId);
@@ -406,7 +442,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Notifications deleted successfully'),
+                                    content: Text(
+                                        'Notifications deleted successfully'),
                                     backgroundColor: Colors.green,
                                   ),
                                 );
@@ -415,7 +452,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Failed to delete notifications'),
+                                    content:
+                                        Text('Failed to delete notifications'),
                                     backgroundColor: red,
                                   ),
                                 );

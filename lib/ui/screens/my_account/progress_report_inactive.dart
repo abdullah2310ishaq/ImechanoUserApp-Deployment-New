@@ -4,6 +4,7 @@ import 'package:imechano/ui/provider/theme_provider.dart';
 import 'package:imechano/ui/shared/widgets/appbar/custom_appbar_widget.dart';
 import 'package:imechano/ui/shared/widgets/appbar/custom_drawer_widget.dart';
 import 'package:imechano/ui/styling/colors.dart';
+import 'package:imechano/ui/utils/price_calculator.dart';
 import 'package:provider/provider.dart';
 
 class ProgressreportInactive extends StatefulWidget {
@@ -15,6 +16,9 @@ class ProgressreportInactive extends StatefulWidget {
 
 class _ProgressreportInactiveState extends State<ProgressreportInactive> {
   dynamic appModelTheme;
+
+  // Dynamic price calculation using PriceCalculator
+  double get _servicePrice => PriceCalculator.getTotalPrice();
 
   @override
   Widget build(BuildContext context) {
@@ -246,7 +250,7 @@ class _ProgressreportInactiveState extends State<ProgressreportInactive> {
                                         ],
                                       ),
                                       Text(
-                                        "KDW 4.000",
+                                        "KDW ${_servicePrice.toStringAsFixed(3)}",
                                         style: TextStyle(
                                             fontFamily: "Poppins4",
                                             fontSize: 14.sp,

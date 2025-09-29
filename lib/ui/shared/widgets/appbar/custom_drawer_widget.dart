@@ -341,10 +341,15 @@ class _drawerpageState extends State<drawerpage> {
                               },
                               child: index == changeLangIndex
                                   ? ListTile(
+                                      tileColor: appModelTheme.darkTheme
+                                          ? null
+                                          : Colors.white,
                                       trailing: Switch(
                                         value: langSwitch,
-                                        activeColor: Colors.black,
+                                        activeColor: logoBlue,
+                                        inactiveThumbColor: logoBlue,
                                         activeTrackColor: Color(0xFF9AF3EE),
+                                        inactiveTrackColor: Colors.white10,
                                         onChanged: (value) {
                                           setState(() {
                                             if (langSwitch) {
@@ -387,6 +392,9 @@ class _drawerpageState extends State<drawerpage> {
                                       ),
                                     )
                                   : ListTile(
+                                      tileColor: appModelTheme.darkTheme
+                                          ? null
+                                          : Colors.white,
                                       trailing: (index == darkThemeIndex)
                                           ? switchButton()
                                           : Text(""),
@@ -455,8 +463,10 @@ class _drawerpageState extends State<drawerpage> {
   Widget switchButton() {
     return Switch(
       value: appModelTheme.darkTheme,
-      activeColor: Colors.black,
+      activeColor: logoBlue,
+      inactiveThumbColor: logoBlue,
       activeTrackColor: Color(0xFF9AF3EE),
+      inactiveTrackColor: Colors.white10,
       onChanged: (value) {
         setState(() {
           appModelTheme.darkTheme = !appModelTheme.darkTheme;

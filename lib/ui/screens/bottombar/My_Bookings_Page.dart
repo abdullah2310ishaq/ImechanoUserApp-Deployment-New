@@ -895,11 +895,12 @@ class _MyBookingsPageState extends State<MyBookingsPage>
           ),
           SizedBox(height: 10),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         'Booking Time',
@@ -907,6 +908,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                           fontSize: 10,
                           fontFamily: 'Poppins1',
                         ),
+                        textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 2),
                       Text(
@@ -915,18 +917,19 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                           fontSize: 10,
                           fontFamily: 'Poppins1',
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ]),
               ),
               Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8),
+                  margin: EdgeInsets.symmetric(horizontal: 12),
                   color:
                       appModelTheme.darkTheme ? Colors.white70 : Colors.black45,
-                  height: 28,
+                  height: 32,
                   width: 1),
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       'Appointment Time',
@@ -934,6 +937,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                         fontSize: 10,
                         fontFamily: 'Poppins1',
                       ),
+                      textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 2),
                     Text(
@@ -942,6 +946,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                         fontSize: 10,
                         fontFamily: 'Poppins1',
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),

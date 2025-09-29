@@ -118,6 +118,11 @@
     "Viewselections": "View selections",
     "otherservices":"Other Services",
     "checkbytestdrive": "Check by Test Drive",
+    "bookatestdrive": "Book a Test Drive",
+    "bookaride": "Book a Ride",
+    "checkbytestdrive_title": "Check by Test Drive",
+    "checkbytestdrive_cta": "Book a Test Drive",
+    "checkbytestdrive_desc": "Schedule a test drive to diagnose issues.",
     "Pleaseselectacartoproceed": "Please select a car to proceed",
     "MultipleServicesSelectios": "Multiple Services Selection",
     "close": "Close",
@@ -631,8 +636,8 @@
     "faqa3": "Typically, they do not need a replacement for at least 60,000 miles under normal driving conditions. Replacing worn belts reduces the chance of breakdowns, and the chance of damage to other components when they break and insures that all belt-driven components operate normally. Replacing worn hoses reduces the chance of failure that could cause engine overheating, and allows for testing of the coolant.",
 
 
-    "JobCarduploded":"Job Card uploded",
-    "JobCarduplodedbyiMechano":"Job Card uploded by iMechano",
+    "JobCarduploded":"Job Card Uploaded",
+    "JobCarduplodedbyiMechano":"Job Card Uploaded by iMechano",
     "AcceptBooking":"Accept Booking",
     "YourbookinghasbeenacceptedbyiMechano":"Your booking has been accepted by iMechano",
     "RejectBooking":"Reject Booking",
@@ -643,7 +648,7 @@
 
 
     "TaskCompleted":"Task Completed",
-    "taskCompletedbyiMechano":"task Completed by iMechano",
+    "taskCompletedbyiMechano":"Task Completed by iMechano",
     
     "DeliveryRequest":"Delivery Request",
     "DeliveryRequestsentbyiMechano":"Delivery Request sent by iMechano"

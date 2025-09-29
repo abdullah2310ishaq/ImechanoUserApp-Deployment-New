@@ -88,6 +88,20 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
   String servicesTotal = '0.00';
   String partsTotal = '0.00';
 
+  // Helpers for local time formatting
+  DateTime _toLocal(String raw) {
+    try {
+      final base = raw.contains('.') ? raw.split('.')[0] : raw;
+      return DateTime.parse(base).toLocal();
+    } catch (_) {
+      return DateTime.now();
+    }
+  }
+
+  String _fmtDate(String raw) => DateFormat('dd-MM-yyyy').format(_toLocal(raw));
+  String _fmtDateTime(String raw) =>
+      DateFormat('dd-MM-yyyy hh:mm:ss a').format(_toLocal(raw));
+
   @override
   void initState() {
     super.initState();
@@ -214,10 +228,8 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                         title: getTranslated(
                                             'jobnumber', context)),
                                     LabelListTile(
-                                        subtitle: DateFormat('dd-MM-yyyy')
-                                            .format(DateTime.parse(
-                                                custjoblistSnapshot
-                                                    .data!.data![0].dateTime!)),
+                                        subtitle: _fmtDate(custjoblistSnapshot
+                                            .data!.data![0].dateTime!),
                                         title:
                                             '${getTranslated('JobCard', context)} ${getTranslated('date', context)}'),
                                   ],
@@ -304,12 +316,9 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                         MainAxisAlignment.spaceAround,
                                     children: [
                                       LabelListTile(
-                                        subtitle:
-                                            DateFormat('dd-MM-yyyy HH:mm:ss')
-                                                .format(DateTime.parse(
-                                                    custjoblistSnapshot.data!
-                                                        .data![0].dateTime!
-                                                        .split('.')[0])),
+                                        subtitle: _fmtDateTime(
+                                            custjoblistSnapshot
+                                                .data!.data![0].dateTime!),
                                         title:
                                             '${getTranslated('JobCard', context)} ${getTranslated('date', context)} ${getTranslated('time', context)}',
                                         widthFactor: 0.87,
@@ -479,10 +488,11 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                                 getTranslated('cancelledat',
                                                         context) +
                                                     ' : ' +
-                                                    custjoblistSnapshot
-                                                        .data!.data![0].dateTime
-                                                        .toString()
-                                                        .substring(0, 19),
+                                                    _fmtDateTime(
+                                                        custjoblistSnapshot
+                                                            .data!
+                                                            .data![0]
+                                                            .dateTime!),
                                                 style: TextStyle(
                                                     fontFamily: "Poppins1",
                                                     fontSize: 15,
@@ -495,16 +505,11 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                                 getTranslated(
                                                         'paidat', context) +
                                                     ' : ' +
-                                                    DateFormat(
-                                                            'dd-MM-yyyy HH:mm:ss')
-                                                        .format(DateTime.parse(
-                                                            custjoblistSnapshot
-                                                                .data!
-                                                                .data![0]
-                                                                .dateTime!
-                                                                .toString()
-                                                                .substring(
-                                                                    0, 19))),
+                                                    _fmtDateTime(
+                                                        custjoblistSnapshot
+                                                            .data!
+                                                            .data![0]
+                                                            .dateTime!),
                                                 style: TextStyle(
                                                     fontFamily: "Poppins1",
                                                     fontSize: 15,

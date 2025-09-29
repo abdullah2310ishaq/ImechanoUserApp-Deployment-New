@@ -14,6 +14,7 @@ import 'package:imechano/ui/repository/repository.dart';
 import 'package:imechano/ui/screens/bottombar/bottom_bar.dart';
 import 'package:imechano/ui/shared/widgets/appbar/custom_appbar_widget.dart';
 import 'package:imechano/ui/shared/widgets/appbar/custom_drawer_widget.dart';
+import 'package:imechano/ui/utils/price_calculator.dart';
 
 import 'package:imechano/ui/styling/colors.dart';
 import 'package:imechano/ui/styling/global.dart';

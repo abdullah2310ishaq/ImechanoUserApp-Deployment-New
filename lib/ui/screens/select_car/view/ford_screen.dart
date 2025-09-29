@@ -643,6 +643,11 @@ class _FordScreenState extends State<FordScreen> {
                         LengthLimitingTextInputFormatter(7),
                       ],
                       keyboardType: TextInputType.number,
+                      cursorColor:
+                          appModelTheme.darkTheme ? Colors.white : Colors.black,
+                      style: TextStyle(
+                          color:
+                              appModelTheme.darkTheme ? white : Colors.black),
                       decoration: InputDecoration(
                           prefixIcon: Padding(
                             padding:
@@ -717,6 +722,11 @@ class _FordScreenState extends State<FordScreen> {
                         LengthLimitingTextInputFormatter(6),
                       ],
                       keyboardType: TextInputType.number,
+                      cursorColor:
+                          appModelTheme.darkTheme ? Colors.white : Colors.black,
+                      style: TextStyle(
+                          color:
+                              appModelTheme.darkTheme ? white : Colors.black),
                       decoration: InputDecoration(
                           prefixIcon: Padding(
                             padding:
@@ -755,10 +765,15 @@ class _FordScreenState extends State<FordScreen> {
                       inputFormatters: [
                         LengthLimitingTextInputFormatter(15),
                       ],
+                      cursorColor:
+                          appModelTheme.darkTheme ? Colors.white : Colors.black,
+                      style: TextStyle(
+                          color:
+                              appModelTheme.darkTheme ? white : Colors.black),
                       decoration: InputDecoration(
                           prefixIcon: Padding(
                             padding:
-                                const EdgeInsets.only(left: 18.0, right: 18),
+                                const EdgeInsets.only(left: 20.0, right: 20),
                             child: Icon(
                               Icons.numbers,
                               color: Colors.blueAccent,
