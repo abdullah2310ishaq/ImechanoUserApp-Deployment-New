@@ -335,7 +335,8 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
         final meta = _extractNotificationMeta(message);
         final title = meta['title'];
         final jobNo = meta['jobNo'];
-        Utils.handleNotificationNavigation(context, null, title, jobNo);
+        final navCtx = Get.context ?? context;
+        Utils.handleNotificationNavigation(navCtx, null, title, jobNo);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           try {
             _refreshDomainData(message);

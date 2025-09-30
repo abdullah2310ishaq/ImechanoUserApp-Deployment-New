@@ -141,7 +141,7 @@ class Utils {
     // Immediate refresh
     Future.delayed(const Duration(milliseconds: 150), refreshOnce);
     // Follow-up refresh to catch backend state propagation
-    Future.delayed(const Duration(seconds: 1), refreshOnce);
+    Future.delayed(const Duration(seconds: 2), refreshOnce);
   }
 
   static void showToast(String msg) {
