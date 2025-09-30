@@ -3,6 +3,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -59,12 +61,33 @@ class _MyBookingsPageState extends State<MyBookingsPage>
   String search = "";
   dynamic appModelTheme;
   TabController? _tabController;
+  Stream<RemoteMessage>? _fcmStream;
+  StreamSubscription<RemoteMessage>? _fcmSub;
 
   var formatter = new DateFormat('dd-MM-yyyy');
   DateTime fromDate = DateTime(2023, 01, 01);
   DateTime toDate =
       DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   final _repository = Repository();
+
+  String _formatToDdMMyyyyAmPm(String? input) {
+    try {
+      if (input == null || input.isEmpty) return '';
+      // Try parse common formats
+      DateTime dt;
+      try {
+        dt = DateTime.parse(input);
+      } catch (_) {
+        // Fallback: replace '/' with '-' then try again
+        dt = DateTime.parse(input.replaceAll('/', '-'));
+      }
+      final dateStr = DateFormat('dd-MM-yyyy').format(dt);
+      final timeStr = DateFormat('hh:mm a').format(dt);
+      return '$dateStr | $timeStr';
+    } catch (_) {
+      return input ?? '';
+    }
+  }
 
 // Filters
 
@@ -156,10 +179,54 @@ class _MyBookingsPageState extends State<MyBookingsPage>
         selectTab = currentBookingTab;
       });
     }
+
+    // Listen to foreground FCM and live-refresh Approved tab on pickup/accept
+    _fcmStream = FirebaseMessaging.onMessage;
+    _fcmSub = _fcmStream?.listen((RemoteMessage message) async {
+      try {
+        final data = message.data;
+        final type =
+            (data['type'] ?? data['action'] ?? '').toString().toLowerCase();
+        final title = (message.notification?.title ?? data['title'] ?? '')
+            .toString()
+            .toLowerCase();
+        final body = (message.notification?.body ?? data['body'] ?? '')
+            .toString()
+            .toLowerCase();
+        final text = '$title $body';
+
+        final isPickup = type == 'pickup_request' ||
+            text.contains('pickup confirmation request') ||
+            (text.contains('pickup') &&
+                (text.contains('confirm') || text.contains('request')));
+        final isAccepted = type == 'accept_booking' ||
+            type == 'booking_accepted' ||
+            text.contains('accept booking');
+
+        if (isPickup || isAccepted) {
+          currentBookingTab = 3;
+          _tabController?.animateTo(3);
+          if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+            final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+            if (userId != null) {
+              // Two passes: immediate and 1s later for backend propagation
+              bookingListbloc.bookinglistsink(userId, '3');
+              Future.delayed(const Duration(seconds: 1), () {
+                bookingListbloc.bookinglistsink(userId, '3');
+                setState(() {});
+              });
+              setState(() {});
+            }
+          }
+        }
+      } catch (_) {}
+    });
   }
 
   @override
   void dispose() {
+    _fcmSub?.cancel();
+    _fcmSub = null;
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -271,6 +338,12 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                       style: ButtonStyle(
                           backgroundColor:
                               WidgetStateProperty.all<Color>(white),
+                          surfaceTintColor:
+                              WidgetStateProperty.all<Color>(Colors.white),
+                          overlayColor: WidgetStateProperty.resolveWith(
+                              (states) => Colors.transparent),
+                          shadowColor: WidgetStateProperty.all<Color>(
+                              Colors.transparent),
                           elevation: WidgetStateProperty.all<double>(0),
                           shape:
                               WidgetStateProperty.all<RoundedRectangleBorder>(
@@ -896,64 +969,107 @@ class _MyBookingsPageState extends State<MyBookingsPage>
             ),
           ),
           SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Column(
+          IntrinsicHeight(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Booking',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontFamily: 'Poppins1',
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                        ),
+                        SizedBox(height: 2),
+                        Builder(builder: (context) {
+                          final display =
+                              _formatToDdMMyyyyAmPm(data.bookingTime);
+                          final parts = display.split(' | ');
+                          return Column(
+                            children: [
+                              Text(
+                                parts.isNotEmpty ? parts[0] : display,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontFamily: 'Poppins1',
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              if (parts.length > 1)
+                                Text(
+                                  parts[1],
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontFamily: 'Poppins1',
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                            ],
+                          );
+                        }),
+                      ]),
+                ),
+                VerticalDivider(
+                  width: 24,
+                  thickness: 1,
+                  color:
+                      appModelTheme.darkTheme ? Colors.white70 : Colors.black45,
+                ),
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'Booking Time',
+                        'Appointment',
                         style: TextStyle(
                           fontSize: 10,
                           fontFamily: 'Poppins1',
                         ),
                         textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
                       ),
                       SizedBox(height: 2),
-                      Text(
-                        formatTo12hWithDMY(data.bookingTime),
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontFamily: 'Poppins1',
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ]),
-              ),
-              Container(
-                  margin: EdgeInsets.symmetric(horizontal: 12),
-                  color:
-                      appModelTheme.darkTheme ? Colors.white70 : Colors.black45,
-                  height: 32,
-                  width: 1),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Appointment Time',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontFamily: 'Poppins1',
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      formatTo12hWithDMY(data.timeDate),
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontFamily: 'Poppins1',
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              )
-            ],
+                      Builder(builder: (context) {
+                        final display = _formatToDdMMyyyyAmPm(data.timeDate);
+                        final parts = display.split(' | ');
+                        return Column(
+                          children: [
+                            Text(
+                              parts.isNotEmpty ? parts[0] : display,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontFamily: 'Poppins1',
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            if (parts.length > 1)
+                              Text(
+                                parts[1],
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontFamily: 'Poppins1',
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                          ],
+                        );
+                      }),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ],
       ),

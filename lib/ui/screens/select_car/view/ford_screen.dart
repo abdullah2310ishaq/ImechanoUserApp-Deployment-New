@@ -425,51 +425,68 @@ class _FordScreenState extends State<FordScreen> {
                             padding: const EdgeInsets.only(
                                 left: 15.0, right: 15, bottom: 12),
                             child: SingleChildScrollView(
-                              child: ExpansionTileCard(
-                                expandedTextColor: Colors.black,
-                                shadowColor: Colors.white,
-                                key: cardAB,
-                                onExpansionChanged: (value) {
-                                  setState(() {
-                                    print(value);
-                                    isExpanded = value;
-                                  });
-                                },
-                                children: [
-                                  ListView.builder(
-                                    // padding: EdgeInsets.zero,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    scrollDirection: Axis.vertical,
-                                    shrinkWrap: true,
-                                    itemCount:
-                                        brandsnapshort.data!.data!.length,
-                                    itemBuilder: (context, index) {
-                                      return ListTile(
-                                        title: Text(brandsnapshort
-                                            .data!.data![index].model!),
-                                        onTap: () {
-                                          log('back from ford screen 481');
-                                          cardAB.currentState?.collapse();
-                                          setState(() {
-                                            modelNameTile = brandsnapshort
-                                                .data!.data![index].model!;
-                                            carImage = brandsnapshort
-                                                .data!.data![index].image!;
-                                            isExpanded = false;
-                                          });
-                                        },
-                                      );
-                                    },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: appModelTheme.darkTheme
+                                      ? Colors.transparent
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: appModelTheme.darkTheme
+                                        ? Colors.grey[600]!
+                                        : Colors.grey[300]!,
+                                    width: 1,
                                   ),
-                                ],
-                                title: Text(
-                                  modelNameTile,
-                                  style: TextStyle(fontFamily: "Montserrat1"),
                                 ),
-                                leading: Icon(
-                                  Icons.car_rental_sharp,
-                                  color: Colors.blueAccent,
-                                  size: 30,
+                                child: ExpansionTileCard(
+                                  expandedTextColor: Colors.black,
+                                  shadowColor: Colors.white,
+                                  baseColor: appModelTheme.darkTheme
+                                      ? Colors.transparent
+                                      : Colors.white,
+                                  key: cardAB,
+                                  onExpansionChanged: (value) {
+                                    setState(() {
+                                      print(value);
+                                      isExpanded = value;
+                                    });
+                                  },
+                                  children: [
+                                    ListView.builder(
+                                      // padding: EdgeInsets.zero,
+                                      physics: NeverScrollableScrollPhysics(),
+                                      scrollDirection: Axis.vertical,
+                                      shrinkWrap: true,
+                                      itemCount:
+                                          brandsnapshort.data!.data!.length,
+                                      itemBuilder: (context, index) {
+                                        return ListTile(
+                                          title: Text(brandsnapshort
+                                              .data!.data![index].model!),
+                                          onTap: () {
+                                            log('back from ford screen 481');
+                                            cardAB.currentState?.collapse();
+                                            setState(() {
+                                              modelNameTile = brandsnapshort
+                                                  .data!.data![index].model!;
+                                              carImage = brandsnapshort
+                                                  .data!.data![index].image!;
+                                              isExpanded = false;
+                                            });
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                  title: Text(
+                                    modelNameTile,
+                                    style: TextStyle(fontFamily: "Montserrat1"),
+                                  ),
+                                  leading: Icon(
+                                    Icons.car_rental_sharp,
+                                    color: Colors.blueAccent,
+                                    size: 30,
+                                  ),
                                 ),
                               ),
                             ),
@@ -562,66 +579,83 @@ class _FordScreenState extends State<FordScreen> {
                   Padding(
                     padding: const EdgeInsets.only(
                         left: 15.0, right: 15, bottom: 12),
-                    child: ExpansionTileCard(
-                      expandedTextColor: Colors.black,
-                      shadowColor: Colors.white,
-                      key: cardB,
-                      onExpansionChanged: (value) {
-                        setState(() {
-                          print(value);
-                          isExpanded = value;
-                        });
-                      },
-                      children: [
-                        new ListTile(
-                          title: const Text('v2'),
-                          onTap: () {
-                            log('back from ford screen 481');
-                            cardB.currentState?.collapse();
-                            setState(() {
-                              this.CylinerTypeTile = 'v2';
-                              //  expansionTile.currentState.collapse();
-                              isExpanded = false;
-                            });
-                          },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: appModelTheme.darkTheme
+                            ? Colors.transparent
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: appModelTheme.darkTheme
+                              ? Colors.grey[600]!
+                              : Colors.grey[300]!,
+                          width: 1,
                         ),
-                        new ListTile(
-                          title: const Text('v4'),
-                          onTap: () {
-                            log('back from ford screen 493');
-                            cardB.currentState?.collapse();
-                            setState(() {
-                              this.CylinerTypeTile = 'v4';
-                            });
-                          },
-                        ),
-                        new ListTile(
-                          title: const Text('v6'),
-                          onTap: () {
-                            cardB.currentState?.collapse();
-                            setState(() {
-                              this.CylinerTypeTile = 'v6';
-                            });
-                          },
-                        ),
-                        new ListTile(
-                          title: const Text('v8'),
-                          onTap: () {
-                            cardB.currentState?.collapse();
-                            setState(() {
-                              this.CylinerTypeTile = 'v8';
-                            });
-                          },
-                        ),
-                      ],
-                      title: Text(
-                        CylinerTypeTile,
-                        style: TextStyle(fontFamily: "Montserrat1"),
                       ),
-                      leading: Icon(
-                        Icons.car_repair,
-                        color: Colors.blueAccent,
-                        size: 30.h,
+                      child: ExpansionTileCard(
+                        expandedTextColor: Colors.black,
+                        shadowColor: Colors.white,
+                        baseColor: appModelTheme.darkTheme
+                            ? Colors.transparent
+                            : Colors.white,
+                        key: cardB,
+                        onExpansionChanged: (value) {
+                          setState(() {
+                            print(value);
+                            isExpanded = value;
+                          });
+                        },
+                        children: [
+                          new ListTile(
+                            title: const Text('v2'),
+                            onTap: () {
+                              log('back from ford screen 481');
+                              cardB.currentState?.collapse();
+                              setState(() {
+                                this.CylinerTypeTile = 'v2';
+                                //  expansionTile.currentState.collapse();
+                                isExpanded = false;
+                              });
+                            },
+                          ),
+                          new ListTile(
+                            title: const Text('v4'),
+                            onTap: () {
+                              log('back from ford screen 493');
+                              cardB.currentState?.collapse();
+                              setState(() {
+                                this.CylinerTypeTile = 'v4';
+                              });
+                            },
+                          ),
+                          new ListTile(
+                            title: const Text('v6'),
+                            onTap: () {
+                              cardB.currentState?.collapse();
+                              setState(() {
+                                this.CylinerTypeTile = 'v6';
+                              });
+                            },
+                          ),
+                          new ListTile(
+                            title: const Text('v8'),
+                            onTap: () {
+                              cardB.currentState?.collapse();
+                              setState(() {
+                                this.CylinerTypeTile = 'v8';
+                              });
+                            },
+                          ),
+                        ],
+                        title: Text(
+                          CylinerTypeTile,
+                          style: TextStyle(fontFamily: "Montserrat1"),
+                        ),
+                        leading: Icon(
+                          Icons.car_repair,
+                          color: Colors.blueAccent,
+                          size: 30.h,
+                        ),
                       ),
                     ),
                   ),
@@ -629,10 +663,16 @@ class _FordScreenState extends State<FordScreen> {
                     margin: EdgeInsets.only(left: 15, right: 15),
                     padding: EdgeInsets.only(bottom: 7, top: 7),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(8),
                       color: appModelTheme.darkTheme
                           ? darkmodeColor
-                          : Color(0XFFF8F8F8),
+                          : Colors.white,
+                      border: Border.all(
+                        color: appModelTheme.darkTheme
+                            ? Colors.grey[600]!
+                            : Colors.grey[300]!,
+                        width: 1,
+                      ),
                     ),
                     child: TextFormField(
                       controller: mileageController,
@@ -669,38 +709,55 @@ class _FordScreenState extends State<FordScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(12.0),
-                    child: ExpansionTileCard(
-                      key: cardC,
-                      expandedTextColor: Colors.black,
-                      shadowColor: Colors.white,
-                      onExpansionChanged: (value) {
-                        setState(() {
-                          print(value);
-                          isExpanded = value;
-                        });
-                      },
-                      children: [
-                        modelYearListTile('1990-1992'),
-                        modelYearListTile('1993-1995'),
-                        modelYearListTile('1996-1998'),
-                        modelYearListTile('1999-2001'),
-                        modelYearListTile('2002-2004'),
-                        modelYearListTile('2005-2007'),
-                        modelYearListTile('2008-2010'),
-                        modelYearListTile('2011-2013'),
-                        modelYearListTile('2014-2016'),
-                        modelYearListTile('2017-2019'),
-                        modelYearListTile('2020-2022'),
-                        modelYearListTile('2023+'),
-                      ],
-                      title: Text(
-                        SelectCarYar,
-                        style: TextStyle(fontFamily: "Montserrat1"),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: appModelTheme.darkTheme
+                            ? Colors.transparent
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: appModelTheme.darkTheme
+                              ? Colors.grey[600]!
+                              : Colors.grey[300]!,
+                          width: 1,
+                        ),
                       ),
-                      leading: Icon(
-                        Icons.directions_car,
-                        color: Colors.blueAccent,
-                        size: 30.h,
+                      child: ExpansionTileCard(
+                        key: cardC,
+                        expandedTextColor: Colors.black,
+                        shadowColor: Colors.white,
+                        baseColor: appModelTheme.darkTheme
+                            ? Colors.transparent
+                            : Colors.white,
+                        onExpansionChanged: (value) {
+                          setState(() {
+                            print(value);
+                            isExpanded = value;
+                          });
+                        },
+                        children: [
+                          modelYearListTile('1990-1992'),
+                          modelYearListTile('1993-1995'),
+                          modelYearListTile('1996-1998'),
+                          modelYearListTile('1999-2001'),
+                          modelYearListTile('2002-2004'),
+                          modelYearListTile('2005-2007'),
+                          modelYearListTile('2008-2010'),
+                          modelYearListTile('2011-2013'),
+                          modelYearListTile('2014-2016'),
+                          modelYearListTile('2017-2019'),
+                          modelYearListTile('2020-2022'),
+                          modelYearListTile('2023+'),
+                        ],
+                        title: Text(
+                          SelectCarYar,
+                          style: TextStyle(fontFamily: "Montserrat1"),
+                        ),
+                        leading: Icon(
+                          Icons.directions_car,
+                          color: Colors.blueAccent,
+                          size: 30.h,
+                        ),
                       ),
                     ),
                   ),
@@ -708,10 +765,16 @@ class _FordScreenState extends State<FordScreen> {
                     padding: EdgeInsets.only(bottom: 7, top: 7),
                     margin: EdgeInsets.only(left: 15, right: 15),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(8),
                       color: appModelTheme.darkTheme
                           ? darkmodeColor
-                          : Color(0XFFF8F8F8),
+                          : Colors.white,
+                      border: Border.all(
+                        color: appModelTheme.darkTheme
+                            ? Colors.grey[600]!
+                            : Colors.grey[300]!,
+                        width: 1,
+                      ),
                     ),
                     child: TextFormField(
                       controller: PlatenumberControler,
@@ -753,10 +816,16 @@ class _FordScreenState extends State<FordScreen> {
                     padding: EdgeInsets.only(bottom: 7, top: 7),
                     margin: EdgeInsets.only(left: 15, right: 15),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(8),
                       color: appModelTheme.darkTheme
                           ? darkmodeColor
-                          : Color(0XFFF8F8F8),
+                          : Colors.white,
+                      border: Border.all(
+                        color: appModelTheme.darkTheme
+                            ? Colors.grey[600]!
+                            : Colors.grey[300]!,
+                        width: 1,
+                      ),
                     ),
                     child: TextFormField(
                       controller: ChesesNumberControler,

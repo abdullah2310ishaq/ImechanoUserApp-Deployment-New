@@ -269,6 +269,12 @@ class _MyJobCardState extends State<MyJobCard>
                         style: ButtonStyle(
                             backgroundColor:
                                 WidgetStateProperty.all<Color>(white),
+                            surfaceTintColor:
+                                WidgetStateProperty.all<Color>(Colors.white),
+                            overlayColor: WidgetStateProperty.resolveWith(
+                                (states) => Colors.transparent),
+                            shadowColor: WidgetStateProperty.all<Color>(
+                                Colors.transparent),
                             elevation: WidgetStateProperty.all<double>(0),
                             shape:
                                 WidgetStateProperty.all<RoundedRectangleBorder>(

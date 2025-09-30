@@ -185,6 +185,7 @@ class _drawerpageState extends State<drawerpage> {
     return ScreenUtilInit(
       designSize: Size(414, 896),
       builder: (context, child) => Drawer(
+        backgroundColor: appModelTheme.darkTheme ? null : Colors.white,
         key: _key,
         child: Column(
           children: [

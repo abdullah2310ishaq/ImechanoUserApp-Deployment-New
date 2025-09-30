@@ -1,5 +1,6 @@
 // ignore_for_file: await_only_futures, deprecated_member_use
 import 'dart:developer';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -18,6 +19,7 @@ import 'package:imechano/ui/provider/invoice_balance_provider.dart';
 import 'package:imechano/ui/provider/notification_count_provider.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
 import 'package:imechano/ui/services/notification_service.dart';
+import 'package:imechano/ui/screens/bottombar/bottom_bar.dart';
 import 'package:imechano/ui/screens/my_account/home.dart';
 import 'package:imechano/ui/screens/select_car/view/edit_details_screen.dart';
 import 'package:imechano/ui/share_preferences/pref_key.dart';
@@ -26,6 +28,10 @@ import 'package:imechano/ui/styling/global.dart';
 import 'package:imechano/utils/utils.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:imechano/ui/bloc/booking_list_bloc.dart';
+import 'package:imechano/ui/bloc/customer_job_cards_list_bloc.dart';
+import 'package:imechano/ui/bloc/pickup_condition_list_bloc.dart';
+import 'package:imechano/ui/common/globals.dart' as globals;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../ui/screens/auth/landing/view/sign_in_sign_up_landing_screen.dart';
@@ -175,8 +181,35 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        log('Notification tapped: ${response.payload}');
+        try {
+          final ctx = appNavigatorKey.currentContext;
+          final payload = response.payload;
+          log('Notification tapped: $payload');
+          if (ctx != null && payload != null && payload.isNotEmpty) {
+            Map<String, dynamic>? data;
+            try {
+              data = jsonDecode(payload) as Map<String, dynamic>;
+            } catch (e) {
+              log('Failed to decode notification payload as JSON: $e');
+            }
+
+            final title = (data?['title'] ?? '').toString();
+            final jobNo =
+                (data?['job_number'] ?? data?['jobNo'] ?? data?['jobno'])
+                    ?.toString();
+            Utils.handleNotificationNavigation(ctx, null, title, jobNo);
+          }
+        } catch (e) {
+          log('Error handling notification tap: $e');
+        }
       },
+    );
+
+    // Bind plugin to NotificationService so app-wide code can trigger local notifications
+    NotificationService.bindLocalNotifications(
+      flutterLocalNotificationsPlugin,
+      channelId: channel.id,
+      channelName: 'High Importance Notifications',
     );
 
     // Create notification channel for Android
@@ -216,7 +249,11 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
       message.notification?.title ?? 'New Notification',
       message.notification?.body ?? 'You have a new message',
       platformChannelSpecifics,
-      payload: message.data.toString(),
+      payload: jsonEncode({
+        ...message.data,
+        'title': message.notification?.title ?? message.data['title'] ?? '',
+        'body': message.notification?.body ?? message.data['body'] ?? '',
+      }),
     );
   }
 
@@ -250,7 +287,14 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
       // log('getInitialMessage data: ${message!.data}');
       log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
       if (message != null) {
-        Utils.handleNotificationNavigation(context, message, null);
+        try {
+          final meta = _extractNotificationMeta(message);
+          final title = meta['title'];
+          final jobNo = meta['jobNo'];
+          Utils.handleNotificationNavigation(context, null, title, jobNo);
+        } catch (_) {
+          Utils.handleNotificationNavigation(context, message, null);
+        }
       }
     });
 
@@ -281,7 +325,27 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
       } catch (e) {
         log('Failed to update notification count onMessage: $e');
       }
-      Utils.handleNotificationNavigation(context, message, null);
+      try {
+        _refreshDomainData(message);
+      } catch (e) {
+        log('Failed to refresh domain data onMessage: $e');
+      }
+      // Auto-open using combined title/body and jobNo, then refresh with new tab
+      try {
+        final meta = _extractNotificationMeta(message);
+        final title = meta['title'];
+        final jobNo = meta['jobNo'];
+        Utils.handleNotificationNavigation(context, null, title, jobNo);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          try {
+            _refreshDomainData(message);
+          } catch (e) {
+            log('Post-navigation refresh failed onMessage: $e');
+          }
+        });
+      } catch (e) {
+        log('Auto-open navigation failed: $e');
+      }
     });
 
     // replacement for onResume: When the app is in the background and opened directly from the push notification.
@@ -298,7 +362,19 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
       } catch (e) {
         log('Failed to update notification count onMessageOpenedApp: $e');
       }
-      Utils.handleNotificationNavigation(context, message, null);
+      try {
+        _refreshDomainData(message);
+      } catch (e) {
+        log('Failed to refresh domain data onMessageOpenedApp: $e');
+      }
+      try {
+        final meta = _extractNotificationMeta(message);
+        final title = meta['title'];
+        final jobNo = meta['jobNo'];
+        Utils.handleNotificationNavigation(context, null, title, jobNo);
+      } catch (_) {
+        Utils.handleNotificationNavigation(context, message, null);
+      }
     });
   }
 
@@ -320,6 +396,95 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
   void _initAppTheme() async {
     appModel.darkTheme = await appModel.appPreference.getTheme();
   }
+
+  void _refreshDomainData(RemoteMessage message) {
+    try {
+      if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+        final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+        if (userId != null) {
+          // Refresh bookings and job cards lists with current tabs
+          bookingListbloc.bookinglistsink(
+              userId, globals.currentBookingTab.toString());
+          jobcardsListbloc.jobcardslistsink(
+              userId, globals.currentJobcardTab.toString());
+        }
+      }
+      // If payload has a job number, refresh pickup conditions for progress
+      final data = message.data;
+      final jobNo = data['job_number'] ?? data['jobNo'] ?? data['jobno'];
+      if (jobNo != null && jobNo.toString().isNotEmpty) {
+        pickupConditionsListBloc.pickupConditionsListSink(jobNo.toString());
+      }
+    } catch (e) {
+      log('refreshDomainData error: $e');
+    }
+  }
+
+  void _maybeAutoOpen(RemoteMessage message) {
+    final data = message.data;
+    final type =
+        (data['type'] ?? data['action'] ?? '').toString().toLowerCase();
+    const autoTypes = {
+      'pickup_request',
+      'job_card',
+      'jobcard',
+      'delivery_request',
+      'progress_update'
+    };
+    if (autoTypes.contains(type) ||
+        data.containsKey('job_number') ||
+        data.containsKey('booking_id')) {
+      Utils.handleNotificationNavigation(context, message, null);
+      return;
+    }
+
+    // Fallback: heuristics on title/body for pickup confirmation requests
+    final title = (message.notification?.title ?? data['title'] ?? '')
+        .toString()
+        .toLowerCase();
+    final body = (message.notification?.body ?? data['body'] ?? '')
+        .toString()
+        .toLowerCase();
+    final text = '$title $body';
+    if (text.contains('pickup') &&
+        (text.contains('confirm') || text.contains('request'))) {
+      try {
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => BottomBarPage(1)),
+            (Route<dynamic> route) => false);
+      } catch (e) {
+        log('Heuristic auto-open to My Bookings failed: $e');
+      }
+    }
+  }
+
+  // Build a readable title/body string and extract job number from incoming message
+  Map<String, String> _extractNotificationMeta(RemoteMessage message) {
+    final data = message.data;
+    final title =
+        (message.notification?.title ?? data['title'] ?? '').toString();
+    final body = (message.notification?.body ?? data['body'] ?? '').toString();
+    final jobNo =
+        (data['job_number'] ?? data['jobNo'] ?? data['jobno'] ?? '').toString();
+    final readable = (title.isNotEmpty || body.isNotEmpty)
+        ? [title, body].where((e) => e.isNotEmpty).join(' - ')
+        : data.toString();
+    return {
+      'title': readable,
+      'jobNo': jobNo,
+    };
+  }
+
+  // Create a stable key per message to prevent duplicate handling across streams
+  String _computeMessageKey(RemoteMessage message) {
+    final id = message.messageId ?? '';
+    final dataStr = message.data.toString();
+    final title = message.notification?.title ?? '';
+    final body = message.notification?.body ?? '';
+    return '${id}::${title}::${body}::${dataStr}'.hashCode.toString();
+  }
+
+  // Removed dedupe/throttle helpers
 
   @override
   Widget build(BuildContext context) {

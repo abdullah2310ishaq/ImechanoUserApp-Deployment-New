@@ -325,9 +325,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              getTranslated(
-                                                  notification.title ?? '',
-                                                  context),
+                                              (() {
+                                                final title =
+                                                    notification.title ?? '';
+                                                final t = getTranslated(
+                                                    title, context);
+                                                return (t == title || t.isEmpty)
+                                                    ? title
+                                                    : t;
+                                              })(),
                                               style: TextStyle(
                                                   fontSize: 11,
                                                   fontFamily: 'Poppins3',
@@ -355,9 +361,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                         ],
                                       ),
                                       subtitle: Text(
-                                        getTranslated(
-                                            notification.message ?? '',
-                                            context),
+                                        (() {
+                                          final msg =
+                                              notification.message ?? '';
+                                          final m = getTranslated(msg, context);
+                                          return (m == msg || m.isEmpty)
+                                              ? msg
+                                              : m;
+                                        })(),
                                         style: TextStyle(
                                           color:
                                               appModelTheme?.darkTheme == true

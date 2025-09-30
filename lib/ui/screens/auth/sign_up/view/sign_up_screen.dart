@@ -569,13 +569,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
       PrefObj.preferences!.put(PrefKeys.CARID, isotp.data!.id);
       Loader().hideLoader(context);
       id = isotp.data!.id.toString();
-      carid
-          ? addCarApiCall()
-          : Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BottomBarPage(2),
-              ));
+      if (carid) {
+        addCarApiCall();
+      } else {
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => BottomBarPage(2)),
+            (Route<dynamic> route) => false);
+      }
       snackBar(getTranslated('RegisterSuccess', context));
       Fluttertoast.showToast(
           msg: isotp.message.toString(),

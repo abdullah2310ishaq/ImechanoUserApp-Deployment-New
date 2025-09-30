@@ -1584,10 +1584,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                 .categoryName!
                                 .removeAllWhitespace
                                 .toLowerCase();
-                            final String title = getTranslated(catKey, context);
-                            return catKey == 'checkbytestdrive'
-                                ? 'Check by\nTest drive'
-                                : title;
+                            final String localized =
+                                getTranslated(catKey, context);
+                            if (catKey == 'checkbytestdrive') {
+                              final parts = localized.split(' ');
+                              if (parts.length > 2) {
+                                final firstLine = parts.sublist(0, 2).join(' ');
+                                final secondLine = parts.sublist(2).join(' ');
+                                return '$firstLine\n$secondLine';
+                              }
+                              return localized.replaceFirst(' ', '\n');
+                            }
+                            return localized;
                           })(),
                           style: TextStyle(
                               fontSize: 12.sp, fontFamily: 'Poppins1'),
