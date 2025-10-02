@@ -971,30 +971,86 @@ class _MyBookingsPageState extends State<MyBookingsPage>
           SizedBox(height: 10),
           IntrinsicHeight(
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 8),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Booking',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontFamily: 'Poppins1',
+                            ),
+                            textAlign: TextAlign.left,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: false,
+                          ),
+                          SizedBox(height: 2),
+                          Builder(builder: (context) {
+                            final display =
+                                _formatToDdMMyyyyAmPm(data.bookingTime);
+                            final parts = display.split(' | ');
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  parts.isNotEmpty ? parts[0] : display,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontFamily: 'Poppins1',
+                                  ),
+                                  textAlign: TextAlign.left,
+                                ),
+                                if (parts.length > 1)
+                                  Text(
+                                    parts[1],
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontFamily: 'Poppins1',
+                                    ),
+                                    textAlign: TextAlign.left,
+                                  ),
+                              ],
+                            );
+                          }),
+                        ]),
+                  ),
+                ),
+                VerticalDivider(
+                  width: 16,
+                  thickness: 1,
+                  color:
+                      appModelTheme.darkTheme ? Colors.white70 : Colors.black45,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Booking',
+                          'Appointment',
                           style: TextStyle(
                             fontSize: 10,
                             fontFamily: 'Poppins1',
                           ),
-                          textAlign: TextAlign.center,
+                          textAlign: TextAlign.left,
                           maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                           softWrap: false,
+                          overflow: TextOverflow.visible,
                         ),
                         SizedBox(height: 2),
                         Builder(builder: (context) {
-                          final display =
-                              _formatToDdMMyyyyAmPm(data.bookingTime);
+                          final display = _formatToDdMMyyyyAmPm(data.timeDate);
                           final parts = display.split(' | ');
                           return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 parts.isNotEmpty ? parts[0] : display,
@@ -1002,7 +1058,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                                   fontSize: 10,
                                   fontFamily: 'Poppins1',
                                 ),
-                                textAlign: TextAlign.center,
+                                textAlign: TextAlign.left,
                               ),
                               if (parts.length > 1)
                                 Text(
@@ -1011,61 +1067,13 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                                     fontSize: 10,
                                     fontFamily: 'Poppins1',
                                   ),
-                                  textAlign: TextAlign.center,
+                                  textAlign: TextAlign.left,
                                 ),
                             ],
                           );
                         }),
-                      ]),
-                ),
-                VerticalDivider(
-                  width: 24,
-                  thickness: 1,
-                  color:
-                      appModelTheme.darkTheme ? Colors.white70 : Colors.black45,
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Appointment',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontFamily: 'Poppins1',
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                      ),
-                      SizedBox(height: 2),
-                      Builder(builder: (context) {
-                        final display = _formatToDdMMyyyyAmPm(data.timeDate);
-                        final parts = display.split(' | ');
-                        return Column(
-                          children: [
-                            Text(
-                              parts.isNotEmpty ? parts[0] : display,
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontFamily: 'Poppins1',
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            if (parts.length > 1)
-                              Text(
-                                parts[1],
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontFamily: 'Poppins1',
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                          ],
-                        );
-                      }),
-                    ],
+                      ],
+                    ),
                   ),
                 )
               ],

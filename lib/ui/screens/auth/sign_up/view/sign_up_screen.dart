@@ -519,8 +519,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   CustomFormMobile mobileForm() {
     mobileno.addListener(() {
-      if (mobileno.text.length > 8) {
-        mobileno.text = mobileno.text.substring(0, 8);
+      // Normalize input: remove non-digits and any country code, cap at 8 digits
+      String digitsOnly = mobileno.text.replaceAll(RegExp(r'[^0-9]'), '');
+      // If user pasted 974XXXXXXXX, keep last 8 digits
+      if (digitsOnly.startsWith('974') && digitsOnly.length > 8) {
+        digitsOnly = digitsOnly.substring(digitsOnly.length - 8);
+      }
+      if (digitsOnly.length > 8) {
+        digitsOnly = digitsOnly.substring(0, 8);
+      }
+      if (mobileno.text != digitsOnly) {
+        mobileno.text = digitsOnly;
         mobileno.selection = TextSelection.fromPosition(
           TextPosition(offset: mobileno.text.length),
         );
@@ -529,8 +538,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return CustomFormMobile(
       fillColor: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
       validationform: (value) {
-        if (value == null || value.isEmpty || value.length < 8) {
+        if (value == null || value.isEmpty) {
           return getTranslated("PleaseenterFilTheMobileNo", context);
+        }
+        final String digitsOnly = value.replaceAll(RegExp(r'[^0-9]'), '');
+        if (digitsOnly.length != 8) {
+          return 'Please enter 8-digit Qatar mobile number';
+        }
+        // Qatar numbers cannot start with 0,1,4,8,9
+        if (RegExp(r'^[01489]').hasMatch(digitsOnly)) {
+          return 'Mobile number cannot start with 0,1,4,8,9';
         }
         return null;
       },
@@ -668,9 +685,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
     print(creatpassword.text);
     print(fcmToken);
     print(resendOTP);
+    // Normalize mobile number: strip +974/974 and keep 8 digits
+    String normalizedMobile = mobileno.text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (normalizedMobile.startsWith('974') && normalizedMobile.length > 8) {
+      normalizedMobile =
+          normalizedMobile.substring(normalizedMobile.length - 8);
+    }
+    if (normalizedMobile.length > 8) {
+      normalizedMobile = normalizedMobile.substring(0, 8);
+    }
     final RegisterModel isRegister = await _repository.onRegistration(
         email.text,
-        mobileno.text,
+        normalizedMobile,
         name.text,
         latitude,
         longitude,

@@ -44,11 +44,6 @@ class CustomFormMobile extends StatelessWidget {
         obscureText: ObscureText,
         keyboardType: TextInputType.phone,
         decoration: InputDecoration(
-            prefixText: "+974-",
-            prefixStyle: TextStyle(
-              color: appModelTheme.darkTheme ? white : Colors.black,
-              fontFamily: 'Poppins3',
-            ),
             prefixIconColor:
                 appModelTheme.darkTheme ? white : Color.fromRGBO(0, 0, 0, 1),
             filled: true,
