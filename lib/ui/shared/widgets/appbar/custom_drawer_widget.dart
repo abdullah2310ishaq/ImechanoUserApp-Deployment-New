@@ -555,9 +555,20 @@ class _drawerpageState extends State<drawerpage> {
                       Provider.of<NotificationCountProvider>(context,
                               listen: false)
                           .clearNotifications();
-                      changeLocale(PrefKeys.USER_ID, "en");
+                      
+                      // Get user ID before clearing preferences
+                      final userId = PrefObj.preferences?.get(PrefKeys.USER_ID);
+                      
+                      // Clear all preferences
                       PrefObj.preferences?.clear();
+                      
+                      // Set app as started but keep user logged out
                       PrefObj.preferences?.put(PrefKeys.APPSTARTED, true);
+                      
+                      // Change locale if we had a user ID
+                      if (userId != null) {
+                        changeLocale(userId, "en");
+                      }
 
                       Navigator.of(context).pushNamedAndRemoveUntil(
                           '/sign-in-sign-up-landing', (Route route) => false);
