@@ -287,14 +287,19 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
       // log('getInitialMessage data: ${message!.data}');
       log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
       if (message != null) {
-        try {
-          final meta = _extractNotificationMeta(message);
-          final title = meta['title'];
-          final jobNo = meta['jobNo'];
-          Utils.handleNotificationNavigation(context, null, title, jobNo);
-        } catch (_) {
-          Utils.handleNotificationNavigation(context, message, null);
-        }
+        // Defer navigation to after first frame to ensure navigator is ready
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          try {
+            final ctx = appNavigatorKey.currentContext ?? context;
+            final meta = _extractNotificationMeta(message);
+            final title = meta['title'];
+            final jobNo = meta['jobNo'];
+            Utils.handleNotificationNavigation(ctx, null, title, jobNo);
+          } catch (_) {
+            final ctx = appNavigatorKey.currentContext ?? context;
+            Utils.handleNotificationNavigation(ctx, message, null);
+          }
+        });
       }
     });
 
@@ -335,7 +340,7 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
         final meta = _extractNotificationMeta(message);
         final title = meta['title'];
         final jobNo = meta['jobNo'];
-        final navCtx = Get.context ?? context;
+        final navCtx = appNavigatorKey.currentContext ?? context;
         Utils.handleNotificationNavigation(navCtx, null, title, jobNo);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           try {
@@ -372,9 +377,11 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
         final meta = _extractNotificationMeta(message);
         final title = meta['title'];
         final jobNo = meta['jobNo'];
-        Utils.handleNotificationNavigation(context, null, title, jobNo);
+        final navCtx = appNavigatorKey.currentContext ?? context;
+        Utils.handleNotificationNavigation(navCtx, null, title, jobNo);
       } catch (_) {
-        Utils.handleNotificationNavigation(context, message, null);
+        final navCtx = appNavigatorKey.currentContext ?? context;
+        Utils.handleNotificationNavigation(navCtx, message, null);
       }
     });
   }

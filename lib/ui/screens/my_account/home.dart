@@ -1336,9 +1336,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               BoxDecoration(
                                                             color: appModelTheme
                                                                     .darkTheme
-                                                                ? darkmodeColor
+                                                                ? Color(
+                                                                    0xff373737)
                                                                 : Color(
                                                                     0xfff4f5f7),
+                                                            border: Border.all(
+                                                              color: appModelTheme
+                                                                      .darkTheme
+                                                                  ? Color(
+                                                                      0xff373737)
+                                                                  : Color(
+                                                                      0xfff4f5f7),
+                                                              width: 1,
+                                                            ),
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
@@ -1406,7 +1416,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                   color: appModelTheme.darkTheme
-                                                      ? darkmodeColor
+                                                      ? Color(0xff373737)
                                                       : Color(0xfff4f5f7),
                                                 ),
                                               ),
@@ -1565,7 +1575,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: appModelTheme.darkTheme
-                          ? darkmodeColor
+                          ? Color(0xff373737)
                           : Color(0xfff4f5f7),
                       borderRadius: BorderRadius.all(
                         Radius.circular(16),
@@ -1734,6 +1744,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                     0xff373737)
                                                                 : Color(
                                                                     0xfff4f5f7),
+                                                            border: Border.all(
+                                                              color: appModelTheme
+                                                                      .darkTheme
+                                                                  ? Color(
+                                                                      0xff373737)
+                                                                  : Color(
+                                                                      0xfff4f5f7),
+                                                              width: 1,
+                                                            ),
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
@@ -1870,7 +1889,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: appModelTheme.darkTheme
-                          ? darkmodeColor
+                          ? Color(0xff373737)
                           : Color(0xfff4f5f7),
                       // color: colorOne[index],
                       borderRadius: BorderRadius.all(
@@ -2005,6 +2024,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                     0xff373737)
                                                                 : Color(
                                                                     0xfff4f5f7),
+                                                            border: Border.all(
+                                                              color: appModelTheme
+                                                                      .darkTheme
+                                                                  ? Color(
+                                                                      0xff373737)
+                                                                  : Color(
+                                                                      0xfff4f5f7),
+                                                              width: 1,
+                                                            ),
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
@@ -2250,15 +2278,49 @@ class _HomeScreenState extends State<HomeScreen> {
   void showSelectCarDialog() {
     showDialog(
       builder: (_) => AlertDialog(
-        title: Text(getTranslated("Nocarselected!", context)),
-        content: Text(getTranslated('Pleaseselectacartoproceed', context)),
+        backgroundColor: appModelTheme.darkTheme
+            ? Color(0xff252525)
+            : Colors.white, // Dark/White background
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15), // Rectangular borders
+        ),
+        title: Text(
+          getTranslated("Nocarselected!", context),
+          style: TextStyle(
+              color: appModelTheme.darkTheme
+                  ? Colors.white
+                  : Colors.black), // White/Black text
+        ),
+        content: Text(
+          getTranslated('Pleaseselectacartoproceed', context),
+          style: TextStyle(
+              color: appModelTheme.darkTheme
+                  ? Colors.white
+                  : Colors.black), // White/Black text
+        ),
         actions: [
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  Color(0xff70bdf1), // Light blue button background
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8), // Rectangular borders
+              ),
+            ),
             onPressed: () => Navigator.of(_).pop(false),
-            //return false when click on "NO"
-            child: Text(getTranslated('close', context)),
+            child: Text(
+              getTranslated('close', context),
+              style: TextStyle(color: Colors.white), // White text
+            ),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  Color(0xff70bdf1), // Light blue button background
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8), // Rectangular borders
+              ),
+            ),
             onPressed: () {
               Navigator.push(
                   context,
@@ -2268,8 +2330,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     //     type: AddCarType.home)
                   ));
             },
-            //return true when click on "Yes"
-            child: Text(getTranslated('Select', context)),
+            child: Text(
+              getTranslated('Select', context),
+              style: TextStyle(color: Colors.white), // White text
+            ),
           ),
         ],
       ),

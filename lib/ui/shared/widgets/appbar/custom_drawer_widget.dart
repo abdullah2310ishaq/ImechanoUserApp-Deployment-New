@@ -347,10 +347,21 @@ class _drawerpageState extends State<drawerpage> {
                                           : Colors.white,
                                       trailing: Switch(
                                         value: langSwitch,
-                                        activeColor: logoBlue,
-                                        inactiveThumbColor: logoBlue,
-                                        activeTrackColor: Color(0xFF9AF3EE),
-                                        inactiveTrackColor: Colors.white10,
+                                        activeColor: appModelTheme.darkTheme
+                                            ? Colors.black
+                                            : logoBlue,
+                                        inactiveThumbColor:
+                                            appModelTheme.darkTheme
+                                                ? Colors.black
+                                                : logoBlue,
+                                        activeTrackColor:
+                                            appModelTheme.darkTheme
+                                                ? logoBlue
+                                                : Color(0xFF9AF3EE),
+                                        inactiveTrackColor:
+                                            appModelTheme.darkTheme
+                                                ? logoBlue
+                                                : Colors.white10,
                                         onChanged: (value) {
                                           setState(() {
                                             if (langSwitch) {
@@ -462,12 +473,12 @@ class _drawerpageState extends State<drawerpage> {
   }
 
   Widget switchButton() {
-    return Switch(
+  return Switch(
       value: appModelTheme.darkTheme,
-      activeColor: logoBlue,
-      inactiveThumbColor: logoBlue,
-      activeTrackColor: Color(0xFF9AF3EE),
-      inactiveTrackColor: Colors.white10,
+      activeColor: appModelTheme.darkTheme ? Colors.black : logoBlue,
+      inactiveThumbColor: appModelTheme.darkTheme ? Colors.black : logoBlue,
+      activeTrackColor: appModelTheme.darkTheme ? logoBlue : Color(0xFF9AF3EE),
+      inactiveTrackColor: appModelTheme.darkTheme ? logoBlue : Colors.white10,
       onChanged: (value) {
         setState(() {
           appModelTheme.darkTheme = !appModelTheme.darkTheme;

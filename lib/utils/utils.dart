@@ -35,7 +35,9 @@ class Utils {
       }
       // Prefer explicit type when available
       if (type.isNotEmpty) {
-        if (type == 'job_card' || type == 'jobcard') {
+        if (type == 'job_card' ||
+            type == 'jobcard' ||
+            type == 'job_card_ready') {
           final jobNumber = extractedJob;
           if (jobNumber == null || jobNumber.isEmpty) {
             log('job_card: missing job_number in payload');
@@ -65,16 +67,36 @@ class Utils {
           _refreshBookingsAfterNavigation(forceTab: 3);
           return;
         }
-        if (type == 'accept_booking' || type == 'booking_accepted') {
+        if (type == 'accept_booking' ||
+            type == 'booking_accepted' ||
+            type == 'accept booking' ||
+            type == 'booking_approved') {
           currentBookingTab = 3;
           screenstack++;
           Get.offAll(() => BottomBarPage(1));
           _refreshBookingsAfterNavigation();
           return;
         }
+        if (type == 'invoice_ready' || type == 'invoice_generated') {
+          Get.to(() => MyInvoice());
+          return;
+        }
+        if (type == 'job_card_payment' || type == 'payment_confirmed') {
+          // Navigate to job card details after payment
+          final jobNumber = extractedJob;
+          if (jobNumber != null && jobNumber.isNotEmpty) {
+            currentJobcardTab = 0;
+            screenstack++;
+            Get.to(() => MyJobCardDetails(job_number: jobNumber));
+          }
+          return;
+        }
       }
 
-      if (str.contains('Invoice is Ready!')) {
+      if (str.contains('Invoice is Ready!') ||
+          str.contains('Invoice Ready') ||
+          str.contains('Your invoice is ready') ||
+          str.contains('Invoice Generated')) {
         Get.to(() => MyInvoice());
       }
       if (str.contains('Pickup') && str.contains('Accept') ||
@@ -92,6 +114,9 @@ class Utils {
         Get.offAll(() => BottomBarPage(1));
         _refreshBookingsAfterNavigation();
       } else if (str.contains('Job Card') ||
+          str.contains('Job Card Ready') ||
+          str.contains('Your job card is ready') ||
+          str.contains('Job card is available') ||
           str.contains("تم تحميل بطاقة العمل")) {
         String? jobNumber = extractedJob ?? message!.data['job_number'];
         if (jobNumber == null) return;
@@ -100,6 +125,17 @@ class Utils {
         screenstack++;
 
         Get.to(() => MyJobCardDetails(job_number: jobNumber));
+      } else if (str.contains('Payment Confirmed') ||
+          str.contains('Payment Successful') ||
+          str.contains('Payment Received') ||
+          str.contains('Your payment has been confirmed')) {
+        // Navigate to job card after payment confirmation
+        String? jobNumber = extractedJob ?? message!.data['job_number'];
+        if (jobNumber != null && jobNumber.isNotEmpty) {
+          currentJobcardTab = 0;
+          screenstack++;
+          Get.to(() => MyJobCardDetails(job_number: jobNumber));
+        }
       } else if (str.contains('Task Completed') ||
           str.contains("تمت المهمة") ||
           str.contains('Please Confirm Delivery') ||
