@@ -134,6 +134,10 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
     // Initialize local notifications for both platforms
     await _initializeLocalNotifications();
 
+    log("🔔 [NOTIFICATION PERMISSION] ================================================");
+    log("🔔 [NOTIFICATION PERMISSION] Requesting notification permissions...");
+    log("🔔 [NOTIFICATION PERMISSION] Platform: ${Platform.isIOS ? 'iOS' : 'Android'}");
+
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
       announcement: false,
@@ -145,16 +149,28 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
       sound: true,
     );
 
-    log('User granted permission: ${settings.authorizationStatus}');
+    log("🔔 [NOTIFICATION PERMISSION] Permission request completed");
+    log('🔔 [NOTIFICATION PERMISSION] User granted permission: ${settings.authorizationStatus}');
+    log("🔔 [NOTIFICATION PERMISSION] Alert setting: ${settings.alert}");
+    log("🔔 [NOTIFICATION PERMISSION] Badge setting: ${settings.badge}");
+    log("🔔 [NOTIFICATION PERMISSION] Sound setting: ${settings.sound}");
+    log("🔔 [NOTIFICATION PERMISSION] Announcement setting: ${settings.announcement}");
+    log("🔔 [NOTIFICATION PERMISSION] CarPlay setting: ${settings.carPlay}");
+    log("🔔 [NOTIFICATION PERMISSION] Critical alert setting: ${settings.criticalAlert}");
+    log("🔔 [NOTIFICATION PERMISSION] Provisional setting: N/A (not available in this version)");
+    log("🔔 [NOTIFICATION PERMISSION] ================================================");
 
     // Handle different authorization statuses
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      log('User granted notification permission');
+      log('🔔 [NOTIFICATION PERMISSION] User granted notification permission');
     } else if (settings.authorizationStatus == AuthorizationStatus.denied) {
-      log('User denied notification permission');
+      log('🔔 [NOTIFICATION PERMISSION] User denied notification permission');
     } else if (settings.authorizationStatus ==
         AuthorizationStatus.notDetermined) {
-      log('User has not yet granted or denied permission');
+      log('🔔 [NOTIFICATION PERMISSION] User has not yet granted or denied permission');
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
+      log('🔔 [NOTIFICATION PERMISSION] User granted provisional notification permission');
     }
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -181,26 +197,45 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
+        log("🔔 [LOCAL NOTIFICATION TAP] ================================================");
+        log("🔔 [LOCAL NOTIFICATION TAP] Local notification tapped");
+        log("🔔 [LOCAL NOTIFICATION TAP] Response ID: ${response.id}");
+        log("🔔 [LOCAL NOTIFICATION TAP] Response Action ID: ${response.actionId}");
+        log("🔔 [LOCAL NOTIFICATION TAP] Response Input: ${response.input}");
+        log("🔔 [LOCAL NOTIFICATION TAP] Response Payload: ${response.payload}");
+        log("🔔 [LOCAL NOTIFICATION TAP] Platform: ${Platform.isIOS ? 'iOS' : 'Android'}");
+        log("🔔 [LOCAL NOTIFICATION TAP] ================================================");
+
         try {
           final ctx = appNavigatorKey.currentContext;
           final payload = response.payload;
-          log('Notification tapped: $payload');
+          log("🔔 [LOCAL NOTIFICATION TAP] Context available: ${ctx != null ? 'YES' : 'NO'}");
+          log("🔔 [LOCAL NOTIFICATION TAP] Payload available: ${payload != null && payload.isNotEmpty ? 'YES' : 'NO'}");
+
           if (ctx != null && payload != null && payload.isNotEmpty) {
             Map<String, dynamic>? data;
             try {
+              log("🔔 [LOCAL NOTIFICATION TAP] Decoding JSON payload...");
               data = jsonDecode(payload) as Map<String, dynamic>;
+              log("🔔 [LOCAL NOTIFICATION TAP] JSON decoded successfully: $data");
             } catch (e) {
-              log('Failed to decode notification payload as JSON: $e');
+              log('🔔 [LOCAL NOTIFICATION TAP] Failed to decode notification payload as JSON: $e');
             }
 
             final title = (data?['title'] ?? '').toString();
             final jobNo =
                 (data?['job_number'] ?? data?['jobNo'] ?? data?['jobno'])
                     ?.toString();
+            log("🔔 [LOCAL NOTIFICATION TAP] Extracted Title: $title");
+            log("🔔 [LOCAL NOTIFICATION TAP] Extracted JobNo: $jobNo");
+            log("🔔 [LOCAL NOTIFICATION TAP] Calling Utils.handleNotificationNavigation...");
             Utils.handleNotificationNavigation(ctx, null, title, jobNo);
+            log("🔔 [LOCAL NOTIFICATION TAP] Utils.handleNotificationNavigation completed");
+          } else {
+            log("🔔 [LOCAL NOTIFICATION TAP] Skipping navigation - Context or payload missing");
           }
         } catch (e) {
-          log('Error handling notification tap: $e');
+          log('🔔 [LOCAL NOTIFICATION TAP] Error handling notification tap: $e');
         }
       },
     );
@@ -223,6 +258,14 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
 
   // Show local notification for iOS
   Future<void> _showLocalNotification(RemoteMessage message) async {
+    log("🔔 [SHOW LOCAL NOTIFICATION] ================================================");
+    log("🔔 [SHOW LOCAL NOTIFICATION] Creating local notification");
+    log("🔔 [SHOW LOCAL NOTIFICATION] Message ID: ${message.messageId}");
+    log("🔔 [SHOW LOCAL NOTIFICATION] Message Data: ${message.data}");
+    log("🔔 [SHOW LOCAL NOTIFICATION] Notification Title: ${message.notification?.title}");
+    log("🔔 [SHOW LOCAL NOTIFICATION] Notification Body: ${message.notification?.body}");
+    log("🔔 [SHOW LOCAL NOTIFICATION] Platform: ${Platform.isIOS ? 'iOS' : 'Android'}");
+
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'high_importance_channel',
@@ -244,17 +287,36 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
       iOS: iOSPlatformChannelSpecifics,
     );
 
+    final payload = {
+      ...message.data,
+      'title': message.notification?.title ?? message.data['title'] ?? '',
+      'body': message.notification?.body ?? message.data['body'] ?? '',
+    };
+
+    log("🔔 [SHOW LOCAL NOTIFICATION] Payload to encode: $payload");
+    final encodedPayload = jsonEncode(payload);
+    log("🔔 [SHOW LOCAL NOTIFICATION] Encoded payload: $encodedPayload");
+
+    final notificationId = message.hashCode;
+    final notificationTitle = message.notification?.title ?? 'New Notification';
+    final notificationBody =
+        message.notification?.body ?? 'You have a new message';
+
+    log("🔔 [SHOW LOCAL NOTIFICATION] Notification ID: $notificationId");
+    log("🔔 [SHOW LOCAL NOTIFICATION] Notification Title: $notificationTitle");
+    log("🔔 [SHOW LOCAL NOTIFICATION] Notification Body: $notificationBody");
+    log("🔔 [SHOW LOCAL NOTIFICATION] Showing notification...");
+
     await flutterLocalNotificationsPlugin.show(
-      message.hashCode,
-      message.notification?.title ?? 'New Notification',
-      message.notification?.body ?? 'You have a new message',
+      notificationId,
+      notificationTitle,
+      notificationBody,
       platformChannelSpecifics,
-      payload: jsonEncode({
-        ...message.data,
-        'title': message.notification?.title ?? message.data['title'] ?? '',
-        'body': message.notification?.body ?? message.data['body'] ?? '',
-      }),
+      payload: encodedPayload,
     );
+
+    log("🔔 [SHOW LOCAL NOTIFICATION] Local notification shown successfully");
+    log("🔔 [SHOW LOCAL NOTIFICATION] ================================================");
   }
 
   @override
@@ -283,122 +345,213 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage? message) async {
-      log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-      // log('getInitialMessage data: ${message!.data}');
-      log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+      log("🔔 [INITIAL MESSAGE] ================================================");
+      log("🔔 [INITIAL MESSAGE] Message received: ${message != null ? 'YES' : 'NO'}");
       if (message != null) {
+        log("🔔 [INITIAL MESSAGE] Message ID: ${message.messageId}");
+        log("🔔 [INITIAL MESSAGE] Data: ${message.data}");
+        log("🔔 [INITIAL MESSAGE] Notification Title: ${message.notification?.title}");
+        log("🔔 [INITIAL MESSAGE] Notification Body: ${message.notification?.body}");
+        log("🔔 [INITIAL MESSAGE] From: ${message.from}");
+        log("🔔 [INITIAL MESSAGE] Sent Time: ${message.sentTime}");
+        log("🔔 [INITIAL MESSAGE] TTL: ${message.ttl}");
+        log("🔔 [INITIAL MESSAGE] ================================================");
+
         // Defer navigation to after first frame to ensure navigator is ready
         WidgetsBinding.instance.addPostFrameCallback((_) {
           try {
             final ctx = appNavigatorKey.currentContext ?? context;
+            log("🔔 [INITIAL MESSAGE] Context available: YES");
+            log("🔔 [INITIAL MESSAGE] App Navigator Key Context: ${appNavigatorKey.currentContext != null ? 'YES' : 'NO'}");
+            log("🔔 [INITIAL MESSAGE] Fallback Context: YES");
+
             final meta = _extractNotificationMeta(message);
             final title = meta['title'];
             final jobNo = meta['jobNo'];
+            log("🔔 [INITIAL MESSAGE] Extracted Title: $title");
+            log("🔔 [INITIAL MESSAGE] Extracted JobNo: $jobNo");
+
+            log("🔔 [INITIAL MESSAGE] Calling Utils.handleNotificationNavigation...");
             Utils.handleNotificationNavigation(ctx, null, title, jobNo);
-          } catch (_) {
+            log("🔔 [INITIAL MESSAGE] Utils.handleNotificationNavigation completed");
+          } catch (e) {
+            log("🔔 [INITIAL MESSAGE] Error in post-frame callback: $e");
             final ctx = appNavigatorKey.currentContext ?? context;
+            log("🔔 [INITIAL MESSAGE] Fallback: Calling Utils.handleNotificationNavigation with message...");
             Utils.handleNotificationNavigation(ctx, message, null);
           }
         });
+      } else {
+        log("🔔 [INITIAL MESSAGE] No initial message found");
       }
     });
 
     // onMessage: When the app is open and it receives a push notification
     // Ensure iOS shows alerts when app is in foreground
     if (Platform.isIOS) {
+      log("🔔 [iOS FOREGROUND] ================================================");
+      log("🔔 [iOS FOREGROUND] Setting iOS foreground notification presentation options");
+      log("🔔 [iOS FOREGROUND] Alert: true, Badge: true, Sound: true");
       FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
         alert: true,
         badge: true,
         sound: true,
       );
+      log("🔔 [iOS FOREGROUND] iOS foreground notification options set successfully");
+      log("🔔 [iOS FOREGROUND] ================================================");
     }
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-      log("onMessage data: ${message.data}");
-      log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~cdfdfds~~~~~~~~~~~~~~~~~~~~");
+      log("🔔 [ON MESSAGE] ================================================");
+      log("🔔 [ON MESSAGE] App is in FOREGROUND - Message received");
+      log("🔔 [ON MESSAGE] Message ID: ${message.messageId}");
+      log("🔔 [ON MESSAGE] Data: ${message.data}");
+      log("🔔 [ON MESSAGE] Notification Title: ${message.notification?.title}");
+      log("🔔 [ON MESSAGE] Notification Body: ${message.notification?.body}");
+      log("🔔 [ON MESSAGE] From: ${message.from}");
+      log("🔔 [ON MESSAGE] Sent Time: ${message.sentTime}");
+      log("🔔 [ON MESSAGE] TTL: ${message.ttl}");
+      log("🔔 [ON MESSAGE] Platform: ${Platform.isIOS ? 'iOS' : 'Android'}");
+      log("🔔 [ON MESSAGE] ================================================");
 
       // Show local notification for both platforms when app is in foreground
+      log("🔔 [ON MESSAGE] Showing local notification...");
       await _showLocalNotification(message);
+      log("🔔 [ON MESSAGE] Local notification shown");
 
       try {
         final ctx = appNavigatorKey.currentContext;
+        log("🔔 [ON MESSAGE] Context available for notification count: ${ctx != null ? 'YES' : 'NO'}");
         if (ctx != null) {
           Provider.of<NotificationCountProvider>(ctx, listen: false)
               .setNotifications();
+          log("🔔 [ON MESSAGE] Notification count updated");
         }
       } catch (e) {
-        log('Failed to update notification count onMessage: $e');
+        log('🔔 [ON MESSAGE] Failed to update notification count: $e');
       }
+
       try {
+        log("🔔 [ON MESSAGE] Refreshing domain data...");
         _refreshDomainData(message);
+        log("🔔 [ON MESSAGE] Domain data refreshed");
       } catch (e) {
-        log('Failed to refresh domain data onMessage: $e');
+        log('🔔 [ON MESSAGE] Failed to refresh domain data: $e');
       }
+
       // Auto-open using combined title/body and jobNo, then refresh with new tab
       try {
+        log("🔔 [ON MESSAGE] Extracting notification meta...");
         final meta = _extractNotificationMeta(message);
         final title = meta['title'];
         final jobNo = meta['jobNo'];
+        log("🔔 [ON MESSAGE] Extracted Title: $title");
+        log("🔔 [ON MESSAGE] Extracted JobNo: $jobNo");
+
         final navCtx = appNavigatorKey.currentContext ?? context;
+        log("🔔 [ON MESSAGE] Navigation context available: YES");
+        log("🔔 [ON MESSAGE] Calling Utils.handleNotificationNavigation...");
         Utils.handleNotificationNavigation(navCtx, null, title, jobNo);
+        log("🔔 [ON MESSAGE] Utils.handleNotificationNavigation completed");
+
         WidgetsBinding.instance.addPostFrameCallback((_) {
           try {
+            log("🔔 [ON MESSAGE] Post-frame callback: Refreshing domain data...");
             _refreshDomainData(message);
+            log("🔔 [ON MESSAGE] Post-frame callback: Domain data refreshed");
           } catch (e) {
-            log('Post-navigation refresh failed onMessage: $e');
+            log('🔔 [ON MESSAGE] Post-navigation refresh failed: $e');
           }
         });
       } catch (e) {
-        log('Auto-open navigation failed: $e');
+        log('🔔 [ON MESSAGE] Auto-open navigation failed: $e');
       }
     });
 
     // replacement for onResume: When the app is in the background and opened directly from the push notification.
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-      log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-      log('onMessageOpenedApp data: $message');
-      log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+      log("🔔 [ON MESSAGE OPENED APP] ================================================");
+      log("🔔 [ON MESSAGE OPENED APP] App opened from BACKGROUND notification");
+      log("🔔 [ON MESSAGE OPENED APP] Message ID: ${message.messageId}");
+      log("🔔 [ON MESSAGE OPENED APP] Data: ${message.data}");
+      log("🔔 [ON MESSAGE OPENED APP] Notification Title: ${message.notification?.title}");
+      log("🔔 [ON MESSAGE OPENED APP] Notification Body: ${message.notification?.body}");
+      log("🔔 [ON MESSAGE OPENED APP] From: ${message.from}");
+      log("🔔 [ON MESSAGE OPENED APP] Sent Time: ${message.sentTime}");
+      log("🔔 [ON MESSAGE OPENED APP] TTL: ${message.ttl}");
+      log("🔔 [ON MESSAGE OPENED APP] Platform: ${Platform.isIOS ? 'iOS' : 'Android'}");
+      log("🔔 [ON MESSAGE OPENED APP] ================================================");
+
       try {
         final ctx = appNavigatorKey.currentContext;
+        log("🔔 [ON MESSAGE OPENED APP] Context available for notification count: ${ctx != null ? 'YES' : 'NO'}");
         if (ctx != null) {
           Provider.of<NotificationCountProvider>(ctx, listen: false)
               .setNotifications();
+          log("🔔 [ON MESSAGE OPENED APP] Notification count updated");
         }
       } catch (e) {
-        log('Failed to update notification count onMessageOpenedApp: $e');
+        log('🔔 [ON MESSAGE OPENED APP] Failed to update notification count: $e');
       }
+
       try {
+        log("🔔 [ON MESSAGE OPENED APP] Refreshing domain data...");
         _refreshDomainData(message);
+        log("🔔 [ON MESSAGE OPENED APP] Domain data refreshed");
       } catch (e) {
-        log('Failed to refresh domain data onMessageOpenedApp: $e');
+        log('🔔 [ON MESSAGE OPENED APP] Failed to refresh domain data: $e');
       }
+
       try {
+        log("🔔 [ON MESSAGE OPENED APP] Extracting notification meta...");
         final meta = _extractNotificationMeta(message);
         final title = meta['title'];
         final jobNo = meta['jobNo'];
+        log("🔔 [ON MESSAGE OPENED APP] Extracted Title: $title");
+        log("🔔 [ON MESSAGE OPENED APP] Extracted JobNo: $jobNo");
+
         final navCtx = appNavigatorKey.currentContext ?? context;
+        log("🔔 [ON MESSAGE OPENED APP] Navigation context available: YES");
+        log("🔔 [ON MESSAGE OPENED APP] Calling Utils.handleNotificationNavigation...");
         Utils.handleNotificationNavigation(navCtx, null, title, jobNo);
-      } catch (_) {
+        log("🔔 [ON MESSAGE OPENED APP] Utils.handleNotificationNavigation completed");
+      } catch (e) {
+        log("🔔 [ON MESSAGE OPENED APP] Error in main navigation: $e");
         final navCtx = appNavigatorKey.currentContext ?? context;
+        log("🔔 [ON MESSAGE OPENED APP] Fallback: Calling Utils.handleNotificationNavigation with message...");
         Utils.handleNotificationNavigation(navCtx, message, null);
+        log("🔔 [ON MESSAGE OPENED APP] Fallback navigation completed");
       }
     });
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    log("🔔 [APP LIFECYCLE] ================================================");
+    log("🔔 [APP LIFECYCLE] App lifecycle state changed: $state");
+    log("🔔 [APP LIFECYCLE] Platform: ${Platform.isIOS ? 'iOS' : 'Android'}");
+
     if (state == AppLifecycleState.resumed) {
+      log("🔔 [APP LIFECYCLE] App resumed - checking notification count");
       try {
         final ctx = appNavigatorKey.currentContext;
+        log("🔔 [APP LIFECYCLE] Context available on resume: ${ctx != null ? 'YES' : 'NO'}");
         if (ctx != null) {
           Provider.of<NotificationCountProvider>(ctx, listen: false)
               .setNotifications();
+          log("🔔 [APP LIFECYCLE] Notification count updated on resume");
         }
       } catch (e) {
-        log('Failed to refresh notification count on resume: $e');
+        log('🔔 [APP LIFECYCLE] Failed to refresh notification count on resume: $e');
       }
+    } else if (state == AppLifecycleState.paused) {
+      log("🔔 [APP LIFECYCLE] App paused");
+    } else if (state == AppLifecycleState.inactive) {
+      log("🔔 [APP LIFECYCLE] App inactive");
+    } else if (state == AppLifecycleState.detached) {
+      log("🔔 [APP LIFECYCLE] App detached");
     }
+    log("🔔 [APP LIFECYCLE] ================================================");
   }
 
   void _initAppTheme() async {
