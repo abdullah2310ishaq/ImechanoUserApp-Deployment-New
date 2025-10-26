@@ -1363,9 +1363,13 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => ConfirmPayDetail(
-                                              selectedindex: selectedindex,
+                                        builder: (context) => BookingListShow(
                                               data: data,
+                                              bookingid: data.bookingId,
+                                              appointment: data.bookingTime,
+                                              booking: data.timeDate,
+                                              carName: data.carName,
+                                              isConfirmPickup: true,
                                             )));
 
                                 // viewDetailsDialog(context, data, selectedindex);

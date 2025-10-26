@@ -9,7 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:imechano/localization/language_constrants.dart';
 import 'package:imechano/ui/modal/booking_list_model.dart';
+import 'package:imechano/ui/modal/accept_pickup_model.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
+import 'package:imechano/ui/repository/repository.dart';
 import 'package:imechano/ui/screens/bottombar/bottom_bar.dart';
 import 'package:imechano/ui/shared/widgets/appbar/custom_appbar_widget.dart';
 import 'package:imechano/ui/styling/colors.dart';
@@ -21,12 +23,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../bloc/pickup_condition_list_bloc.dart';
 import '../../modal/pickup_conditions_list_model.dart';
 import '../../styling/config.dart';
+import 'package:imechano/ui/styling/global.dart';
 
 class BookingListShow extends StatefulWidget {
   final ItemData data;
   final String? carName;
   final String? booking;
   final String? appointment;
+  final bool isConfirmPickup;
 
   final String? bookingid;
   const BookingListShow(
@@ -35,7 +39,8 @@ class BookingListShow extends StatefulWidget {
       this.bookingid,
       this.carName,
       this.booking,
-      this.appointment})
+      this.appointment,
+      this.isConfirmPickup = false})
       : super(key: key);
 
   @override
@@ -815,24 +820,65 @@ class _BookingListShowState extends State<BookingListShow>
     );
   }
 
+  void _confirmPickupAction() async {
+    Repository repository = Repository();
+    Loader().showLoader(context);
+    final AcceptpickuprequestModel ispickrequest =
+        await repository.onAcceptPickupApi(widget.bookingid.toString());
+    if (ispickrequest.code != '0') {
+      Loader().hideLoader(context);
+      showSnackBar(
+          context, ispickrequest.message ?? 'Pickup Confirmation Accepted');
+      // Navigate back to My Bookings page
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => BottomBarPage(1)),
+          (Route<dynamic> route) => false);
+    } else {
+      Loader().hideLoader(context);
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text('Error'),
+                content: Text(ispickrequest.message ?? 'Something went wrong'),
+                actions: [
+                  TextButton(
+                    child: const Text("Ok"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ));
+    }
+  }
+
   Widget _backButton() {
     return Padding(
       padding: const EdgeInsets.only(left: 26, right: 20),
       child: GestureDetector(
         onTap: () {
-          Navigator.pop(context);
+          if (widget.isConfirmPickup) {
+            _confirmPickupAction();
+          } else {
+            Navigator.pop(context);
+          }
         },
         child: Container(
           height: 50,
           width: double.infinity,
           decoration: BoxDecoration(
-            color:
-                appModelTheme.darkTheme ? Color(0xff2a2a2a) : Colors.grey[200],
+            color: widget.isConfirmPickup
+                ? Colors.green[400]
+                : (appModelTheme.darkTheme
+                    ? Color(0xff2a2a2a)
+                    : Colors.grey[200]),
             borderRadius: BorderRadius.circular(5),
             border: Border.all(
-              color: appModelTheme.darkTheme
-                  ? greycolo.withOpacity(0.3)
-                  : Colors.grey[300]!,
+              color: widget.isConfirmPickup
+                  ? Colors.green[600]!
+                  : (appModelTheme.darkTheme
+                      ? greycolo.withOpacity(0.3)
+                      : Colors.grey[300]!),
               width: 1,
             ),
             boxShadow: [
@@ -847,16 +893,24 @@ class _BookingListShowState extends State<BookingListShow>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.arrow_back_ios,
-                color: appModelTheme.darkTheme ? white : black,
+                widget.isConfirmPickup
+                    ? Icons.check_circle
+                    : Icons.arrow_back_ios,
+                color: widget.isConfirmPickup
+                    ? white
+                    : (appModelTheme.darkTheme ? white : black),
                 size: 18,
               ),
               SizedBox(width: 8),
               Text(
-                getTranslated('Back', context),
+                widget.isConfirmPickup
+                    ? getTranslated('confirmpickup', context)
+                    : getTranslated('Back', context),
                 style: TextStyle(
                   fontSize: 16,
-                  color: appModelTheme.darkTheme ? white : black,
+                  color: widget.isConfirmPickup
+                      ? white
+                      : (appModelTheme.darkTheme ? white : black),
                   fontFamily: "Poppins2",
                   fontWeight: FontWeight.w600,
                 ),
