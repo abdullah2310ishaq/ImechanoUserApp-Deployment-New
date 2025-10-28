@@ -192,7 +192,7 @@ class _MySelectionPageState extends State<MySelectionPage>
       appBar: WidgetAppBar(
         title: getTranslated('myselections', context),
         menuItem: 'assets/svg/Menu.svg',
-        // imageicon: 'assets/svg/Arrow_alt_left.svg',
+        imageicon: 'assets/svg/Arrow_alt_left.svg',
         home: 'assets/svg/homeicon.svg',
         action2: 'assets/svg/ball.svg',
         flag: false,
@@ -841,7 +841,9 @@ class _MySelectionPageState extends State<MySelectionPage>
                           style: TextStyle(
                             fontSize: 10,
                             fontFamily: 'Poppins3',
-                            color: Colors.black38,
+                            color: appModelTheme.darkTheme
+                                ? Colors.white70
+                                : Colors.black38,
                           ),
                         ),
                       ],
@@ -897,7 +899,7 @@ class _MySelectionPageState extends State<MySelectionPage>
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Poppins2',
-              color: Colors.black,
+              color: appModelTheme.darkTheme ? Colors.white : Colors.black,
             ),
           ),
         ],
@@ -907,7 +909,7 @@ class _MySelectionPageState extends State<MySelectionPage>
 
   Widget _bookAppoinment() {
     return Padding(
-      padding: const EdgeInsets.only(left: 25, right: 20),
+      padding: const EdgeInsets.only(left: 26, right: 20),
       child: GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
@@ -945,34 +947,50 @@ class _MySelectionPageState extends State<MySelectionPage>
           }
         },
         child: Container(
-          height: 48,
-          width: 380.w,
+          height: 50,
+          width: double.infinity,
           decoration: BoxDecoration(
             color: logoBlue,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: logoBlue.withOpacity(0.3),
+              width: 1,
+            ),
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Icon(
+                  Icons.calendar_today,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              SizedBox(width: 10),
               Text(
-                "${globals.currentCount} " +
-                    getTranslated("Selected", context) +
-                    " " +
-                    getTranslated('Service', context),
+                '${globals.currentCount} ' + getTranslated('Selected', context),
                 style: TextStyle(
                   fontFamily: 'Poppins1',
                   color: white,
-                  fontSize: 10,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              Text(
-                getTranslated('BookApointment', context),
-                style: TextStyle(
-                  fontFamily: 'Poppins1',
-                  color: white,
-                  fontSize: 15,
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  getTranslated('Book Appointment', context),
+                  style: TextStyle(
+                    fontFamily: 'Poppins2',
+                    color: white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
+              // Removed trailing arrow icon as requested
             ],
           ),
         ),

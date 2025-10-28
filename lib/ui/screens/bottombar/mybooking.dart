@@ -38,6 +38,7 @@ class _MyBookingState extends State<MyBooking> {
           appBar: WidgetAppBar(
             title: 'My Booking',
             menuItem: 'assets/svg/Menu.svg',
+            imageicon: 'assets/svg/Arrow_alt_left.svg',
             action: 'assets/svg/shopping-cart.svg',
             action2: 'assets/svg/ball.svg',
           ),
@@ -104,45 +105,45 @@ class _MyBookingState extends State<MyBooking> {
                 ],
               ),
               SizedBox(height: 15.h),
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: 1,
-                itemBuilder: (context, index) {
-                  return Container(
-                    height: 48,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            selectedindex = 0;
-                            setState(() {});
-                          },
-                          child: card(
-                              "Completed", selectedindex == 0 ? true : false),
-                        ),
-                        SizedBox(width: 15.w),
-                        GestureDetector(
-                          onTap: () {
-                            selectedindex = 1;
-                            setState(() {});
-                          },
-                          child: card(
-                              "Pending", selectedindex == 1 ? true : false),
-                        ),
-                        SizedBox(width: 15.w),
-                        GestureDetector(
-                          onTap: () {
-                            selectedindex = 2;
-                            setState(() {});
-                          },
-                          child: card(
-                              "Canceled", selectedindex == 2 ? true : false),
-                        ),
-                      ],
+              Container(
+                height: 38.h,
+                margin: EdgeInsets.symmetric(horizontal: 15.w),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          selectedindex = 0;
+                          setState(() {});
+                        },
+                        child: card(
+                            "Completed", selectedindex == 0 ? true : false),
+                      ),
                     ),
-                  );
-                },
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          selectedindex = 1;
+                          setState(() {});
+                        },
+                        child:
+                            card("Pending", selectedindex == 1 ? true : false),
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          selectedindex = 2;
+                          setState(() {});
+                        },
+                        child:
+                            card("Canceled", selectedindex == 2 ? true : false),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               SizedBox(
                 height: 15.h,
@@ -220,7 +221,11 @@ class _MyBookingState extends State<MyBooking> {
                         child: Text(
                           "Car Delivery back",
                           style: TextStyle(
-                              fontFamily: "Poppins1", fontSize: 13.sp),
+                              fontFamily: "Poppins1",
+                              fontSize: 13.sp,
+                              color: appModelTheme.darkTheme
+                                  ? Colors.white
+                                  : Colors.black),
                         ),
                       ),
                       Container(
@@ -249,7 +254,7 @@ class _MyBookingState extends State<MyBooking> {
                         child: ElevatedButton(
                           style: ButtonStyle(
                               backgroundColor: MaterialStateProperty.all<Color>(
-                                  Color(0xe165d456)),
+                                  Colors.green),
                               shape: MaterialStateProperty.all<
                                       RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
@@ -284,39 +289,32 @@ class _MyBookingState extends State<MyBooking> {
   }
 
   Widget card(String title, bool isselected) {
-    return Card(
-      elevation: 0,
-
-      //==================================by jenish================================
-      //
-      color: appModelTheme.darkTheme
-          ? isselected
-              ? logoBlue
-              : Colors.transparent
-          : isselected
-              ? Colors.white
-              : Color(0xff70BDF1),
-      // color: appModelTheme.darkTheme ? black : logoBlue,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5),
-          side: BorderSide(
-            width: 1.5,
-            color: appModelTheme.darkTheme
-                ? isselected
-                    ? logoBlue
-                    : white
-                : white,
-          )),
-      child: new Container(
-        alignment: Alignment.center,
-        height: 38.h,
-        width: 160.w,
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 150),
+      height: double.infinity,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: appModelTheme.darkTheme
+            ? (isselected ? logoBlue : Colors.transparent)
+            : (isselected ? Colors.white : Color(0xff70BDF1)),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          width: isselected ? 0 : 1.5,
+          color: isselected
+              ? Colors.transparent
+              : (appModelTheme.darkTheme ? white : white),
+        ),
+      ),
+      child: Center(
         child: Text(
           title,
           style: TextStyle(
-              fontSize: 13,
-              fontFamily: "Poppins3",
-              color: isselected ? Colors.black : Colors.white),
+            fontSize: 13.sp,
+            fontFamily: "Poppins3",
+            color: isselected
+                ? (appModelTheme.darkTheme ? Colors.white : Colors.black)
+                : Colors.white,
+          ),
         ),
       ),
     );
@@ -351,16 +349,25 @@ class _MyBookingState extends State<MyBooking> {
 }
 
 Widget cardPoint(String title) {
-  return Container(
-    margin: EdgeInsets.only(left: 17.w, top: 3.h),
-    child: Row(
-      children: [
-        Image(
-            height: 10.h,
-            image: AssetImage("assets/icons/My Account/Ellipse 27.png")),
-        SizedBox(width: 7.w),
-        Text(title, style: TextStyle(fontFamily: 'Poppins3', fontSize: 10))
-      ],
-    ),
+  return Consumer<AppModel>(
+    builder: (context, appModel, child) {
+      return Container(
+        margin: EdgeInsets.only(left: 17.w, top: 3.h),
+        child: Row(
+          children: [
+            Image(
+                height: 10.h,
+                image: AssetImage("assets/icons/My Account/Ellipse 27.png")),
+            SizedBox(width: 7.w),
+            Text(title,
+                style: TextStyle(
+                  fontFamily: 'Poppins3',
+                  fontSize: 10,
+                  color: appModel.darkTheme ? Colors.white70 : Colors.black87,
+                ))
+          ],
+        ),
+      );
+    },
   );
 }

@@ -1,5 +1,7 @@
 // ignore_for_file: must_be_immutable, unnecessary_brace_in_string_interps
 
+import 'dart:async';
+import 'dart:developer';
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,7 +14,7 @@ import 'package:imechano/ui/screens/my_account/Notification.dart';
 import 'package:imechano/ui/styling/colors.dart';
 import 'package:provider/provider.dart';
 
-class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
+class WidgetAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Color? backgroundColor;
   final Color? textIconColor;
   final String? imageicon;
@@ -36,26 +38,37 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.action2,
     this.flag = true,
   });
-  dynamic appModelTheme;
-  int count = 1;
-
-  final GlobalKey<ScaffoldState> _key = GlobalKey();
 
   @override
   Size get preferredSize => Size.fromHeight(height!);
+
+  @override
+  _WidgetAppBarState createState() => _WidgetAppBarState();
+}
+
+class _WidgetAppBarState extends State<WidgetAppBar> {
+  dynamic appModelTheme;
+  int count = 1;
+  int _lastNotifiedCount = -1;
+  bool _isInitialized = false;
+  Timer? _notificationTimer;
+
+  final GlobalKey<ScaffoldState> _key = GlobalKey();
+
+  // Removed local timer in favor of one global timer started in main.dart
 
   @override
   Widget build(BuildContext context) {
     final appModel = Provider.of<AppModel>(context);
     appModelTheme = appModel;
     return ScreenUtilInit(
-      // designSize: Size(500, 896),
+      designSize: Size(414, 896),
       builder: (context, child) => AppBar(
         key: _key,
-        toolbarHeight: preferredSize.height,
-        leadingWidth: preferredSize.width,
+        toolbarHeight: 60.h,
+        leadingWidth: 120.w,
         iconTheme: IconThemeData(
-          color: textIconColor,
+          color: widget.textIconColor,
         ),
         leading: Padding(
           padding: const EdgeInsets.all(0),
@@ -64,40 +77,37 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
               InkWell(
                 onTap: () {
                   print("I M RRR");
-                  // Navigator.pop(context);
-                  if (menuItem!.contains('assets/svg/Arrow_alt_left.svg')) {
-                    // var route = ModalRoute.of(context);
-                    // if (route != null) {
-                    //   print(route.settings.name);
-                    //   if (route.settings.name == null) {
-                    //     print("service selection");
-                    //   }
-                    // }
-                    // if (globals.screenstack != 0) globals.screenstack--;
-                    // print('globals.screenstack');
-                    // print(globals.screenstack);
-                    // Scaffold.of(context).openDrawer();
+                  if (widget.menuItem!
+                      .contains('assets/svg/Arrow_alt_left.svg')) {
+                    // Back button - navigate back
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.pop(context);
+                    } else {
+                      Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (context) => BottomBarPage(2)),
+                          (Route<dynamic> route) => false);
+                    }
                   } else {
+                    // Menu button - open drawer
                     Scaffold.of(context).openDrawer();
                   }
                 },
                 child: Container(
-                    padding: appModelTheme.appLocal == Locale("en")
-                        ? EdgeInsets.only(
-                            top: 15, bottom: 15, left: 10, right: 10)
-                        : EdgeInsets.only(
-                            top: 15, bottom: 15, left: 17, right: 17),
+                    width: 50.w,
+                    height: 50.h,
+                    padding: EdgeInsets.all(12.w),
                     child: SvgPicture.asset(
-                      '${menuItem}',
+                      '${widget.menuItem}',
+                      width: 24.w,
+                      height: 24.h,
                     )),
               ),
               InkWell(
                 splashColor: Color(0xFF2A7AD5), // Customizing the splash color
-
                 onTap: () {
-                  if (imageicon != null) {
+                  if (widget.imageicon != null) {
                     print("Shoaib Pressed Back button from App Bar");
-
                     if (Navigator.of(context).canPop()) {
                       Navigator.pop(context);
                     } else {
@@ -109,15 +119,20 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
                   }
                 },
                 child: Container(
-                    padding: EdgeInsets.only(
-                        top: 15, left: 20, right: 5, bottom: 15),
-                    child: SvgPicture.asset('${imageicon}')),
+                    width: 50.w,
+                    height: 50.h,
+                    padding: EdgeInsets.all(12.w),
+                    child: SvgPicture.asset(
+                      '${widget.imageicon}',
+                      width: 24.w,
+                      height: 24.h,
+                    )),
               ),
             ],
           ),
         ),
         actions: [
-          home != null
+          widget.home != null
               ? GestureDetector(
                   onTap: () {
                     Navigator.of(context).pushAndRemoveUntil(
@@ -126,50 +141,113 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
                         (Route<dynamic> route) => false);
                   },
                   child: Container(
-                      padding: EdgeInsets.only(
-                          top: 15, right: 17, bottom: 15, left: 13),
+                      width: 50.w,
+                      height: 50.h,
+                      padding: EdgeInsets.all(12.w),
                       child: SvgPicture.asset(
-                        "${home}",
-                        height: 20,
+                        "${widget.home}",
+                        width: 24.w,
+                        height: 24.h,
                         color: Colors.white,
                       )),
                 )
               : Text(''),
-          if (action2 != null)
-            GestureDetector(onTap: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) {
-                  return NotificationScreen();
+          if (widget.action2 != null)
+            GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) {
+                      return NotificationScreen();
+                    },
+                  ));
+                  globals.screenstack++;
                 },
-              ));
-              globals.screenstack++;
-            }, child: Consumer<NotificationCountProvider>(
-                builder: (context, value, child) {
-              return value.notifications == 0
-                  ? Padding(
-                      padding: EdgeInsets.only(
-                          top: 15, right: 17, bottom: 15, left: 13),
-                      child: SvgPicture.asset(
-                        "${action2}",
-                      ),
-                    )
-                  : badges.Badge(
-                      // toAnimate: false,
-                      badgeContent: Text(
-                        value.notifications > 99
-                            ? '99+'
-                            : '${value.notifications}',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      position: badges.BadgePosition.topEnd(top: 5, end: 10),
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                            top: 15, right: 17, bottom: 15, left: 13),
-                        child: SvgPicture.asset(
-                          "${action2}",
-                        ),
-                      ));
-            })),
+                child: Selector<NotificationCountProvider, int>(
+                    selector: (context, provider) => provider.notifications,
+                    builder: (context, count, child) {
+                      // Debounce mechanism to prevent double blink
+                      if (!_isInitialized) {
+                        _lastNotifiedCount = count;
+                        _isInitialized = true;
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (mounted) setState(() {});
+                        });
+                      }
+
+                      final hasNotifications = count > 0;
+                      final shouldShow =
+                          count != _lastNotifiedCount || hasNotifications;
+
+                      if (shouldShow) {
+                        _lastNotifiedCount = count;
+                      }
+
+                      return AnimatedSwitcher(
+                        duration: Duration(milliseconds: 300),
+                        transitionBuilder:
+                            (Widget child, Animation<double> animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: ScaleTransition(
+                              scale: animation,
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: hasNotifications
+                            ? Container(
+                                key: ValueKey('badge_$count'),
+                                width: 50.w,
+                                height: 50.h,
+                                alignment: Alignment.center,
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    // Bell icon centered
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: SvgPicture.asset(
+                                        "${widget.action2}",
+                                        width: 24.w,
+                                        height: 24.h,
+                                      ),
+                                    ),
+                                    // Badge pinned to the logical top-end of the icon area (RTL aware)
+                                    PositionedDirectional(
+                                      top: 6,
+                                      end: 8,
+                                      child: badges.Badge(
+                                        position: badges.BadgePosition.topEnd(
+                                            top: 0, end: 0),
+                                        badgeStyle: badges.BadgeStyle(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 5, vertical: 2),
+                                          elevation: 0,
+                                        ),
+                                        badgeContent: Text(
+                                          count > 99 ? '99+' : '$count',
+                                          style: TextStyle(
+                                              color: Colors.white, fontSize: 9),
+                                        ),
+                                        child: SizedBox(width: 0, height: 0),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Container(
+                                key: ValueKey('no_badge'),
+                                width: 50.w,
+                                height: 50.h,
+                                alignment: Alignment.center,
+                                child: SvgPicture.asset(
+                                  "${widget.action2}",
+                                  width: 24.w,
+                                  height: 24.h,
+                                ),
+                              ),
+                      );
+                    })),
           //   Container(
           //       padding:
           //           EdgeInsets.only(top: 15, right: 17, bottom: 15, left: 13),
@@ -179,14 +257,16 @@ class WidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
           // ),
         ],
         title: Text(
-          title!,
+          widget.title!,
           style: TextStyle(
-            fontSize: 15.w,
+            fontSize: 16.sp,
             fontFamily: 'Poppins1',
-            color: textIconColor,
+            color: widget.textIconColor,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: appModelTheme.darkTheme ? black : logoBlue,
+        backgroundColor:
+            appModelTheme.darkTheme ? black : widget.backgroundColor,
         centerTitle: true,
         elevation: 0,
       ),

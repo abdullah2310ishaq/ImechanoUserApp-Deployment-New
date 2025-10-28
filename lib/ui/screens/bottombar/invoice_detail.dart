@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:imechano/localization/language_constrants.dart';
@@ -25,6 +27,7 @@ import 'package:imechano/ui/styling/config.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:flutter/rendering.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../bloc/view_services_bloc.dart';
@@ -80,6 +83,52 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
 
   List<ServicesData> servicess = <ServicesData>[];
   late ServicesDataSource servicesDataSource;
+
+  String formatDateDMY(String? value) {
+    if (value == null || value.isEmpty) return '';
+    try {
+      final dt = DateTime.parse(value);
+      return DateFormat('dd-MM-yyyy').format(dt);
+    } catch (_) {
+      final patterns = [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm:ss',
+        'yyyy/MM/dd',
+        "yyyy-MM-dd'T'HH:mm:ss",
+        'dd-MM-yyyy HH:mm:ss',
+      ];
+      for (final p in patterns) {
+        try {
+          final dt = DateFormat(p).parse(value);
+          return DateFormat('dd-MM-yyyy').format(dt);
+        } catch (_) {}
+      }
+      return value;
+    }
+  }
+
+  String formatDateTime12hDMY(String? value) {
+    if (value == null || value.isEmpty) return '';
+    try {
+      final dt = DateTime.parse(value);
+      return DateFormat('hh:mm a, dd-MM-yyyy').format(dt);
+    } catch (_) {
+      final patterns = [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm',
+        "yyyy-MM-dd'T'HH:mm:ss",
+        'dd-MM-yyyy HH:mm:ss',
+      ];
+      for (final p in patterns) {
+        try {
+          final dt = DateFormat(p).parse(value);
+          return DateFormat('hh:mm a, dd-MM-yyyy').format(dt);
+        } catch (_) {}
+      }
+      return value;
+    }
+  }
 
   void initState() {
     super.initState();
@@ -215,7 +264,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                                     pw.SizedBox(width: 5.w),
                                     pw.Text(
                                       getTranslated("OrderAt", context) +
-                                          '\n${widget.invoiceData!.createdAt!.substring(0, 10)}',
+                                          '\n${formatDateDMY(widget.invoiceData!.createdAt)}',
                                       textDirection: pw.TextDirection.rtl,
                                       textAlign: pw.TextAlign.right,
                                       style: arabicTextStyle,
@@ -223,7 +272,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                                     pw.Spacer(),
                                     pw.Text(
                                       getTranslated('PaidAt', context) +
-                                          '\n${widget.invoiceData!.updatedAt!.substring(0, 10)}',
+                                          '\n${formatDateDMY(widget.invoiceData!.updatedAt)}',
                                       textDirection: pw.TextDirection.rtl,
                                       textAlign: pw.TextAlign.right,
                                       style: arabicTextStyle,
@@ -231,7 +280,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                                     pw.Spacer(),
                                     pw.Text(
                                       getTranslated("OrderAt", context) +
-                                          '\n${widget.invoiceData!.updatedAt!.substring(0, 10)}',
+                                          '\n${formatDateDMY(widget.invoiceData!.updatedAt)}',
                                       textDirection: pw.TextDirection.rtl,
                                       textAlign: pw.TextAlign.right,
                                       style: arabicTextStyle,
@@ -468,7 +517,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                                             alignment: pw.Alignment.centerRight,
                                             child: pw.Text(
                                               getTranslated("date", context) +
-                                                  ': ${widget.invoiceData!.updatedAt!.substring(0, 10)}',
+                                                  ': ${formatDateDMY(widget.invoiceData!.updatedAt)}',
                                               style: arabicTextStyle,
                                               textDirection:
                                                   pw.TextDirection.rtl,
@@ -634,9 +683,9 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
     await file.writeAsBytes(await pdf.save());
 
     final snackBar = SnackBar(
-      duration: Duration(seconds: 10),
+      duration: Duration(seconds: 4),
       backgroundColor: Colors.green[400],
-      content: Text('Saved to $filePath'),
+      content: Text('Invoice saved'),
       action: SnackBarAction(
         label: 'Open',
         textColor: Color.fromARGB(255, 255, 255, 255),
@@ -649,6 +698,46 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
     setState(() {
       loader_download = false;
     });
+  }
+
+  Future<void> captureAndSaveScreenshot() async {
+    try {
+      final boundary = previewContainer.currentContext?.findRenderObject()
+          as RenderRepaintBoundary?;
+      if (boundary == null) return;
+      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return;
+      final Uint8List pngBytes = byteData.buffer.asUint8List();
+
+      final directory = (await getApplicationDocumentsDirectory()).path;
+      final currentTime = DateFormat('HHmmss').format(DateTime.now());
+      final currentDate = DateFormat('yyyyMMdd').format(DateTime.now());
+      final fileName =
+          'ImechanoInvoiceScreenshot_${currentDate}_$currentTime.png';
+      final filePath = '$directory/$fileName';
+      final file = File(filePath);
+      await file.writeAsBytes(pngBytes);
+
+      final snackBar = SnackBar(
+        duration: Duration(seconds: 4),
+        backgroundColor: Colors.green[400],
+        content: Text('Screenshot saved'),
+        action: SnackBarAction(
+          label: 'Open',
+          textColor: Color.fromARGB(255, 255, 255, 255),
+          onPressed: () {
+            OpenFile.open(file.path);
+          },
+        ),
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    } catch (e) {
+      log('Failed to capture screenshot: $e');
+    }
   }
 
   void scrollToBottom() {
@@ -735,13 +824,14 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                                           )),
                                       margin: EdgeInsets.only(
                                           left: 10.w, right: 10.w),
-                                      child: Container(
-                                        width: double.infinity,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 8.w),
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            CRNo(),
+                                            Flexible(child: CRNo()),
                                             Column(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
@@ -763,7 +853,7 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                                                 )
                                               ],
                                             ),
-                                            mobileNumber(),
+                                            Flexible(child: mobileNumber()),
                                           ],
                                         ),
                                       ),
@@ -987,28 +1077,73 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                             });
                           }
                         },
-                        child: Row(
-                          children: [
-                            loader_download
-                                ? Container(
-                                    height: 10,
-                                    width: 10,
-                                    child: Center(
-                                        child: CircularProgressIndicator()))
-                                : Text(
-                                    getTranslated("download", context),
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: 'Poppins1',
-                                        fontSize: 12.sp),
-                                  ),
-                            Icon(
-                              Icons.download,
-                              color: Colors.white,
-                            )
-                          ],
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              loader_download
+                                  ? SizedBox(
+                                      height: 12,
+                                      width: 12,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2, color: Colors.white),
+                                    )
+                                  : Text(
+                                      getTranslated("download", context),
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Poppins1',
+                                          fontSize: 12.sp),
+                                    ),
+                              SizedBox(width: 6),
+                              Icon(
+                                Icons.download,
+                                color: Colors.white,
+                                size: 16,
+                              )
+                            ],
+                          ),
                         )),
                   ),
+                  // SizedBox(width: 8.w),
+                  // Container(
+                  //   width: 120.w,
+                  //   child: OutlinedButton(
+                  //       style: OutlinedButton.styleFrom(
+                  //         side: BorderSide(
+                  //           width: 1.0,
+                  //           color: Colors.white,
+                  //           style: BorderStyle.solid,
+                  //         ),
+                  //       ),
+                  //       onPressed: () async {
+                  //         await captureAndSaveScreenshot();
+                  //       },
+                  //       child: FittedBox(
+                  //         fit: BoxFit.scaleDown,
+                  //         child: Row(
+                  //           mainAxisSize: MainAxisSize.min,
+                  //           children: [
+                  //             Text(
+                  //               getTranslated("screenshot", context),
+                  //               overflow: TextOverflow.ellipsis,
+                  //               style: TextStyle(
+                  //                   color: Colors.white,
+                  //                   fontFamily: 'Poppins1',
+                  //                   fontSize: 12.sp),
+                  //             ),
+                  //             SizedBox(width: 6),
+                  //             Icon(
+                  //               Icons.camera_alt,
+                  //               color: Colors.white,
+                  //               size: 16,
+                  //             )
+                  //           ],
+                  //         ),
+                  //       )),
+                  // ),
                 ],
               ),
             )
@@ -1357,19 +1492,16 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                 ),
               ),
               SizedBox(height: 5.h),
-              Row(
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                spacing: 16,
+                runSpacing: 10,
                 children: [
-                  Image(
-                      image:
-                          AssetImage("assets/icons/My Vehicle/Group 9254.png"),
-                      height: 50.h),
-                  Spacer(),
+                  _buildProfileImage(),
                   carddivider(
                       getTranslated("CXname", context), profileData["name"]),
-                  Spacer(),
                   carddivider(getTranslated("Address", context),
                       widget.invoiceData!.address!.substring(0, 20)),
-                  Spacer(),
                   carddivider(getTranslated("mobileno.", context),
                       profileData['mobile_number']),
                 ],
@@ -1382,44 +1514,33 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
                 style: TextStyle(fontFamily: "Poppins2", fontSize: 10.sp),
               ),
               SizedBox(height: 10.h),
-              Row(
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                spacing: 16,
+                runSpacing: 10,
                 children: [
-                  Image(
-                      image:
-                          AssetImage("assets/icons/My Vehicle/Group 9253.png"),
-                      height: 50.h),
-                  Spacer(),
+                  _buildCarImage(),
                   carddivider(getTranslated("Make", context),
                       widget.invoiceData!.car!.carBrand!),
-                  Spacer(),
                   carddivider(getTranslated("Model", context),
                       widget.invoiceData!.car!.carModel!),
-                  Spacer(),
                   carddivider(getTranslated("Year", context),
                       widget.invoiceData!.car!.carYear!),
                 ],
               ),
               SizedBox(height: 10.h),
-              Row(
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                spacing: 16,
+                runSpacing: 10,
                 children: [
-                  carddivider(
-                      getTranslated("Mileage", context),
-                      //"Milage",
+                  carddivider(getTranslated("Mileage", context),
                       widget.invoiceData!.car!.carMileage!),
-                  Spacer(),
-                  carddivider(
-                      getTranslated("cylindertype", context),
-                      // "Cylinder",
+                  carddivider(getTranslated("cylindertype", context),
                       widget.invoiceData!.car!.carCylinder!),
-                  Spacer(),
-                  carddivider(
-                      getTranslated("carplateno", context),
-                      //"Car Plate",
+                  carddivider(getTranslated("carplateno", context),
                       widget.invoiceData!.car!.plateNo!),
-                  Spacer(),
-                  carddivider(
-                      getTranslated("ChasisNo", context),
-                      //"Chasis No (Optional)",
+                  carddivider(getTranslated("ChasisNo", context),
                       widget.invoiceData!.car!.carChasis!)
                 ],
               ),
@@ -1437,13 +1558,13 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
       children: [
         SizedBox(width: 5.w),
         carddivider(getTranslated("OrderAt", context),
-            widget.invoiceData!.createdAt!.substring(0, 10)),
+            formatDateDMY(widget.invoiceData!.createdAt)),
         Spacer(),
         carddivider(getTranslated('PaidAt', context),
-            widget.invoiceData!.updatedAt!.substring(0, 10)),
+            formatDateDMY(widget.invoiceData!.updatedAt)),
         Spacer(),
         carddivider(getTranslated("date", context),
-            '${widget.invoiceData!.updatedAt!.substring(0, 10)}'),
+            formatDateDMY(widget.invoiceData!.updatedAt)),
         SizedBox(width: 5.w),
       ],
     );
@@ -1486,6 +1607,82 @@ class _InvoiceDetailState extends State<InvoiceDetail> {
         textAlign: TextAlign.center,
         style: TextStyle(
             color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+
+  String? _profileImageUrl() {
+    // Prefer stored profile path combined with Config.profileurl; fallback to PREF_PROFILE_IMG absolute URL
+    try {
+      final profileJson = PrefObj.preferences!.get(PrefKeys.PROFILE_DATA);
+      if (profileJson != null) {
+        final map = json.decode(profileJson);
+        final String? profile = map['profile']?.toString();
+        if (profile != null &&
+            profile.isNotEmpty &&
+            !profile.contains('null')) {
+          return profile.startsWith('http')
+              ? profile
+              : (Config.profileurl + profile);
+        }
+      }
+    } catch (_) {}
+    if (PrefObj.preferences!.containsKey(PrefKeys.PROFILE_IMG)) {
+      final dynamic val = PrefObj.preferences!.get(PrefKeys.PROFILE_IMG);
+      if (val is String && val.isNotEmpty) return val;
+    }
+    return null;
+  }
+
+  Widget _buildProfileImage() {
+    final String? url = _profileImageUrl();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(25),
+      child: SizedBox(
+        height: 50.h,
+        width: 50.h,
+        child: url == null
+            ? Container(
+                color: Colors.grey[300],
+                child: Icon(
+                  Icons.person,
+                  size: 30.h,
+                  color: Colors.grey[600],
+                ),
+              )
+            : Image.network(url, fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey[300],
+                  child: Icon(
+                    Icons.person,
+                    size: 30.h,
+                    color: Colors.grey[600],
+                  ),
+                );
+              }),
+      ),
+    );
+  }
+
+  Widget _buildCarImage() {
+    final String? carImageUrl = widget.invoiceData?.car?.carImage;
+    final String? url = (carImageUrl != null && carImageUrl.isNotEmpty)
+        ? (carImageUrl.startsWith('http')
+            ? carImageUrl
+            : (Config.imageurl + carImageUrl))
+        : null;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(6),
+      child: SizedBox(
+        height: 50.h,
+        width: 80.w,
+        child: url == null
+            ? Image.asset('assets/images/car.png', fit: BoxFit.cover)
+            : Image.network(url, fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                return Image.asset('assets/images/car.png', fit: BoxFit.cover);
+              }),
       ),
     );
   }

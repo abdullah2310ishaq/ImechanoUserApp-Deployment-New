@@ -25,6 +25,7 @@ class MoreServicies extends StatefulWidget {
 }
 
 class _MoreServiciesState extends State<MoreServicies> {
+  // ignore: unused_field
   final List<bool> _selected = List.generate(7, (i) => false);
   bool _isTextFieldEnable = true;
   TextEditingController _others = TextEditingController();
@@ -47,8 +48,6 @@ class _MoreServiciesState extends State<MoreServicies> {
     final response = await http.post(uri,
         body: json.encode(postData),
         headers: {'content-Type': 'application/json'});
-
-    dynamic responseJson;
 
     if (response.statusCode == 200) {
       globals.other.add(itemId);
@@ -267,12 +266,14 @@ class _MoreServiciesState extends State<MoreServicies> {
                                   // EdgeInsets.only(top: 15.h, bottom: 15.h),
                                   // textColor: Colors.white,
                                   child: Container(
-                                    alignment: Alignment.topLeft,
+                                    alignment: Alignment.centerLeft,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 16),
                                     child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Container(
+                                        Expanded(
                                           child: Text(
                                             globals.currentCount.toString() +
                                                 " " +
@@ -281,20 +282,19 @@ class _MoreServiciesState extends State<MoreServicies> {
                                                 " " +
                                                 getTranslated(
                                                     'Service', context),
-                                            style: TextStyle(fontSize: 12),
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.white),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          margin: EdgeInsets.only(left: 20),
                                         ),
-                                        SizedBox(
-                                          width: 40,
-                                        ),
-                                        Container(
-                                            child: Text(
+                                        Text(
                                           getTranslated(
                                               'Viewselections', context),
-                                          style:
-                                              TextStyle(fontFamily: "Poppins2"),
-                                        ))
+                                          style: TextStyle(
+                                              fontFamily: "Poppins2",
+                                              color: Colors.white),
+                                        ),
                                       ],
                                     ),
                                   ),

@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, unused_element
 import 'dart:developer';
 import 'dart:io';
 
@@ -94,16 +94,40 @@ class _EmergencyPageState extends State<EmergencyPage> {
   }
 
   openWhatsapp() async {
-    String whatsapp = '+97455929250';
-    String whatsappURlAndroid =
-        "whatsapp://send?phone=$whatsapp&text=Hi imechano, It's emergency";
-    await launchUrl(Uri.parse(whatsappURlAndroid));
-    String whatsappURLIos =
-        "https://wa.me/$whatsapp?text=${Uri.parse("Hi imechano, Its emergency")}";
-    if (Platform.isIOS) {
-      await launchUrl(Uri.parse(whatsappURLIos));
-    } else {
-      await launchUrl(Uri.parse(whatsappURlAndroid));
+    try {
+      String whatsapp = '+97455929250';
+      String message = Uri.encodeComponent("Hi imechano, It's emergency");
+
+      // First try WhatsApp app scheme
+      String whatsappUrl = "whatsapp://send?phone=$whatsapp&text=$message";
+
+      // Check if WhatsApp can be launched
+      bool canLaunchWhatsApp = await canLaunchUrl(Uri.parse(whatsappUrl));
+
+      if (canLaunchWhatsApp) {
+        // Launch WhatsApp app directly
+        await launchUrl(
+          Uri.parse(whatsappUrl),
+          mode: LaunchMode.externalApplication, // Force external app
+        );
+      } else {
+        // Fallback to WhatsApp Web
+        String whatsappWebUrl = "https://wa.me/$whatsapp?text=$message";
+        await launchUrl(
+          Uri.parse(whatsappWebUrl),
+          mode: LaunchMode.externalApplication,
+        );
+      }
+    } catch (e) {
+      print('WhatsApp launch error: $e');
+      // Show user-friendly error
+      Get.snackbar(
+        'Error',
+        'WhatsApp could not be opened. Please check if WhatsApp is installed.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: Duration(seconds: 3),
+      );
     }
   }
 
@@ -129,12 +153,15 @@ class _EmergencyPageState extends State<EmergencyPage> {
 
   openGallery() async {
     try {
-      var pickedfiles = await _picker.pickMultiImage();
-      //you can use ImageCourse.camera for Camera capture
-      setState(() {
-        imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
-      });
-      Navigator.pop(context);
+      final pickedfiles = await _picker.pickMultiImage();
+      if (pickedfiles.isNotEmpty) {
+        setState(() {
+          imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
+        });
+        Navigator.pop(context);
+      } else {
+        print("No image is selected.");
+      }
     } catch (e) {
       print("error while picking file.");
     }
@@ -394,11 +421,24 @@ class _EmergencyPageState extends State<EmergencyPage> {
                       return SimpleDialog(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20)),
-                        title: Center(
-                          child: Text(
-                            "SELECT ANY ONE",
-                            style: TextStyle(fontFamily: "Poppins2"),
-                          ),
+                        titlePadding: EdgeInsets.only(
+                            left: 16, right: 8, top: 12, bottom: 0),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Center(
+                                child: Text(
+                                  "SELECT ANY ONE",
+                                  style: TextStyle(fontFamily: "Poppins2"),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.close),
+                              onPressed: () => Navigator.of(context).pop(),
+                            )
+                          ],
                         ),
                         children: [
                           Row(
@@ -614,11 +654,11 @@ class _EmergencyPageState extends State<EmergencyPage> {
       width: 327.w,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(10.0),
           ),
-          backgroundColor: Color(0xff70BDF1), // foreground
+          backgroundColor: Color(0xff70BDF1),
+          foregroundColor: Colors.white,
         ),
         onPressed: () {
           if (!isCarAdded ||
@@ -770,18 +810,14 @@ class _EmergencyPageState extends State<EmergencyPage> {
       width: 327.w,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(10.0),
           ),
-          backgroundColor: Color.fromRGBO(37, 211, 102, 1), // foreground
+          backgroundColor: Color.fromRGBO(37, 211, 102, 1),
+          foregroundColor: Colors.white,
         ),
         onPressed: () {
           openWhatsapp();
-          var whatsappURl_android =
-              "whatsapp://send?phone=923430529998&text=hello";
-          var whatappURL_ios =
-              "https://wa.me/923430529998?text=${Uri.parse("hello")}";
         },
         child: Text(
           getTranslated('WhatsappMessage', context),
@@ -798,11 +834,11 @@ class _EmergencyPageState extends State<EmergencyPage> {
       width: 327.w,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(10.0),
           ),
-          backgroundColor: Color(0xff70BDF1), // foreground
+          backgroundColor: Color(0xff70BDF1),
+          foregroundColor: Colors.white,
         ),
         onPressed: () {
           _makePhoneCall("+97455929250");
@@ -817,11 +853,38 @@ class _EmergencyPageState extends State<EmergencyPage> {
   }
 
   Future<void> _makePhoneCall(String phoneNumber) async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
-    await launchUrl(launchUri);
+    try {
+      final Uri launchUri = Uri(
+        scheme: 'tel',
+        path: phoneNumber,
+      );
+
+      bool canMakeCall = await canLaunchUrl(launchUri);
+
+      if (canMakeCall) {
+        await launchUrl(
+          launchUri,
+          mode: LaunchMode.externalApplication, // Force external app (dialer)
+        );
+      } else {
+        Get.snackbar(
+          'Error',
+          'Phone dialer could not be opened',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: Duration(seconds: 3),
+        );
+      }
+    } catch (e) {
+      print('Phone call error: $e');
+      Get.snackbar(
+        'Error',
+        'Unable to make phone call',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: Duration(seconds: 3),
+      );
+    }
   }
 
   Widget _DateTime() {

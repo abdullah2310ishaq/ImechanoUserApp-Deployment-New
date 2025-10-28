@@ -61,13 +61,15 @@ class _MyvehicalscreenState extends State<Myvehicalscreen> {
     appModelTheme = appModel;
     return ScreenUtilInit(
       designSize: Size(414, 896),
-      builder: (context, child) => WillPopScope(
-        onWillPop: () async {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => BottomBarPage(2)));
-          return true;
+      builder: (context, child) => PopScope(
+        canPop: true,
+        onPopInvoked: (didPop) {
+          if (!didPop) {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => BottomBarPage(2)));
+          }
         },
         child: Scaffold(
           drawer: drawerpage(),
@@ -147,8 +149,8 @@ class _MyvehicalscreenState extends State<Myvehicalscreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset(
-            "assets/svg/imechano-logo.svg",
+          Image.asset(
+            "assets/icons/splash/logo.png",
             height: MediaQuery.of(context).size.height * 0.11,
             color: appModelTheme.darkTheme ? white : null,
           ),
@@ -250,8 +252,9 @@ class _MyvehicalscreenState extends State<Myvehicalscreen> {
                             ]),
                         child: Card(
                           elevation: 0,
-                          color:
-                              appModelTheme.darkTheme ? darkmodeColor : white,
+                          color: appModelTheme.darkTheme
+                              ? Color(0xff252525)
+                              : Colors.white,
                           child: Padding(
                             padding: const EdgeInsets.only(left: 12, right: 12),
                             child: Column(

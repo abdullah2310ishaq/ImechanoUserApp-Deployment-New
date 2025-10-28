@@ -1,7 +1,4 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:convert';
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -104,23 +101,21 @@ class _ProfilePageState extends State<ProfilePage> {
     final appModel = Provider.of<AppModel>(context);
     appModelTheme = appModel;
 
-    return WillPopScope(
-        onWillPop: () async {
-          if (!Navigator.of(context).canPop()) {
-            // If there's no screen in the stack, navigate to home screen
+    return PopScope(
+        canPop: true,
+        onPopInvoked: (didPop) {
+          if (!didPop && !Navigator.of(context).canPop()) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => BottomBarPage(2)),
             );
-            return false; // Return false to prevent the app from closing
-          } else {
-            return true; // Return true to allow the app to close
           }
         },
         child: Scaffold(
           appBar: WidgetAppBar(
             title: getTranslated('myprofile', context),
             menuItem: 'assets/svg/Menu.svg',
+            imageicon: 'assets/svg/Arrow_alt_left.svg',
             action: 'assets/svg/shopping-cart.svg',
             action2: 'assets/svg/ball.svg',
           ),
@@ -252,17 +247,145 @@ class _ProfilePageState extends State<ProfilePage> {
                     return SimpleDialog(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
-                      title: Center(
-                        child: Text(
-                          "SELECT ANY ONE",
-                          style: TextStyle(fontFamily: "Poppins2"),
-                        ),
+                      titlePadding: EdgeInsets.only(
+                          left: 16, right: 8, top: 12, bottom: 0),
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                "SELECT ANY ONE",
+                                style: TextStyle(fontFamily: "Poppins2"),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () => Navigator.of(context).pop(),
+                          )
+                        ],
                       ),
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SimpleDialogOption(
+                            Expanded(
+                              child: SimpleDialogOption(
+                                child: InkWell(
+                                  onTap: () async {
+                                    image = await _picker.pickImage(
+                                        source: ImageSource.camera);
+                                    onUploadAPI(
+                                        PrefObj.preferences!
+                                            .get(PrefKeys.USER_ID),
+                                        File(image!.path));
+                                    setState(() {
+                                      temp = image;
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 60.h,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: logoBlue,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Camera",
+                                        style: TextStyle(
+                                            fontSize: 18.sp,
+                                            color: Colors.white,
+                                            fontFamily: "Poppins1"),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10.w),
+                            Expanded(
+                              child: SimpleDialogOption(
+                                child: InkWell(
+                                  onTap: () async {
+                                    image = await _picker.pickImage(
+                                        source: ImageSource.gallery);
+                                    onUploadAPI(
+                                        PrefObj.preferences!
+                                            .get(PrefKeys.USER_ID),
+                                        File(image!.path));
+                                    setState(() {
+                                      temp = image;
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 60.h,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: logoBlue,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Gallery",
+                                        style: TextStyle(
+                                            fontSize: 18.sp,
+                                            color: Colors.white,
+                                            fontFamily: "Poppins1"),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }),
+        ),
+        // Small pen edit button overlay on avatar
+        Positioned(
+          right: MediaQuery.of(context).size.width / 2 - 55.h - 6,
+          bottom: 4,
+          child: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+              showDialog(
+                barrierDismissible: true,
+                context: context,
+                builder: (context) {
+                  return SimpleDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    titlePadding:
+                        EdgeInsets.only(left: 16, right: 8, top: 12, bottom: 0),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              "SELECT ANY ONE",
+                              style: TextStyle(fontFamily: "Poppins2"),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close),
+                          onPressed: () => Navigator.of(context).pop(),
+                        )
+                      ],
+                    ),
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: SimpleDialogOption(
                               child: InkWell(
                                 onTap: () async {
                                   image = await _picker.pickImage(
@@ -277,7 +400,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 },
                                 child: Container(
                                   height: 60.h,
-                                  width: 100.w,
+                                  width: double.infinity,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     color: logoBlue,
@@ -294,7 +417,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               ),
                             ),
-                            SimpleDialogOption(
+                          ),
+                          SizedBox(width: 10.w),
+                          Expanded(
+                            child: SimpleDialogOption(
                               child: InkWell(
                                 onTap: () async {
                                   image = await _picker.pickImage(
@@ -309,7 +435,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 },
                                 child: Container(
                                   height: 60.h,
-                                  width: 100.w,
+                                  width: double.infinity,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     color: logoBlue,
@@ -326,14 +452,26 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }),
-        )
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            child: Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: logoBlue,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: Icon(Icons.edit, size: 16, color: Colors.white),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -348,7 +486,8 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         SizedBox(height: 10.h),
         CustomButton(
-            title: Text(getTranslated('Signout', context)),
+            title: Text(getTranslated('Signout', context),
+                style: TextStyle(color: Colors.white)),
             width: 0.3,
             callBackFunction: () => logOutDialog(),
             bgColor: red,
@@ -520,6 +659,7 @@ class _ProfilePageState extends State<ProfilePage> {
       width: 370.w,
       child: ElevatedButton(
         style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(logoBlue),
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),

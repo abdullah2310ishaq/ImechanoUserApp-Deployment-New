@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -10,9 +8,11 @@ import 'package:imechano/localization/language_constrants.dart';
 import 'package:imechano/ui/bloc/customer_notification_list_bloc.dart';
 import 'package:imechano/ui/modal/customer_notification_list_model.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
+
 import 'package:imechano/ui/shared/widgets/appbar/custom_appbar_widget.dart';
 import 'package:imechano/ui/shared/widgets/appbar/custom_drawer_widget.dart';
 import 'package:imechano/ui/shared/widgets/confirmation_dialog.dart';
+
 import 'package:imechano/ui/styling/colors.dart';
 import 'package:imechano/ui/styling/global.dart';
 import 'package:imechano/utils/utils.dart';
@@ -32,17 +32,77 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   bool isSwitch = true;
-  dynamic appModelTheme;
+  AppModel? appModelTheme;
+  bool isLoading = false;
+  String? errorMessage;
+  bool _isDisposed = false;
+
+  DateTime _parseToLocal(String? raw) {
+    try {
+      if (raw == null) return DateTime.now();
+      final trimmed = raw.trim();
+      // Epoch seconds or milliseconds
+      final isNumeric = RegExp(r'^\d{10,13}$').hasMatch(trimmed);
+      if (isNumeric) {
+        final intVal = int.tryParse(trimmed) ?? 0;
+        // Heuristic: 13 digits = ms, 10 = s
+        final millis = trimmed.length >= 13 ? intVal : intVal * 1000;
+        return DateTime.fromMillisecondsSinceEpoch(millis, isUtc: true)
+            .toLocal();
+      }
+      // ISO-8601
+      return DateTime.parse(trimmed).toLocal();
+    } catch (_) {
+      return DateTime.now();
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    print("Notification page");
-    Provider.of<NotificationCountProvider>(context, listen: false)
-        .setNotifications();
-    if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
-      customerNotificationListBloc
-          .notificationListSinck(PrefObj.preferences!.get(PrefKeys.USER_ID));
+    log("Notification page");
+    _loadNotifications();
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
+
+  Future<void> _loadNotifications() async {
+    if (_isDisposed) return;
+
+    try {
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+          errorMessage = null;
+        });
+      }
+
+      await Provider.of<NotificationCountProvider>(context, listen: false)
+          .setNotifications();
+
+      if (PrefObj.preferences?.containsKey(PrefKeys.USER_ID) == true) {
+        final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+        if (userId != null) {
+          await customerNotificationListBloc.notificationListSinck(userId);
+        }
+      }
+    } catch (e) {
+      log('Error loading notifications: $e');
+      if (mounted) {
+        setState(() {
+          errorMessage = 'Failed to load notifications. Please try again.';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -59,10 +119,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
           home: 'assets/svg/homeicon.svg',
         ),
         drawer: drawerpage(),
-        backgroundColor: appModelTheme.darkTheme ? black : Color(0xff70bdf1),
+        backgroundColor:
+            appModelTheme?.darkTheme == true ? black : const Color(0xff70bdf1),
         body: ScreenUtilInit(
           designSize: Size(414, 896),
-          child: NotificationListener<OverscrollIndicatorNotification>(
+          builder: (context, child) =>
+              NotificationListener<OverscrollIndicatorNotification>(
             onNotification: (notification) {
               notification.disallowIndicator();
               return true;
@@ -72,10 +134,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 Expanded(
                     child: Container(
                   decoration: BoxDecoration(
-                      color: appModelTheme.darkTheme
-                          ? Color(0xff252525)
+                      color: appModelTheme?.darkTheme == true
+                          ? const Color(0xff252525)
                           : Colors.white,
-                      borderRadius: BorderRadius.only(
+                      borderRadius: const BorderRadius.only(
                           topRight: Radius.circular(25.0),
                           topLeft: Radius.circular(25.0))),
                   child: SingleChildScrollView(
@@ -90,94 +152,237 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             builder: (context,
                                 AsyncSnapshot<CustomerNotificationListModel>
                                     notificationListSnapshot) {
-                              if (!notificationListSnapshot.hasData) {
+                              if (isLoading) {
                                 return Center(
-                                  child: CircularProgressIndicator(),
+                                  child: CircularProgressIndicator(
+                                    valueColor:
+                                        AlwaysStoppedAnimation<Color>(logoBlue),
+                                  ),
+                                );
+                              }
+
+                              if (errorMessage != null) {
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.error_outline,
+                                        size: 50,
+                                        color: red,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        errorMessage!,
+                                        style: TextStyle(
+                                          color:
+                                              appModelTheme?.darkTheme == true
+                                                  ? white
+                                                  : black,
+                                          fontSize: 14,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      ElevatedButton(
+                                        onPressed: _loadNotifications,
+                                        child: const Text('Retry'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: logoBlue,
+                                          foregroundColor: white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+
+                              if (notificationListSnapshot.hasError) {
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.error_outline,
+                                        size: 50,
+                                        color: red,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        'Error loading notifications',
+                                        style: TextStyle(
+                                          color:
+                                              appModelTheme?.darkTheme == true
+                                                  ? white
+                                                  : black,
+                                          fontSize: 14,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      ElevatedButton(
+                                        onPressed: _loadNotifications,
+                                        child: const Text('Retry'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: logoBlue,
+                                          foregroundColor: white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+
+                              if (!notificationListSnapshot.hasData ||
+                                  notificationListSnapshot.data?.data == null ||
+                                  notificationListSnapshot
+                                      .data!.data!.isEmpty) {
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.notifications_none,
+                                        size: 50,
+                                        color: appModelTheme?.darkTheme == true
+                                            ? greycolo
+                                            : Colors.grey[400],
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        'No notifications yet',
+                                        style: TextStyle(
+                                          color:
+                                              appModelTheme?.darkTheme == true
+                                                  ? white
+                                                  : black,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 );
                               }
                               return ListView.separated(
                                 scrollDirection: Axis.vertical,
-                                physics: BouncingScrollPhysics(),
+                                physics: const BouncingScrollPhysics(),
                                 itemCount:
                                     notificationListSnapshot.data!.data!.length,
                                 shrinkWrap: true,
                                 separatorBuilder: (context, index) {
-                                  return Divider();
+                                  return Divider(
+                                    color: appModelTheme?.darkTheme == true
+                                        ? Colors.grey[700]
+                                        : Colors.grey[400],
+                                    thickness: 1.0,
+                                    height: 1.0,
+                                  );
                                 },
                                 itemBuilder: (context, index) {
+                                  final notification = notificationListSnapshot
+                                      .data!.data![index];
+                                  final isRead = notification.status == '1';
+
                                   return Container(
-                                    color: notificationListSnapshot
-                                                .data!.data![index].status ==
-                                            '1'
-                                        ? grayE6E6E5
-                                        : greycolo.withOpacity(0.5),
+                                    color: appModelTheme?.darkTheme == true
+                                        ? (isRead
+                                            ? const Color(0xff1e1e1e)
+                                            : const Color(0xff2a2a2a))
+                                        : (isRead
+                                            ? Colors.white
+                                            : const Color(0xFFE6E6E5)),
                                     child: ListTile(
                                       isThreeLine: true,
                                       onTap: () async {
-                                        if (notificationListSnapshot
-                                                .data!.data![index].status ==
-                                            '0') {
-                                          bool response = await NotificationApi
-                                              .updateNotificationStatus(
-                                                  notificationListSnapshot
-                                                      .data!.data![index]);
-                                          log('$response');
-                                        }
+                                        try {
+                                          if (!isRead) {
+                                            bool response =
+                                                await NotificationApi
+                                                    .updateNotificationStatus(
+                                                        notification);
+                                            log('Notification status updated: $response');
+                                          }
 
-                                        String? str = notificationListSnapshot
-                                            .data!.data![index].title!;
-                                        String? jobNo = notificationListSnapshot
-                                            .data!.data![index].jobNo;
-                                        Utils.handleNotificationNavigation(
-                                            context, null, str, jobNo);
+                                          final title = notification.title;
+                                          final jobNo = notification.jobNo;
+                                          Utils.handleNotificationNavigation(
+                                              context, null, title, jobNo);
+                                        } catch (e) {
+                                          log('Error handling notification tap: $e');
+                                          if (mounted) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: const Text(
+                                                    'Error occurred'),
+                                                backgroundColor: red,
+                                              ),
+                                            );
+                                          }
+                                        }
                                       },
                                       title: Row(
                                         children: [
-                                          Text(
-                                            getTranslated(
-                                                notificationListSnapshot
-                                                    .data!
-                                                    .data![index]
-                                                    .title!
-                                                    .removeAllWhitespace,
-                                                context),
-                                            style: TextStyle(
-                                                fontSize: 11,
-                                                fontFamily: 'Poppins3'),
+                                          Expanded(
+                                            child: Text(
+                                              (() {
+                                                final title =
+                                                    notification.title ?? '';
+                                                final t = getTranslated(
+                                                    title, context);
+                                                return (t == title || t.isEmpty)
+                                                    ? title
+                                                    : t;
+                                              })(),
+                                              style: TextStyle(
+                                                  fontSize: 11,
+                                                  fontFamily: 'Poppins3',
+                                                  color: appModelTheme
+                                                              ?.darkTheme ==
+                                                          true
+                                                      ? white
+                                                      : black,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
                                           ),
-                                          Flexible(
-                                              fit: FlexFit.tight,
-                                              child: SizedBox()),
                                           Text(
                                             DateFormat('hh:mm a dd-MM-yy')
-                                                .format(DateTime.parse(
-                                                    notificationListSnapshot
-                                                        .data!
-                                                        .data![index]
-                                                        .updatedAt!)),
+                                                .format(_parseToLocal(
+                                                    notification.updatedAt)),
                                             style: TextStyle(
                                                 fontSize: 10,
-                                                fontFamily: 'Poppins3'),
+                                                fontFamily: 'Poppins3',
+                                                color:
+                                                    appModelTheme?.darkTheme ==
+                                                            true
+                                                        ? Colors.grey[300]
+                                                        : Colors.grey[600]),
                                           ),
                                         ],
                                       ),
                                       subtitle: Text(
-                                        getTranslated(
-                                            notificationListSnapshot
-                                                .data!
-                                                .data![index]
-                                                .message!
-                                                .removeAllWhitespace,
-                                            context),
+                                        (() {
+                                          final msg =
+                                              notification.message ?? '';
+                                          final m = getTranslated(msg, context);
+                                          return (m == msg || m.isEmpty)
+                                              ? msg
+                                              : m;
+                                        })(),
+                                        style: TextStyle(
+                                          color:
+                                              appModelTheme?.darkTheme == true
+                                                  ? Colors.grey[200]
+                                                  : Colors.grey[700],
+                                          fontSize: 12,
+                                        ),
                                       ),
                                       leading: Image(
                                           height: 10,
-                                          image: notificationListSnapshot.data!
-                                                      .data![index].status ==
-                                                  '1'
-                                              ? AssetImage(
+                                          image: isRead
+                                              ? const AssetImage(
                                                   "assets/icons/My Account/Ellipse 27.png")
-                                              : AssetImage(
+                                              : const AssetImage(
                                                   "assets/icons/My Account/Ellipse 27-1.png")),
                                     ),
                                   );
@@ -201,7 +406,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           height: 20.h,
           child: Image(
             height: 25.h,
-            image: AssetImage(
+            image: const AssetImage(
                 "assets/icons/My Account/notifications_black_24dp.png"),
           ),
           margin: EdgeInsets.only(left: 20.w, right: 20.w),
@@ -209,7 +414,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
         Expanded(
           child: Text(
             getTranslated("notification", context),
-            style: TextStyle(fontSize: 17.sp),
+            style: TextStyle(
+              fontSize: 17.sp,
+              color: appModelTheme?.darkTheme == true ? white : black,
+            ),
           ),
         ),
         IconButton(
@@ -220,36 +428,83 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     return ConfirmationDialog(
                         message: 'delete all notifications?',
                         onYesPressed: () async {
-                          Loader().showLoader(context);
-                          bool response =
-                              await NotificationApi.deleteAllNotifications();
-                          if (response) {
-                            await Provider.of<NotificationCountProvider>(
-                                    context,
-                                    listen: false)
-                                .setNotifications();
-                            if (PrefObj.preferences!
-                                .containsKey(PrefKeys.USER_ID)) {
-                              await customerNotificationListBloc
-                                  .notificationListSinck(PrefObj.preferences!
-                                      .get(PrefKeys.USER_ID));
-                              setState(() {});
+                          try {
+                            Loader().showLoader(context);
+                            bool response =
+                                await NotificationApi.deleteAllNotifications();
+                            if (response) {
+                              await Provider.of<NotificationCountProvider>(
+                                      context,
+                                      listen: false)
+                                  .setNotifications();
+                              if (PrefObj.preferences
+                                      ?.containsKey(PrefKeys.USER_ID) ==
+                                  true) {
+                                final userId =
+                                    PrefObj.preferences!.get(PrefKeys.USER_ID);
+                                if (userId != null) {
+                                  await customerNotificationListBloc
+                                      .notificationListSinck(userId);
+                                  if (mounted) {
+                                    setState(() {});
+                                  }
+                                }
+                              }
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Notifications deleted successfully'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              }
+                            } else {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content:
+                                        Text('Failed to delete notifications'),
+                                    backgroundColor: red,
+                                  ),
+                                );
+                              }
+                            }
+                          } catch (e) {
+                            log('Error deleting notifications: $e');
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Error occurred'),
+                                  backgroundColor: red,
+                                ),
+                              );
+                            }
+                          } finally {
+                            Loader().hideLoader(context);
+                            if (mounted) {
+                              Navigator.pop(context);
                             }
                           }
-
-                          Loader().hideLoader(context);
-                          Navigator.pop(context);
                         });
                   });
             },
             icon: Icon(Icons.delete, color: red)),
         Switch(
-          activeColor: Colors.blue,
+          activeColor: logoBlue,
+          activeTrackColor: logoBlue.withOpacity(0.3),
+          inactiveThumbColor:
+              appModelTheme?.darkTheme == true ? greycolo : Colors.grey[400],
+          inactiveTrackColor: appModelTheme?.darkTheme == true
+              ? greycolo.withOpacity(0.3)
+              : Colors.grey[300],
           value: isSwitch,
           onChanged: (value) {
-            setState(() {
-              isSwitch = value;
-            });
+            if (mounted) {
+              setState(() {
+                isSwitch = value;
+              });
+            }
           },
         )
       ],

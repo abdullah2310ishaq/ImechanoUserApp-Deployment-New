@@ -88,6 +88,20 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
   String servicesTotal = '0.00';
   String partsTotal = '0.00';
 
+  // Helpers for local time formatting
+  DateTime _toLocal(String raw) {
+    try {
+      final base = raw.contains('.') ? raw.split('.')[0] : raw;
+      return DateTime.parse(base).toLocal();
+    } catch (_) {
+      return DateTime.now();
+    }
+  }
+
+  String _fmtDate(String raw) => DateFormat('dd-MM-yyyy').format(_toLocal(raw));
+  String _fmtDateTime(String raw) =>
+      DateFormat('dd-MM-yyyy hh:mm:ss a').format(_toLocal(raw));
+
   @override
   void initState() {
     super.initState();
@@ -139,7 +153,7 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
         onDetached();
         break;
       case AppLifecycleState.hidden:
-        // TODO: Handle this case.
+        onPaused();
         break;
     }
   }
@@ -172,7 +186,9 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                 Expanded(
                     child: Container(
                   decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: appModelTheme.darkTheme
+                          ? Colors.grey[850]
+                          : Colors.white,
                       borderRadius: BorderRadius.only(
                           topRight: Radius.circular(25),
                           topLeft: Radius.circular(25))),
@@ -212,9 +228,8 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                         title: getTranslated(
                                             'jobnumber', context)),
                                     LabelListTile(
-                                        subtitle: custjoblistSnapshot
-                                            .data!.data![0].dateTime!
-                                            .split(' ')[0],
+                                        subtitle: _fmtDate(custjoblistSnapshot
+                                            .data!.data![0].dateTime!),
                                         title:
                                             '${getTranslated('JobCard', context)} ${getTranslated('date', context)}'),
                                   ],
@@ -301,9 +316,9 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                         MainAxisAlignment.spaceAround,
                                     children: [
                                       LabelListTile(
-                                        subtitle: custjoblistSnapshot
-                                            .data!.data![0].dateTime!
-                                            .split('.')[0],
+                                        subtitle: _fmtDateTime(
+                                            custjoblistSnapshot
+                                                .data!.data![0].dateTime!),
                                         title:
                                             '${getTranslated('JobCard', context)} ${getTranslated('date', context)} ${getTranslated('time', context)}',
                                         widthFactor: 0.87,
@@ -320,7 +335,9 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                   height: 10,
                                 ),
                                 Divider(
-                                  color: Colors.grey[100],
+                                  color: appModelTheme.darkTheme
+                                      ? Colors.grey[800]
+                                      : Colors.grey[100],
                                   thickness: 11,
                                 ),
                                 SizedBox(
@@ -331,7 +348,9 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                   height: 10,
                                 ),
                                 Divider(
-                                  color: Colors.grey[100],
+                                  color: appModelTheme.darkTheme
+                                      ? Colors.grey[800]
+                                      : Colors.grey[100],
                                   thickness: 11,
                                 ),
                                 SizedBox(height: 10.h),
@@ -340,7 +359,9 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                 ),
                                 SizedBox(height: 10.h),
                                 Divider(
-                                  color: Colors.grey[100],
+                                  color: appModelTheme.darkTheme
+                                      ? Colors.grey[800]
+                                      : Colors.grey[100],
                                   thickness: 11,
                                 ),
                                 // SizedBox(height: 15.h),
@@ -357,8 +378,14 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                             height: 50,
                                             width: 165,
                                             child: ElevatedButton(
-                                              child: Text(getTranslated(
-                                                  'PayandConfirm', context)),
+                                              child: Text(
+                                                  getTranslated(
+                                                      'PayandConfirm', context),
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14,
+                                                      fontFamily: "Poppins1")),
                                               onPressed: () {
                                                 // _asyncConfirmDialog(
                                                 //     context,
@@ -461,25 +488,35 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                                                 getTranslated('cancelledat',
                                                         context) +
                                                     ' : ' +
-                                                    custjoblistSnapshot
-                                                        .data!.data![0].dateTime
-                                                        .toString()
-                                                        .substring(0, 19),
+                                                    _fmtDateTime(
+                                                        custjoblistSnapshot
+                                                            .data!
+                                                            .data![0]
+                                                            .dateTime!),
                                                 style: TextStyle(
                                                     fontFamily: "Poppins1",
-                                                    fontSize: 15)))
+                                                    fontSize: 15,
+                                                    color:
+                                                        appModelTheme.darkTheme
+                                                            ? Colors.white
+                                                            : Colors.black)))
                                         : Center(
                                             child: Text(
                                                 getTranslated(
                                                         'paidat', context) +
                                                     ' : ' +
-                                                    custjoblistSnapshot
-                                                        .data!.data![0].dateTime
-                                                        .toString()
-                                                        .substring(0, 19),
+                                                    _fmtDateTime(
+                                                        custjoblistSnapshot
+                                                            .data!
+                                                            .data![0]
+                                                            .dateTime!),
                                                 style: TextStyle(
                                                     fontFamily: "Poppins1",
-                                                    fontSize: 15)),
+                                                    fontSize: 15,
+                                                    color:
+                                                        appModelTheme.darkTheme
+                                                            ? Colors.white
+                                                            : Colors.black)),
                                           ),
                                 SizedBox(height: 35.h)
                               ],
@@ -523,9 +560,23 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
         margin: EdgeInsets.only(left: 9, right: 9, top: 7, bottom: 7),
         padding: EdgeInsets.only(bottom: 15, top: 15),
         decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.all(Radius.circular(10))),
-        child: Container(margin: EdgeInsets.only(left: 15), child: Text(title)),
+            color: appModelTheme.darkTheme
+                ? Colors.grey[900]
+                : Colors.grey[100], // Darker card background
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            border: Border.all(
+              color: appModelTheme.darkTheme
+                  ? Colors.grey[700]!
+                  : Colors.grey[300]!,
+              width: 1,
+            )),
+        child: Container(
+            margin: EdgeInsets.only(left: 15),
+            child: Text(title,
+                style: TextStyle(
+                    color: appModelTheme.darkTheme
+                        ? Colors.white
+                        : Colors.black))),
       ),
     );
   }
@@ -566,7 +617,12 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Text(
                   getTranslated('Repairs-PartsEstimate', context) + " : ",
-                  style: TextStyle(fontFamily: "Poppins1", fontSize: 15),
+                  style: TextStyle(
+                      fontFamily: "Poppins1",
+                      fontSize: 15,
+                      color: appModelTheme.darkTheme
+                          ? Colors.white
+                          : Colors.black),
                 ),
               ),
               Container(
@@ -574,12 +630,17 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                 margin:
                     EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
                 decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
+                    border: Border.all(
+                        color: appModelTheme.darkTheme
+                            ? Colors.white30
+                            : Colors.black),
                     borderRadius: BorderRadius.all(Radius.circular(2))),
                 height: 350,
                 child: SfDataGridTheme(
-                  data:
-                      SfDataGridThemeData(headerColor: const Color(0xff162e3f)),
+                  data: SfDataGridThemeData(
+                      headerColor: appModelTheme.darkTheme
+                          ? const Color(0xff2a2a2a)
+                          : const Color(0xff162e3f)),
                   child: SfDataGrid(
                     isScrollbarAlwaysShown: true,
                     source: employeeDataSource,
@@ -690,14 +751,21 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                     height: 40,
                     width: 150,
                     alignment: Alignment.center,
-                    color: Colors.grey[200],
+                    color: appModelTheme.darkTheme
+                        ? Colors.grey[700]
+                        : Colors.grey[200],
                     child: Text(
                       // ViewpartsDataSnapshot.data!.mainTotal.toString(),
                       getTranslated('EstBalance:KWD2.000', context) +
                           getTranslated('qr', context) +
                           ": ${ViewpartsDataSnapshot.data!.mainTotal}",
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontFamily: "Poppins4", fontSize: 11),
+                      style: TextStyle(
+                          fontFamily: "Poppins4",
+                          fontSize: 11,
+                          color: appModelTheme.darkTheme
+                              ? Colors.white
+                              : Colors.black),
                     ),
                   ),
                 ),
@@ -747,7 +815,12 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Text(
                   getTranslated('ServicesEstimate', context) + " : ",
-                  style: TextStyle(fontFamily: "Poppins1", fontSize: 15),
+                  style: TextStyle(
+                      fontFamily: "Poppins1",
+                      fontSize: 15,
+                      color: appModelTheme.darkTheme
+                          ? Colors.white
+                          : Colors.black),
                 ),
               ),
               Container(
@@ -755,12 +828,17 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                 margin:
                     EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
                 decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
+                    border: Border.all(
+                        color: appModelTheme.darkTheme
+                            ? Colors.white30
+                            : Colors.black),
                     borderRadius: BorderRadius.all(Radius.circular(2))),
                 height: 350,
                 child: SfDataGridTheme(
-                  data:
-                      SfDataGridThemeData(headerColor: const Color(0xff162e3f)),
+                  data: SfDataGridThemeData(
+                      headerColor: appModelTheme.darkTheme
+                          ? const Color(0xff2a2a2a)
+                          : const Color(0xff162e3f)),
                   child: SfDataGrid(
                     source: servicesDataSource,
                     showCheckboxColumn: true,
@@ -859,13 +937,20 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
                     height: 40,
                     width: 150,
                     alignment: Alignment.center,
-                    color: Colors.grey[200],
+                    color: appModelTheme.darkTheme
+                        ? Colors.grey[700]
+                        : Colors.grey[200],
                     child: Text(
                       getTranslated('EstBalance:KWD2.000', context) +
                           getTranslated('qr', context) +
                           ": ${ViewServicesDataSnapshot.data!.mainTotal}",
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontFamily: "Poppins4", fontSize: 11),
+                      style: TextStyle(
+                          fontFamily: "Poppins4",
+                          fontSize: 11,
+                          color: appModelTheme.darkTheme
+                              ? Colors.white
+                              : Colors.black),
                     ),
                   ),
                 ),
@@ -948,18 +1033,40 @@ class _MyJobCardDetailsState extends State<MyJobCardDetails>
   }
 }
 
-Widget textFiled(String title, TextEditingController controller) {
+Widget textFiled(
+    String title, TextEditingController controller, BuildContext context) {
+  final appModel = Provider.of<AppModel>(context);
   return Container(
     margin: EdgeInsets.only(bottom: 10, top: 10),
     height: 60,
     width: 175,
     decoration: BoxDecoration(
-      color: cardgreycolor,
+      color: appModel.darkTheme
+          ? Colors.black
+          : Colors.white, // Full black for dark mode
       borderRadius: BorderRadius.circular(15),
+      border: Border.all(
+        color: appModel.darkTheme ? Colors.white : Colors.green,
+        width: 1,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: appModel.darkTheme
+              ? Colors.black26
+              : Colors.green.withOpacity(0.8),
+          spreadRadius: 2,
+          blurRadius: 5,
+        ),
+      ],
     ),
     child: TextField(
       readOnly: true,
       controller: controller,
+      style: TextStyle(
+        color: appModel.darkTheme ? Colors.white : Colors.black,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
       decoration: InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
@@ -969,8 +1076,12 @@ Widget textFiled(String title, TextEditingController controller) {
             ),
           ),
           hintText: title,
-          hintStyle: TextStyle(fontSize: 13, fontFamily: 'Poppins3'),
-          fillColor: cardgreycolor,
+          hintStyle: TextStyle(
+            fontSize: 13,
+            fontFamily: 'Poppins3',
+            color: appModel.darkTheme ? Colors.white : Colors.grey,
+          ),
+          fillColor: appModel.darkTheme ? Colors.black : Colors.white,
           filled: true),
     ),
   );
@@ -1063,11 +1174,12 @@ class EmployeeDataSource extends DataGridSource {
         );
       }
 
+      final appModel = Provider.of<AppModel>(context);
       return Container(
           // color: getRowBackgroundColor(),
           alignment: Alignment.center,
           child: Text(dataGridCell.value.toString(),
-              style: TextStyle(fontSize: 11)));
+              style: TextStyle(fontSize: 11, color: Colors.black)));
     }).toList());
   }
 
@@ -1342,10 +1454,11 @@ class ServicesDataSource extends DataGridSource {
       //             style: TextStyle(fontSize: 11))),
       //   );
       // }
+      final appModel = Provider.of<AppModel>(context);
       return Container(
           alignment: Alignment.centerLeft,
           child: Text(dataGridCell.value.toString(),
-              style: TextStyle(fontSize: 11)));
+              style: TextStyle(fontSize: 11, color: Colors.black)));
     }).toList());
   }
 

@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:imechano/localization/language_constrants.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
@@ -34,16 +34,29 @@ class _MapLocationState extends State<MapLocation> {
   bool loadAddress = false;
 
   void _getUserLocation() async {
-    var position = await GeolocatorPlatform.instance.getCurrentPosition();
-    setState(() {
-      currentPosition = LatLng(position.latitude, position.longitude);
-      latitudeCurrentLocation = currentPosition!.latitude;
-      longtitudeCurrentLocation = currentPosition!.longitude;
+    try {
+      // iOS-friendly location fetching
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 10),
+      );
       setState(() {
+        currentPosition = LatLng(position.latitude, position.longitude);
+        latitudeCurrentLocation = currentPosition!.latitude;
+        longtitudeCurrentLocation = currentPosition!.longitude;
         mapLoad = true;
       });
       marker();
-    });
+    } catch (e) {
+      print('Location error: $e');
+      // Fallback to Mumbai coordinates if location fails
+      setState(() {
+        latitudeCurrentLocation = 19.0760;
+        longtitudeCurrentLocation = 72.8777;
+        mapLoad = true;
+      });
+      marker();
+    }
   }
 
   List<Placemark>? placemarks;
@@ -77,66 +90,49 @@ class _MapLocationState extends State<MapLocation> {
   }
 
   GoogleMapController? mapsController;
-
   LatLng? middlePointOfScreenOnMap;
+  bool _isLocationLoading = false;
+
+  // Helper method to update location data
+  Future<void> _updateLocationData() async {
+    try {
+      placemarks = await placemarkFromCoordinates(
+          latitudeCurrentLocation, longtitudeCurrentLocation);
+      addressGet();
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString(
+        'address',
+        "${("$street, $area, $area2, $city, $state, $country, $postalCode")}",
+      );
+      prefs.setString('lontitude', "$longtitudeCurrentLocation");
+      prefs.setString('latitude', "$latitudeCurrentLocation");
+
+      setState(() {
+        loadAddress = true;
+      });
+
+      widget.callBackFunction!(true);
+      print("$longtitudeCurrentLocation data updated");
+    } catch (e) {
+      print("Error updating location data: $e");
+    }
+  }
 
   marker() async {
+    _markers.clear(); // Clear existing markers
     _markers.add(Marker(
         markerId: MarkerId('SomeId'),
         draggable: true,
         onDragEnd: (value) async {
           latitudeCurrentLocation = value.latitude;
           longtitudeCurrentLocation = value.longitude;
-          placemarks = await placemarkFromCoordinates(
-              latitudeCurrentLocation, longtitudeCurrentLocation);
-          addressGet();
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setString(
-            'address',
-            "${("$street, $area, $area2, $city, $state, $country, $postalCode")}",
-          );
-
-          prefs.setString(
-            'lontitude',
-            "$longtitudeCurrentLocation",
-          );
-
-          prefs.setString(
-            'latitude',
-            "$latitudeCurrentLocation",
-          );
-          widget.callBackFunction!(true);
-
-          print("$longtitudeCurrentLocation   data set");
+          await _updateLocationData();
         },
         position: LatLng(latitudeCurrentLocation, longtitudeCurrentLocation),
-        infoWindow: InfoWindow(title: 'The title of the marker')));
-    placemarks = await placemarkFromCoordinates(
-        latitudeCurrentLocation, longtitudeCurrentLocation);
-    addressGet();
+        infoWindow: InfoWindow(title: 'Your Location')));
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(
-      'address',
-      "${("$street, $area, $area2, $city, $state, $country, $postalCode")}",
-    );
-
-    prefs.setString(
-      'lontitude',
-      "$longtitudeCurrentLocation",
-    );
-
-    prefs.setString(
-      'latitude',
-      "$latitudeCurrentLocation",
-    );
-
-    if (postalCode != null) {
-      setState(() {
-        loadAddress = true;
-      });
-    }
-    widget.callBackFunction!(true);
+    await _updateLocationData();
   }
 
   String? currentVisibleRegion;
@@ -206,74 +202,158 @@ class _MapLocationState extends State<MapLocation> {
     appModelTheme = appModel;
 
     return ScreenUtilInit(
-        designSize: Size(360, 690),
+        designSize: Size(414, 896), // Updated to match other screens
         builder: (context, child) {
-          // ignore: deprecated_member_use
-          return WillPopScope(
-            onWillPop: () async {
-              if (Navigator.of(context).canPop()) {
-                Navigator.pop(context);
-              } else {
-                Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => BottomBarPage(2)),
-                    (Route<dynamic> route) => false);
+          return PopScope(
+            canPop: true,
+            onPopInvoked: (didPop) {
+              if (!didPop) {
+                if (Navigator.of(context).canPop()) {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => BottomBarPage(2)),
+                      (Route<dynamic> route) => false);
+                }
               }
-              return true;
             },
             child: Scaffold(
-                key: _key,
-                drawer: drawerpage(),
-                appBar: WidgetAppBar(
-                  title: getTranslated('pickuplocation', context),
-                  menuItem: 'assets/svg/Menu.svg',
-                  imageicon: 'assets/svg/Arrow_alt_left.svg',
-                  home: 'assets/svg/homeicon.svg',
-                  //action2: 'assets/svg/ball.svg',
-                ),
-                body: Container(
-                    child: Stack(
+              key: _key,
+              drawer: drawerpage(),
+              appBar: WidgetAppBar(
+                title: getTranslated('pickuplocation', context),
+                menuItem: 'assets/svg/Menu.svg',
+                imageicon: 'assets/svg/Arrow_alt_left.svg',
+                home: 'assets/svg/homeicon.svg',
+                //action2: 'assets/svg/ball.svg',
+              ),
+              body: SafeArea(
+                  child: Container(
+                child: Stack(
                   children: [
                     Container(
-                        height: MediaQuery.of(context).size.height / 1.5,
+                        height: MediaQuery.of(context).size.height *
+                            0.65, // More responsive
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(40.0),
-                                topLeft: Radius.circular(40.0))),
-                        child: mapLoad == true
-                            ? GoogleMap(
-                                markers: Set<Marker>.of(_markers),
-                                myLocationButtonEnabled: true,
-                                onCameraIdle: () async {
-                                  var bounds =
-                                      await mapsController!.getVisibleRegion();
-                                  print(bounds);
+                                topRight: Radius.circular(30.r),
+                                topLeft: Radius.circular(30.r))),
+                        child: Stack(
+                          children: [
+                            mapLoad == true
+                                ? GoogleMap(
+                                    markers: Set<Marker>.of(_markers),
+                                    myLocationButtonEnabled: true,
+                                    myLocationEnabled: true,
+                                    onCameraIdle: () async {
+                                      if (mapsController != null) {
+                                        // Get center of screen when camera stops moving
+                                        LatLngBounds bounds =
+                                            await mapsController!
+                                                .getVisibleRegion();
+                                        LatLng center = LatLng(
+                                          (bounds.northeast.latitude +
+                                                  bounds.southwest.latitude) /
+                                              2,
+                                          (bounds.northeast.longitude +
+                                                  bounds.southwest.longitude) /
+                                              2,
+                                        );
 
-                                  // LatLng center = LatLng(
-                                  //   (bounds.northeast.latitude + bounds.southwest.latitude) / 2,
-                                  //   (bounds.northeast.longitude + bounds.southwest.longitude) / 2,
-                                  // );
-                                  // print("${bounds}      0000");
-                                  // final LatLngBounds visibleRegion =
-                                  //     await mapController!.getVisibleRegion();
-                                  // setState(() {
-                                  //   _visibleRegion = visibleRegion;
-                                  // });
-                                },
-                                onCameraMove: (position) async {},
-                                myLocationEnabled: false,
-                                zoomControlsEnabled: false,
-                                mapType: MapType.hybrid,
-                                initialCameraPosition: CameraPosition(
-                                  target: LatLng(latitudeCurrentLocation,
-                                      longtitudeCurrentLocation),
-                                  zoom: 15,
-                                ),
-                                onMapCreated:
-                                    (GoogleMapController controller) {},
-                              )
-                            : Center(
-                                child: CircularProgressIndicator(),
-                              )),
+                                        // Update location when user stops dragging map
+                                        if (!_isLocationLoading) {
+                                          _isLocationLoading = true;
+                                          latitudeCurrentLocation =
+                                              center.latitude;
+                                          longtitudeCurrentLocation =
+                                              center.longitude;
+
+                                          // Update address
+                                          try {
+                                            placemarks =
+                                                await placemarkFromCoordinates(
+                                                    latitudeCurrentLocation,
+                                                    longtitudeCurrentLocation);
+                                            addressGet();
+
+                                            SharedPreferences prefs =
+                                                await SharedPreferences
+                                                    .getInstance();
+                                            prefs.setString(
+                                              'address',
+                                              "${("$street, $area, $area2, $city, $state, $country, $postalCode")}",
+                                            );
+                                            prefs.setString('lontitude',
+                                                "$longtitudeCurrentLocation");
+                                            prefs.setString('latitude',
+                                                "$latitudeCurrentLocation");
+
+                                            setState(() {
+                                              loadAddress = true;
+                                            });
+
+                                            widget.callBackFunction!(true);
+                                          } catch (e) {
+                                            print('Address fetch error: $e');
+                                          }
+                                          _isLocationLoading = false;
+                                        }
+                                      }
+                                    },
+                                    onCameraMove: (position) async {
+                                      // Show that location is being updated
+                                      setState(() {
+                                        loadAddress = false;
+                                      });
+                                    },
+                                    zoomControlsEnabled: true,
+                                    mapType: MapType.normal,
+                                    initialCameraPosition: CameraPosition(
+                                      target: LatLng(latitudeCurrentLocation,
+                                          longtitudeCurrentLocation),
+                                      zoom: 16,
+                                    ),
+                                    onMapCreated:
+                                        (GoogleMapController controller) {
+                                      mapsController = controller;
+                                    },
+                                    onTap: (LatLng location) async {
+                                      // Handle tap on map to select location
+                                      if (!_isLocationLoading) {
+                                        _isLocationLoading = true;
+                                        latitudeCurrentLocation =
+                                            location.latitude;
+                                        longtitudeCurrentLocation =
+                                            location.longitude;
+
+                                        // Update marker
+                                        _markers.clear();
+                                        _markers.add(Marker(
+                                          markerId:
+                                              MarkerId('selectedLocation'),
+                                          position: location,
+                                          draggable: true,
+                                          onDragEnd: (value) async {
+                                            latitudeCurrentLocation =
+                                                value.latitude;
+                                            longtitudeCurrentLocation =
+                                                value.longitude;
+                                            await _updateLocationData();
+                                          },
+                                          infoWindow: InfoWindow(
+                                              title: 'Selected Location'),
+                                        ));
+
+                                        await _updateLocationData();
+                                        _isLocationLoading = false;
+                                      }
+                                    },
+                                  )
+                                : Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                          ],
+                        )),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -283,15 +363,18 @@ class _MapLocationState extends State<MapLocation> {
                                     ? darkmodeColor
                                     : Colors.white,
                                 borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(40.0),
-                                    topLeft: Radius.circular(30.0))),
-                            height: 200.h,
+                                    topRight: Radius.circular(30.r),
+                                    topLeft: Radius.circular(30.r))),
+                            height: MediaQuery.of(context).size.height *
+                                0.25, // Responsive height
                             width: double.infinity,
                             child: Bottomsheet())
                       ],
                     )
                   ],
-                ))),
+                ),
+              )),
+            ),
           );
         });
   }
@@ -307,13 +390,13 @@ class _MapLocationState extends State<MapLocation> {
           endIndent: 90,
         ),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
               width: 25.w,
             ),
             Container(
               width: 20.w,
-              margin: EdgeInsets.only(bottom: 100.h),
               alignment: Alignment.centerLeft,
               child: Container(
                 child: DottedBorder(
@@ -332,88 +415,105 @@ class _MapLocationState extends State<MapLocation> {
                 ),
               ),
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: EdgeInsets.only(left: 8.0.w),
-                  child: Text(
-                    "Home",
-                    style: TextStyle(fontFamily: "Poppins2"),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 8.0.w),
+                    child: Text(
+                      "Home",
+                      style: TextStyle(fontFamily: "Poppins2"),
+                    ),
+                    alignment: Alignment.topLeft,
                   ),
-                  alignment: Alignment.topLeft,
-                ),
-                SizedBox(
-                  height: 8.h,
-                ),
-                Container(
-                    width: MediaQuery.of(context).size.width * 0.8,
-                    margin: EdgeInsets.only(left: 8.0.w),
-                    child: loadAddress == true
-                        ? Text(
-                            "${("$street, $area, $area2, $city, $state, $country, $postalCode")}",
-                            style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 11.sp,
-                                fontFamily: "Poppins1"),
-                          )
-                        : Text("Location Searching....")),
-                SizedBox(
-                  height: 8.h,
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 8.0.w),
-                  child: Text(
-                    "",
-                    style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 11.sp,
-                        fontFamily: "Poppins1"),
+                  SizedBox(
+                    height: 8.h,
                   ),
-                ),
-                Container(
-                  height: 42.h,
-                  width: 250.w,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          side: BorderSide(
-                            color: Color(0xff70bdf1),
-                            width: 2.0,
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      margin: EdgeInsets.symmetric(horizontal: 8.0.w),
+                      child: loadAddress == true
+                          ? Text(
+                              "${("$street, $area, $area2, $city, $state, $country, $postalCode")}",
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 11.sp,
+                                  fontFamily: "Poppins1"),
+                            )
+                          : Row(
+                              children: [
+                                SizedBox(
+                                  width: 12,
+                                  height: 12,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 1.5),
+                                ),
+                                SizedBox(width: 8),
+                                Text("Getting address...",
+                                    style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 11.sp,
+                                        fontFamily: "Poppins1")),
+                              ],
+                            )),
+                  SizedBox(
+                    height: 8.h,
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 8.0.w),
+                    child: Text(
+                      "",
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 11.sp,
+                          fontFamily: "Poppins1"),
+                    ),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: 0.9,
+                    child: SizedBox(
+                      height: 42.h,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: logoBlue,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            side: BorderSide(
+                              color: Color(0xff70bdf1),
+                              width: 2.0,
+                            ),
                           ),
                         ),
+                        child: Text(
+                          'Confirm your Location',
+                          style: TextStyle(
+                              fontFamily: "Poppins1",
+                              color: Colors.white,
+                              fontSize: 16.sp),
+                        ),
+                        onPressed: () async {
+                          String latLong = latitudeCurrentLocation.toString() +
+                              '/' +
+                              longtitudeCurrentLocation.toString() +
+                              '/' +
+                              fullAddress;
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.pop(context, latLong);
+                          } else {
+                            Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (context) => BottomBarPage(2)),
+                                (Route<dynamic> route) => false);
+                          }
+                        },
                       ),
                     ),
-                    child: Text(
-                      'Confirm your Location',
-                      style: TextStyle(
-                          fontFamily: "Poppins1",
-                          color: Colors.white,
-                          fontSize: 16.sp),
-                    ),
-                    onPressed: () async {
-                      String latLong = latitudeCurrentLocation.toString() +
-                          '/' +
-                          longtitudeCurrentLocation.toString() +
-                          '/' +
-                          fullAddress;
-                      if (Navigator.of(context).canPop()) {
-                        Navigator.pop(context, latLong);
-                      } else {
-                        Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (context) => BottomBarPage(2)),
-                            (Route<dynamic> route) => false);
-                      }
-
-                      // Get.off(SignUpScreen());
-                    },
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           ],
         ),

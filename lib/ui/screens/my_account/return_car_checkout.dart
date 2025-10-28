@@ -8,6 +8,7 @@ import 'package:imechano/ui/screens/bottombar/My_Bookings_Page.dart';
 import 'package:imechano/ui/shared/widgets/appbar/custom_appbar_widget.dart';
 import 'package:imechano/ui/styling/colors.dart';
 import 'package:imechano/ui/styling/global.dart';
+import 'package:imechano/ui/utils/price_calculator.dart';
 
 import 'package:provider/provider.dart';
 
@@ -21,6 +22,11 @@ class _ReturnCarCheckOutState extends State<ReturnCarCheckOut> {
   List _nameList = [];
   final _repository = Repository();
   dynamic appModelTheme;
+
+  // Dynamic price calculations using PriceCalculator
+  double get _totalAmount => PriceCalculator.getTotalPrice();
+  double get _balanceAmount => PriceCalculator.getBalanceAmount();
+  double get _finalTotal => PriceCalculator.getFinalTotal();
   @override
   void initState() {
     // TODO: implement initState
@@ -553,7 +559,7 @@ class _ReturnCarCheckOutState extends State<ReturnCarCheckOut> {
               width: 50.w,
             ),
             Text(
-              'KWD 4.0000',
+              'KWD ${_totalAmount.toStringAsFixed(4)}',
               textAlign: TextAlign.end,
               style: TextStyle(
                 fontFamily: 'Poppins2',
@@ -575,7 +581,7 @@ class _ReturnCarCheckOutState extends State<ReturnCarCheckOut> {
               width: 80.w,
             ),
             Text(
-              'KWD 2',
+              'KWD ${_balanceAmount.toStringAsFixed(0)}',
               textAlign: TextAlign.end,
               style: TextStyle(
                 fontFamily: 'Poppins2',
@@ -602,7 +608,7 @@ class _ReturnCarCheckOutState extends State<ReturnCarCheckOut> {
           width: 120.w,
         ),
         Text(
-          'KWD 4.020',
+          'KWD ${_finalTotal.toStringAsFixed(3)}',
           textAlign: TextAlign.end,
           style: TextStyle(
             fontFamily: 'Poppins2',

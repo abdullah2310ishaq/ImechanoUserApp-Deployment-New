@@ -20,7 +20,6 @@ class _ChooseLanguageState extends State<ChooseLanguage> {
   //Locale selectedLocale = Locale('en');
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     log('Inside init state of choose language screen');
     var lang = Provider.of<AppModel>(context, listen: false).fetchLocale();

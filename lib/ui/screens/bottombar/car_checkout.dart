@@ -14,6 +14,7 @@ import 'package:imechano/ui/repository/repository.dart';
 import 'package:imechano/ui/screens/bottombar/bottom_bar.dart';
 import 'package:imechano/ui/shared/widgets/appbar/custom_appbar_widget.dart';
 import 'package:imechano/ui/shared/widgets/appbar/custom_drawer_widget.dart';
+import 'package:imechano/ui/utils/price_calculator.dart';
 
 import 'package:imechano/ui/styling/colors.dart';
 import 'package:imechano/ui/styling/global.dart';
@@ -93,8 +94,8 @@ class _CheckOutState extends State<CheckOut> {
 
   bool loadMap = true;
   var address;
-  dynamic lat = 0.obs;
-  dynamic long;
+  String lat = '0.00';
+  String long = '0.00';
   List<Marker> _markers = <Marker>[];
 
   final GlobalKey<ScaffoldState> _key = GlobalKey();

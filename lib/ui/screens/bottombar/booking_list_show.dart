@@ -9,9 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:imechano/localization/language_constrants.dart';
 import 'package:imechano/ui/modal/booking_list_model.dart';
+import 'package:imechano/ui/modal/accept_pickup_model.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
+import 'package:imechano/ui/repository/repository.dart';
 import 'package:imechano/ui/screens/bottombar/bottom_bar.dart';
-
 import 'package:imechano/ui/shared/widgets/appbar/custom_appbar_widget.dart';
 import 'package:imechano/ui/styling/colors.dart';
 import 'package:intl/intl.dart';
@@ -22,12 +23,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../bloc/pickup_condition_list_bloc.dart';
 import '../../modal/pickup_conditions_list_model.dart';
 import '../../styling/config.dart';
+import 'package:imechano/ui/styling/global.dart';
 
 class BookingListShow extends StatefulWidget {
   final ItemData data;
   final String? carName;
   final String? booking;
   final String? appointment;
+  final bool isConfirmPickup;
 
   final String? bookingid;
   const BookingListShow(
@@ -36,7 +39,8 @@ class BookingListShow extends StatefulWidget {
       this.bookingid,
       this.carName,
       this.booking,
-      this.appointment})
+      this.appointment,
+      this.isConfirmPickup = false})
       : super(key: key);
 
   @override
@@ -64,6 +68,28 @@ class _BookingListShowState extends State<BookingListShow>
   // Create a NumberFormat instance for formatting
   var numberFormat = NumberFormat('#,##0.00', 'en_US');
   String formattedGrossTotal = '';
+  String _formatDateTime(String? value) {
+    if (value == null || value.isEmpty) return '';
+    try {
+      final dt = DateTime.parse(value);
+      return DateFormat('hh:mm a, dd-MM-yyyy').format(dt);
+    } catch (_) {
+      final patterns = [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm',
+        "yyyy-MM-dd'T'HH:mm:ss",
+        'dd-MM-yyyy HH:mm:ss',
+      ];
+      for (final p in patterns) {
+        try {
+          final dt = DateFormat(p).parse(value);
+          return DateFormat('hh:mm a, dd-MM-yyyy').format(dt);
+        } catch (_) {}
+      }
+      return value;
+    }
+  }
 
   @override
   void initState() {
@@ -110,6 +136,9 @@ class _BookingListShowState extends State<BookingListShow>
         break;
       case AppLifecycleState.detached:
         onDetached();
+        break;
+      case AppLifecycleState.hidden:
+        onPaused();
         break;
     }
   }
@@ -255,6 +284,10 @@ class _BookingListShowState extends State<BookingListShow>
           SizedBox(height: 15),
           _delTotal(),
           SizedBox(height: 15),
+          _backButton(),
+          SizedBox(height: 15),
+
+          SizedBox(height: 20),
           dynamicBottomCard(),
           SizedBox(height: 15),
         ],
@@ -473,13 +506,19 @@ class _BookingListShowState extends State<BookingListShow>
 
   Widget _addLocationComment() {
     return Padding(
-      padding: const EdgeInsets.only(left: 25, right: 18),
+      padding: const EdgeInsets.only(left: 26, right: 20),
       child: Container(
           height: 50,
           width: double.infinity,
           decoration: BoxDecoration(
             color: appModelTheme.darkTheme ? darkmodeColor : Color(0xffE6E6E5),
             borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: appModelTheme.darkTheme
+                  ? greycolo.withOpacity(0.3)
+                  : Colors.grey[300]!,
+              width: 1,
+            ),
           ),
           child: Row(
             children: [
@@ -553,7 +592,7 @@ class _BookingListShowState extends State<BookingListShow>
               Text(
                 getTranslated('AppointmentTime', context) +
                     " : " +
-                    widget.data.timeDate.toString(),
+                    _formatDateTime(widget.data.timeDate),
                 style: TextStyle(
                   fontSize: 12,
                   fontFamily: 'Poppins1',
@@ -563,7 +602,7 @@ class _BookingListShowState extends State<BookingListShow>
               Text(
                 getTranslated('BookingTime', context) +
                     " : " +
-                    widget.data.bookingTime.toString(),
+                    _formatDateTime(widget.data.bookingTime),
                 style: TextStyle(
                   fontSize: 12,
                   fontFamily: 'Poppins1',
@@ -664,7 +703,9 @@ class _BookingListShowState extends State<BookingListShow>
                         style: TextStyle(
                           fontSize: 10,
                           fontFamily: 'Poppins3',
-                          color: Colors.black38,
+                          color: appModelTheme.darkTheme
+                              ? Colors.white70
+                              : Colors.black38,
                         ),
                       ),
                     ],
@@ -723,7 +764,7 @@ class _BookingListShowState extends State<BookingListShow>
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Poppins2',
-              color: Colors.black,
+              color: appModelTheme.darkTheme ? Colors.white : Colors.black,
             ),
           ),
         ],
@@ -771,7 +812,7 @@ class _BookingListShowState extends State<BookingListShow>
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Poppins2',
-              color: black,
+              color: appModelTheme.darkTheme ? Colors.white : black,
             ),
           ),
         ],
@@ -779,53 +820,101 @@ class _BookingListShowState extends State<BookingListShow>
     );
   }
 
-  Widget _bookAppoinment() {
+  void _confirmPickupAction() async {
+    Repository repository = Repository();
+    Loader().showLoader(context);
+    final AcceptpickuprequestModel ispickrequest =
+        await repository.onAcceptPickupApi(widget.bookingid.toString());
+    if (ispickrequest.code != '0') {
+      Loader().hideLoader(context);
+      showSnackBar(
+          context, ispickrequest.message ?? 'Pickup Confirmation Accepted');
+      // Navigate back to My Bookings page
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => BottomBarPage(1)),
+          (Route<dynamic> route) => false);
+    } else {
+      Loader().hideLoader(context);
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text('Error'),
+                content: Text(ispickrequest.message ?? 'Something went wrong'),
+                actions: [
+                  TextButton(
+                    child: const Text("Ok"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ));
+    }
+  }
+
+  Widget _backButton() {
     return Padding(
-      padding: const EdgeInsets.only(left: 25, right: 20),
+      padding: const EdgeInsets.only(left: 26, right: 20),
       child: GestureDetector(
         onTap: () {
-          showDialog(
-            context: context,
-            builder: (_) => Dialog(
-              backgroundColor: Colors.transparent,
-              insetPadding: EdgeInsets.all(20),
-              child: Container(
-                height: hh * 0.57,
-                child: _DateTime(),
-              ),
-            ),
-          );
+          if (widget.isConfirmPickup) {
+            _confirmPickupAction();
+          } else {
+            Navigator.pop(context);
+          }
         },
         child: Container(
-          height: 48,
-          width: 380,
+          height: 50,
+          width: double.infinity,
           decoration: BoxDecoration(
-            color: logoBlue,
-            borderRadius: BorderRadius.circular(10),
+            color: widget.isConfirmPickup
+                ? Colors.green[400]
+                : (appModelTheme.darkTheme
+                    ? Color(0xff2a2a2a)
+                    : Colors.grey[200]),
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: widget.isConfirmPickup
+                  ? Colors.green[600]!
+                  : (appModelTheme.darkTheme
+                      ? greycolo.withOpacity(0.3)
+                      : Colors.grey[300]!),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                '3 Services Selected',
-                style: TextStyle(
-                  fontFamily: 'Poppins1',
-                  color: white,
-                  fontSize: 10,
-                ),
-              ),
-              Text(
-                'Book Apointment',
-                style: TextStyle(
-                  fontFamily: 'Poppins1',
-                  color: white,
-                  fontSize: 15,
-                ),
-              ),
               Icon(
-                Icons.shopping_cart,
-                color: white,
-              )
+                widget.isConfirmPickup
+                    ? Icons.check_circle
+                    : Icons.arrow_back_ios,
+                color: widget.isConfirmPickup
+                    ? white
+                    : (appModelTheme.darkTheme ? white : black),
+                size: 18,
+              ),
+              SizedBox(width: 8),
+              Text(
+                widget.isConfirmPickup
+                    ? getTranslated('confirmpickup', context)
+                    : getTranslated('Back', context),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: widget.isConfirmPickup
+                      ? white
+                      : (appModelTheme.darkTheme ? white : black),
+                  fontFamily: "Poppins2",
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
         ),
@@ -1008,7 +1097,9 @@ class _BookingListShowState extends State<BookingListShow>
                         Container(
                           // height: double.infinity,
                           decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: appModelTheme.darkTheme
+                                  ? darkmodeColor
+                                  : Colors.white,
                               borderRadius: BorderRadius.only(
                                   topRight: Radius.circular(25.0),
                                   topLeft: Radius.circular(25.0))),
@@ -1032,7 +1123,9 @@ class _BookingListShowState extends State<BookingListShow>
       width: double.infinity,
       margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
       decoration: BoxDecoration(
-          border: Border.all(color: Color(0xffa9d7f7)),
+          border: Border.all(
+              color:
+                  appModelTheme.darkTheme ? Colors.white30 : Color(0xffa9d7f7)),
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -1042,7 +1135,11 @@ class _BookingListShowState extends State<BookingListShow>
             padding: const EdgeInsets.only(top: 7, bottom: 7, left: 10),
             child: Text(
               "$label",
-              style: TextStyle(fontFamily: "Poppins1", fontSize: 15),
+              style: TextStyle(
+                fontFamily: "Poppins1",
+                fontSize: 15,
+                color: appModelTheme.darkTheme ? white : Colors.black,
+              ),
             ),
           ),
           Padding(
@@ -1071,7 +1168,7 @@ class _BookingListShowState extends State<BookingListShow>
       final Map<int, String> values = {
         for (int i = 0; i < split.length; i++) i: split[i]
       };
-      var containers = "";
+      // Removed unused variable
 
       return Row(
         children: [
@@ -1148,19 +1245,22 @@ class _BookingListShowState extends State<BookingListShow>
           margin: EdgeInsets.all(10),
           padding: EdgeInsets.only(top: 10, bottom: 10),
           decoration: BoxDecoration(
-              color: cardgreycolor2,
+              color:
+                  appModelTheme.darkTheme ? Color(0xff3a3a3a) : cardgreycolor2,
               borderRadius: BorderRadius.all(Radius.circular(10))),
           child: ListTile(
             title: Text(
               "Pickup Condition",
               style: TextStyle(
-                  color: greycolorfont, fontSize: 9, fontFamily: "Poppins3"),
+                  color: appModelTheme.darkTheme ? white : greycolorfont,
+                  fontSize: 9,
+                  fontFamily: "Poppins3"),
             ),
             subtitle: Container(
               margin: EdgeInsets.only(top: 5),
               child: Text("$carCondition",
                   style: TextStyle(
-                      color: Colors.black,
+                      color: appModelTheme.darkTheme ? white : Colors.black,
                       fontSize: 11,
                       fontFamily: "Poppins3")),
             ),
@@ -1170,19 +1270,22 @@ class _BookingListShowState extends State<BookingListShow>
           margin: EdgeInsets.all(10),
           padding: EdgeInsets.only(top: 10, bottom: 10),
           decoration: BoxDecoration(
-              color: cardgreycolor2,
+              color:
+                  appModelTheme.darkTheme ? Color(0xff3a3a3a) : cardgreycolor2,
               borderRadius: BorderRadius.all(Radius.circular(10))),
           child: ListTile(
             title: Text(
               "Type of Work Needed",
               style: TextStyle(
-                  color: greycolorfont, fontSize: 9, fontFamily: "Poppins3"),
+                  color: appModelTheme.darkTheme ? white : greycolorfont,
+                  fontSize: 9,
+                  fontFamily: "Poppins3"),
             ),
             subtitle: Container(
               margin: EdgeInsets.only(top: 5),
               child: Text("$workNeeded",
                   style: TextStyle(
-                      color: Colors.black,
+                      color: appModelTheme.darkTheme ? white : Colors.black,
                       fontSize: 11,
                       fontFamily: "Poppins3")),
             ),

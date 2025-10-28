@@ -1,6 +1,11 @@
-// ignore_for_file: non_constant_identifier_names, deprecated_member_use
+// ignore_for_file: non_constant_identifier_names, deprecated_member_use, unused_element
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
 import 'package:imechano/ui/shared/widgets/appbar/custom_appbar_widget.dart';
@@ -8,6 +13,7 @@ import 'package:imechano/ui/shared/widgets/appbar/custom_drawer_widget.dart';
 import 'package:imechano/ui/styling/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imechano/ui/styling/config.dart';
+import 'package:imechano/ui/utils/price_calculator.dart';
 import 'package:provider/provider.dart';
 
 class MyInvoiceTest extends StatefulWidget {
@@ -26,6 +32,37 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
   String fromTime = DateTime.now().toString().split(' ')[1].split('.')[0];
 
   dynamic appModelTheme;
+
+  final GlobalKey previewContainer = GlobalKey();
+
+  Future<void> captureAndSaveScreenshot() async {
+    try {
+      final boundary = previewContainer.currentContext?.findRenderObject()
+          as RenderRepaintBoundary?;
+      if (boundary == null) return;
+      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return;
+      final Uint8List pngBytes = byteData.buffer.asUint8List();
+
+      final directory = (await getApplicationDocumentsDirectory()).path;
+      final now = DateTime.now();
+      final fileName =
+          'ImechanoInvoiceScreenshot_${now.millisecondsSinceEpoch}.png';
+      final filePath = '$directory/$fileName';
+      final file = File(filePath);
+      await file.writeAsBytes(pngBytes);
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        duration: Duration(seconds: 4),
+        backgroundColor: Colors.green[400],
+        content: Text('Screenshot saved'),
+      ));
+    } catch (e) {
+      // ignore
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,166 +88,170 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
                 children: [
                   // _blankContainer(),
                   Center(
-                    child: Container(
-                      margin: EdgeInsets.only(left: 15, right: 15),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          color:
-                              appModelTheme.darkTheme ? darkmodeColor : white,
-                          borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(25.0),
-                              topLeft: Radius.circular(25.0))),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: NotificationListener<
-                            OverscrollIndicatorNotification>(
-                          onNotification: (notification) {
-                            notification.disallowIndicator();
-                            return true;
-                          },
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  height: 64.h,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(15.0),
-                                          topLeft: Radius.circular(15.0)),
-                                      image: DecorationImage(
-                                        fit: BoxFit.fitWidth,
-                                        image: AssetImage(
-                                            "assets/icons/My Vehicle/Group 9252.png"),
-                                      )),
-                                  margin:
-                                      EdgeInsets.only(left: 10.w, right: 10.w),
-                                  child: Container(
+                    child: RepaintBoundary(
+                      key: previewContainer,
+                      child: Container(
+                        margin: EdgeInsets.only(left: 15, right: 15),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            color:
+                                appModelTheme.darkTheme ? darkmodeColor : white,
+                            borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(25.0),
+                                topLeft: Radius.circular(25.0))),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: NotificationListener<
+                              OverscrollIndicatorNotification>(
+                            onNotification: (notification) {
+                              notification.disallowIndicator();
+                              return true;
+                            },
+                            child: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
                                     width: double.infinity,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        CRNo(),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Image(
-                                              height: 30.h,
-                                              image: AssetImage(
-                                                  "assets/icons/splash/logo.png"),
-                                              color: Colors.white,
-                                            ),
-                                            Text(
-                                              'Powered by Company',
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 8.sp,
-                                                  fontFamily: "Poppins1"),
-                                            )
-                                          ],
-                                        ),
-                                        mobileNumber(),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                schedule(),
-                                Divider(
-                                    indent: 10.w,
-                                    endIndent: 10.w,
-                                    color: Colors.grey),
-                                SizedBox(height: 8),
-                                customerDetails(),
-                                Divider(
-                                  indent: 10.w,
-                                  endIndent: 10.w,
-                                  color: Colors.grey,
-                                ),
-                                SizedBox(height: 8),
-                                dataCard(),
-                                SizedBox(height: 8),
-                                Container(
-                                  margin:
-                                      EdgeInsets.only(left: 10.w, right: 10.w),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            left: 10.w, right: 10.w),
-                                        child: Text(
-                                          "Car Information",
-                                          style:
-                                              TextStyle(fontFamily: "Poppins2"),
-                                        ),
-                                      ),
-                                      SizedBox(height: 10.h),
-                                      carDetails(),
-                                      Divider(
-                                        indent: 10.w,
-                                        endIndent: 10.w,
-                                        color: Colors.grey,
-                                      ),
-                                      SizedBox(
-                                        height: 10.h,
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            left: 10.w, right: 10.w),
-                                        child: Text(
-                                          "Parts Repairs-Spares Elimate:",
-                                          style: TextStyle(
-                                            fontFamily: "Poppins2",
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 10.h),
-                                      table(),
-                                      SizedBox(height: 15.h),
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            left: 10.w, right: 10.w),
-                                        child: Text(
-                                          "Labour Estimates",
-                                          style: TextStyle(
-                                              fontFamily: "Poppins2",
-                                              fontSize: 13.sp),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10.h,
-                                      ),
-                                      tableSecond(),
-                                      Row(
+                                    height: 64.h,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(15.0),
+                                            topLeft: Radius.circular(15.0)),
+                                        image: DecorationImage(
+                                          fit: BoxFit.fitWidth,
+                                          image: AssetImage(
+                                              "assets/icons/My Vehicle/Group 9252.png"),
+                                        )),
+                                    margin: EdgeInsets.only(
+                                        left: 10.w, right: 10.w),
+                                    child: Container(
+                                      width: double.infinity,
+                                      child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            "Date: 24-10-2021",
-                                            style: TextStyle(
-                                                fontSize: 13.sp,
-                                                fontFamily: "Poppins1"),
+                                          CRNo(),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Image(
+                                                height: 30.h,
+                                                image: AssetImage(
+                                                    "assets/icons/splash/logo.png"),
+                                                color: Colors.white,
+                                              ),
+                                              Text(
+                                                'Powered by Company',
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 8.sp,
+                                                    fontFamily: "Poppins1"),
+                                              )
+                                            ],
                                           ),
-                                          totalPart(),
+                                          mobileNumber(),
                                         ],
                                       ),
-                                      SizedBox(
-                                        height: 2.h,
-                                      ),
-                                      totalLabour(),
-                                      SizedBox(
-                                        height: 2.h,
-                                      ),
-                                      estBalance(),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  schedule(),
+                                  Divider(
+                                      indent: 10.w,
+                                      endIndent: 10.w,
+                                      color: Colors.grey),
+                                  SizedBox(height: 8),
+                                  customerDetails(),
+                                  Divider(
+                                    indent: 10.w,
+                                    endIndent: 10.w,
+                                    color: Colors.grey,
+                                  ),
+                                  SizedBox(height: 8),
+                                  dataCard(),
+                                  SizedBox(height: 8),
+                                  Container(
+                                    margin: EdgeInsets.only(
+                                        left: 10.w, right: 10.w),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 10.w, right: 10.w),
+                                          child: Text(
+                                            "Car Information",
+                                            style: TextStyle(
+                                                fontFamily: "Poppins2"),
+                                          ),
+                                        ),
+                                        SizedBox(height: 10.h),
+                                        carDetails(),
+                                        Divider(
+                                          indent: 10.w,
+                                          endIndent: 10.w,
+                                          color: Colors.grey,
+                                        ),
+                                        SizedBox(
+                                          height: 10.h,
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 10.w, right: 10.w),
+                                          child: Text(
+                                            "Parts Repairs-Spares Elimate:",
+                                            style: TextStyle(
+                                              fontFamily: "Poppins2",
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 10.h),
+                                        table(),
+                                        SizedBox(height: 15.h),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 10.w, right: 10.w),
+                                          child: Text(
+                                            "Labour Estimates",
+                                            style: TextStyle(
+                                                fontFamily: "Poppins2",
+                                                fontSize: 13.sp),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 10.h,
+                                        ),
+                                        tableSecond(),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Date: 24-10-2021",
+                                              style: TextStyle(
+                                                  fontSize: 13.sp,
+                                                  fontFamily: "Poppins1"),
+                                            ),
+                                            totalPart(),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 2.h,
+                                        ),
+                                        totalLabour(),
+                                        SizedBox(
+                                          height: 2.h,
+                                        ),
+                                        estBalance(),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -282,21 +323,27 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
                           ),
                         ),
                         onPressed: () {},
-                        child: Row(
-                          children: [
-                            Text(
-                              "Download",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'Poppins1',
-                                  fontSize: 12.sp),
-                            ),
-                            // SizedBox(width: 2.w),
-                            Icon(
-                              Icons.download,
-                              color: Colors.white,
-                            )
-                          ],
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "Download",
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Poppins1',
+                                    fontSize: 12.sp),
+                              ),
+                              SizedBox(width: 6),
+                              Icon(
+                                Icons.download,
+                                color: Colors.white,
+                                size: 16,
+                              )
+                            ],
+                          ),
                         )),
                   ),
                 ],
@@ -306,42 +353,58 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
         ));
   }
 
+  Widget _blankContainer() {
+    return Container(
+      height: 100.h,
+      decoration: BoxDecoration(
+        color: appModelTheme.darkTheme ? black : logoBlue,
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(100.0.w),
+            bottomRight: Radius.circular(100.0.w)),
+      ),
+    );
+  }
+
   Widget table() {
-    List partno = [
-      '1',
-      '2',
-      '3',
-    ];
+    // Dynamic data from cart or API using PriceCalculator
+    bool hasCartItems = PriceCalculator.hasItems();
+    int cartItemCount = PriceCalculator.getCartItemCount();
 
-    List ptype = [
-      'New Org',
-      'Used Org',
-      'New Org',
-    ];
+    List partno = hasCartItems
+        ? List.generate(cartItemCount, (index) => '${index + 1}')
+        : ['1', '2', '3'];
 
-    List pdesc = [
-      'Break Liner',
-      'Spring Liner',
-      'Ball Joint Curk',
-    ];
+    List ptype = hasCartItems
+        ? ['New Org', 'Used Org', 'New Org'] // Default types
+        : ['New Org', 'Used Org', 'New Org'];
 
-    List qty = [
-      '4',
-      '2',
-      '1',
-    ];
+    List pdesc = hasCartItems
+        ? [
+            'Service Item 1',
+            'Service Item 2',
+            'Service Item 3'
+          ] // Default descriptions
+        : ['Break Liner', 'Spring Liner', 'Ball Joint Curk'];
 
-    List ecost = [
-      '2.000',
-      '1.000',
-      '4.000',
-    ];
+    List qty = hasCartItems
+        ? ['1', '1', '1'] // Default quantity
+        : ['4', '2', '1'];
 
-    List total = [
-      '0.00',
-      '0.00',
-      '0.00',
-    ];
+    List ecost = hasCartItems
+        ? [
+            PriceCalculator.getTotalPrice() / 3,
+            PriceCalculator.getTotalPrice() / 3,
+            PriceCalculator.getTotalPrice() / 3
+          ].map((price) => price.toStringAsFixed(3)).toList()
+        : ['2.000', '1.000', '4.000'];
+
+    List total = hasCartItems
+        ? [
+            PriceCalculator.getTotalPrice() / 3,
+            PriceCalculator.getTotalPrice() / 3,
+            PriceCalculator.getTotalPrice() / 3
+          ].map((price) => price.toStringAsFixed(2)).toList()
+        : ['0.00', '0.00', '0.00'];
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
       scrollDirection: Axis.horizontal,
@@ -471,24 +534,27 @@ class _MyInvoiceTestState extends State<MyInvoiceTest> {
                       fontSize: 12.sp))),
         ],
         rows: List.generate(2, (index) {
+          // Calculate dynamic labour cost using PriceCalculator
+          double labourCost = PriceCalculator.getLabourCost();
+
           return DataRow(cells: [
             DataCell(
               Center(
                 child: Text(
-                  '1',
-                  style: TextStyle(fontFamily: 'Popp  ins1', fontSize: 11.sp),
+                  '${index + 1}',
+                  style: TextStyle(fontFamily: 'Poppins1', fontSize: 11.sp),
                 ),
               ),
             ),
             DataCell(Center(
               child: Text(
-                'Test Invoice',
+                'Labour Work Description ${index + 1}',
                 style: TextStyle(fontFamily: 'Poppins1', fontSize: 11.sp),
               ),
             )),
             DataCell(Center(
               child: Text(
-                'KWD 2000',
+                'KWD ${labourCost.toStringAsFixed(0)}',
                 style: TextStyle(fontFamily: 'Poppins1', fontSize: 11.sp),
               ),
             )),
@@ -1046,11 +1112,24 @@ class _ViewDataPageState extends State<ViewDataPage> {
                           ],
                         )),
                   ),
+                  // Screenshot button temporarily hidden per request (keep download only)
                 ],
               ),
             )
           ],
         ));
+  }
+
+  Widget _blankContainer() {
+    return Container(
+      height: 100.h,
+      decoration: BoxDecoration(
+        color: appModelTheme.darkTheme ? black : logoBlue,
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(100.0.w),
+            bottomRight: Radius.circular(100.0.w)),
+      ),
+    );
   }
 
   Widget _infoList() {

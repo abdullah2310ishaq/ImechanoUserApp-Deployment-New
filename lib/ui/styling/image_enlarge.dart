@@ -11,14 +11,39 @@ class ImageDialog extends StatelessWidget {
     return Dialog(
       insetPadding:
           EdgeInsets.only(top: size.height * 0.05, bottom: size.height * 0.02),
-      child: InteractiveViewer(
-        child: Image.network(
-          imageUrl,
-          width: size.width * 0.9,
-          //  width: 300,
-          //  height: 300,
-          fit: BoxFit.contain,
-        ),
+      child: Stack(
+        children: [
+          InteractiveViewer(
+            child: Image.network(
+              imageUrl,
+              width: size.width * 0.9,
+              //  width: 300,
+              //  height: 300,
+              fit: BoxFit.contain,
+            ),
+          ),
+          Positioned(
+            top: 10,
+            right: 10,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.7),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -66,6 +66,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
 
   dynamic appModelTheme;
   ValueNotifier<int> _index = ValueNotifier(0);
+  ValueNotifier<bool> _expanded = ValueNotifier(false);
   final GlobalKey<ScaffoldState> _key = GlobalKey();
   @override
   Widget build(BuildContext context) {
@@ -82,16 +83,19 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
         designSize: Size(360, 690),
         builder: (context, child) => WillPopScope(
               onWillPop: () async {
+                // If any step is expanded, collapse it first
+                if (_expanded.value) {
+                  _expanded.value = false;
+                  return false;
+                }
                 if (!Navigator.of(context).canPop()) {
-                  // If there's no screen in the stack, navigate to home screen
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => BottomBarPage(2)),
                   );
-                  return false; // Return false to prevent the app from closing
-                } else {
-                  return true; // Return true to allow the app to close
+                  return false;
                 }
+                return true;
               },
               child: Scaffold(
                 key: _key,
@@ -145,157 +149,151 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
                                 child: ValueListenableBuilder(
                                     valueListenable: _index,
                                     builder: (context, value, child) {
-                                      return Stepper(
-                                        physics: ClampingScrollPhysics(),
-                                        controlsBuilder: (BuildContext context,
-                                            ControlsDetails controls) {
-                                          return Row(
-                                            children: <Widget>[
-                                              Container(),
-                                            ],
-                                          );
-                                        },
-                                        currentStep: _index.value,
-                                        onStepTapped: (int index) {
-                                          _index.value = index;
-                                        },
-                                        steps: <Step>[
-                                          for (int i = 0; i < steps.length; i++)
-                                            Step(
-                                              title: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    steps[i]['item_id'] > 10000
-                                                        ? Text(
-                                                            steps[i]['name']
-                                                                .toString()
-                                                                .removeAllWhitespace,
-                                                          )
-                                                        : Text(getTranslated(
-                                                            steps[i]['name']
-                                                                .toString()
-                                                                .removeAllWhitespace,
-                                                            context)),
-                                                    _index.value != i
-                                                        ? Icon(
-                                                            Icons.chevron_right,
-                                                            size: 30,
-                                                            color: Colors.blue,
-                                                          )
-                                                        : Container(),
-                                                  ]),
-                                              content: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10),
-                                                child:
-                                                    Column(children: <Widget>[
-                                                  for (int j = 0;
-                                                      j <
-                                                          (steps[i]['work_image']
-                                                                  .toString()
-                                                                  .contains(",")
-                                                              ? steps[i]['work_image']
-                                                                      .split(
-                                                                          ",")
-                                                                      .length -
-                                                                  1
-                                                              : 0);
-                                                      j++)
-                                                    Row(
-                                                      children: [
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            showDialog(
-                                                              context: context,
-                                                              builder: (_) =>
-                                                                  ImageDialog(
-                                                                imageUrl: Config
-                                                                        .imageurl +
-                                                                    steps[i][
-                                                                            'work_image']
-                                                                        .split(
-                                                                            ",")[j]
-                                                                        .toString(), // Replace with your image URL
-                                                              ),
-                                                            );
-                                                          },
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    bottom: 10),
-                                                            child:
-                                                                Image.network(
-                                                              Config.imageurl +
+                                      return ValueListenableBuilder<bool>(
+                                          valueListenable: _expanded,
+                                          builder: (context, isExpanded, _) {
+                                            return Stepper(
+                                              physics: ClampingScrollPhysics(),
+                                              controlsBuilder: (BuildContext
+                                                      context,
+                                                  ControlsDetails controls) {
+                                                return Row(
+                                                  children: <Widget>[
+                                                    Container(),
+                                                  ],
+                                                );
+                                              },
+                                              currentStep: _index.value,
+                                              onStepTapped: (int index) {
+                                                if (_index.value == index &&
+                                                    _expanded.value) {
+                                                  _expanded.value = false;
+                                                } else {
+                                                  _index.value = index;
+                                                  _expanded.value = true;
+                                                }
+                                              },
+                                              steps: <Step>[
+                                                for (int i = 0;
+                                                    i < steps.length;
+                                                    i++)
+                                                  Step(
+                                                    title: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          steps[i]['item_id'] >
+                                                                  10000
+                                                              ? Text(
                                                                   steps[i][
-                                                                          'work_image']
-                                                                      .split(
-                                                                          ",")[j]
-                                                                      .toString(),
-                                                              height: 120,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  new Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            bottom: 10,
-                                                            top: 10),
-                                                    child: Text(
-                                                      steps[i]['status']
-                                                                  .toString() ==
-                                                              "0"
-                                                          ? getTranslated(
-                                                              'comingsoon',
-                                                              context)
-                                                          : steps[i]['status']
-                                                                      .toString() ==
-                                                                  "1"
-                                                              ? getTranslated(
-                                                                  'workdone',
-                                                                  context)
-                                                              : '',
-                                                      style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
+                                                                          'name']
+                                                                      .toString()
+                                                                      .removeAllWhitespace,
+                                                                )
+                                                              : Text(getTranslated(
+                                                                  steps[i][
+                                                                          'name']
+                                                                      .toString()
+                                                                      .removeAllWhitespace,
+                                                                  context)),
+                                                          _index.value != i ||
+                                                                  !isExpanded
+                                                              ? Icon(
+                                                                  Icons
+                                                                      .chevron_right,
+                                                                  size: 30,
+                                                                  color: Colors
+                                                                      .blue,
+                                                                )
+                                                              : Container(),
+                                                        ]),
+                                                    content:
+                                                        isExpanded &&
+                                                                _index.value ==
+                                                                    i
+                                                            ? Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            10),
+                                                                child: Column(
+                                                                    children: <Widget>[
+                                                                      for (int j =
+                                                                              0;
+                                                                          j < (steps[i]['work_image'].toString().contains(",") ? steps[i]['work_image'].split(",").length - 1 : 0);
+                                                                          j++)
+                                                                        Row(
+                                                                          children: [
+                                                                            GestureDetector(
+                                                                              onTap: () {
+                                                                                showDialog(
+                                                                                  context: context,
+                                                                                  builder: (_) => ImageDialog(
+                                                                                    imageUrl: Config.imageurl + steps[i]['work_image'].split(",")[j].toString(),
+                                                                                  ),
+                                                                                );
+                                                                              },
+                                                                              child: Padding(
+                                                                                padding: const EdgeInsets.only(bottom: 10),
+                                                                                child: Image.network(
+                                                                                  Config.imageurl + steps[i]['work_image'].split(",")[j].toString(),
+                                                                                  height: 120,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      new Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            bottom:
+                                                                                10,
+                                                                            top:
+                                                                                10),
+                                                                        child:
+                                                                            Text(
+                                                                          steps[i]['status'].toString() == "0"
+                                                                              ? getTranslated('comingsoon', context)
+                                                                              : steps[i]['status'].toString() == "1"
+                                                                                  ? getTranslated('workdone', context)
+                                                                                  : '',
+                                                                          style:
+                                                                              const TextStyle(fontWeight: FontWeight.bold),
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                        ),
+                                                                      ),
+                                                                      new Row(
+                                                                        children: [
+                                                                          Flexible(
+                                                                            child:
+                                                                                Text(
+                                                                              steps[i]['status'] != "0"
+                                                                                  ? steps[i]['work_done'].toString().length > 0
+                                                                                      ? steps[i]['work_done']
+                                                                                      : ""
+                                                                                  : "",
+                                                                              maxLines: 10,
+                                                                              softWrap: true,
+                                                                              overflow: TextOverflow.fade,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ]),
+                                                              )
+                                                            : SizedBox.shrink(),
+                                                    isActive: steps[i]
+                                                                ['status'] !=
+                                                            "0"
+                                                        ? true
+                                                        : false,
                                                   ),
-                                                  new Row(
-                                                    children: [
-                                                      Flexible(
-                                                        child: Text(
-                                                          steps[i]['status'] !=
-                                                                  "0"
-                                                              ? steps[i]['work_done']
-                                                                          .toString()
-                                                                          .length >
-                                                                      0
-                                                                  ? steps[i][
-                                                                      'work_done']
-                                                                  : ""
-                                                              : "",
-                                                          maxLines: 10,
-                                                          softWrap: true,
-                                                          overflow:
-                                                              TextOverflow.fade,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ]),
-                                              ),
-                                              isActive:
-                                                  steps[i]['status'] != "0"
-                                                      ? true
-                                                      : false,
-                                            ),
-                                        ],
-                                      );
+                                              ],
+                                            );
+                                          });
                                     }),
                               )
                             : Text(""),
@@ -464,9 +462,11 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
       context: context,
       builder: (_) => Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding: EdgeInsets.all(20.h),
-        child: Container(
-          height: hh * 0.43,
+        insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: hh * 0.65,
+          ),
           child: _DateTime(),
         ),
       ),
@@ -847,6 +847,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
         elevation: 10,
         color: appModelTheme.darkTheme ? darkmodeColor : Colors.white,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
               width: double.infinity,
@@ -890,7 +891,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
               ),
             ),
             _dateAndTime(),
-            Spacer(),
+            SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -1014,10 +1015,10 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
                     ),
                   ),
                 ),
-                SizedBox(height: 30.h),
+                SizedBox(height: 20),
               ],
             ),
-            SizedBox(height: 50.h)
+            SizedBox(height: 10)
           ],
         ),
       ),
@@ -1026,7 +1027,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
 
   Widget _dateAndTime() {
     return Container(
-      height: hh * 0.25,
+      height: hh * 0.28,
       child: CupertinoDatePicker(
         minimumDate: DateTime.now(),
         mode: CupertinoDatePickerMode.dateAndTime,
@@ -1050,7 +1051,7 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
       'job_number': widget.job_number.toString(),
     });
     print("Iam here");
-    var res = request
+    request
         .send()
         .then((value) => http.Response.fromStream(value).then((onvalue) {
               final result = jsonDecode(onvalue.body) as Map<String, dynamic>;
@@ -1310,11 +1311,24 @@ class _ProgressReportActiveState extends State<ProgressReportActive> {
                       return SimpleDialog(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20)),
-                        title: Center(
-                          child: Text(
-                            "SELECT ANY ONE",
-                            style: TextStyle(fontFamily: "Poppins2"),
-                          ),
+                        titlePadding: EdgeInsets.only(
+                            left: 16, right: 8, top: 12, bottom: 0),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Center(
+                                child: Text(
+                                  "SELECT ANY ONE",
+                                  style: TextStyle(fontFamily: "Poppins2"),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.close),
+                              onPressed: () => Navigator.of(context).pop(),
+                            )
+                          ],
                         ),
                         children: [
                           Row(

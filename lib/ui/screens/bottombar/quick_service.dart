@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, unused_element
 
 import 'dart:developer';
 import 'dart:io';
@@ -271,11 +271,24 @@ class _QuickServiceState extends State<QuickServices> {
                       return SimpleDialog(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20)),
-                        title: Center(
-                          child: Text(
-                            "SELECT ANY ONE",
-                            style: TextStyle(fontFamily: "Poppins2"),
-                          ),
+                        titlePadding: EdgeInsets.only(
+                            left: 16, right: 8, top: 12, bottom: 0),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Center(
+                                child: Text(
+                                  "SELECT ANY ONE",
+                                  style: TextStyle(fontFamily: "Poppins2"),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.close),
+                              onPressed: () => Navigator.of(context).pop(),
+                            )
+                          ],
                         ),
                         children: [
                           Row(
@@ -491,11 +504,11 @@ class _QuickServiceState extends State<QuickServices> {
       width: 327.w,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(10.0),
           ),
-          backgroundColor: Color(0xff70BDF1), // foreground
+          backgroundColor: Color(0xff70BDF1),
+          foregroundColor: Colors.white,
         ),
         onPressed: () {
           if (!isCarAdded ||
@@ -823,12 +836,15 @@ class _QuickServiceState extends State<QuickServices> {
 
   openGallery() async {
     try {
-      var pickedfiles = await _picker.pickMultiImage();
-      //you can use ImageCourse.camera for Camera capture
-      setState(() {
-        imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
-      });
-      Navigator.pop(context);
+      final pickedfiles = await _picker.pickMultiImage();
+      if (pickedfiles.isNotEmpty) {
+        setState(() {
+          imagefiles = [...?imagefiles, ...pickedfiles].toSet().toList();
+        });
+        Navigator.pop(context);
+      } else {
+        print("No image is selected.");
+      }
     } catch (e) {
       print("error while picking file.");
     }

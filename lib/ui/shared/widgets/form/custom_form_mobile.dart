@@ -44,10 +44,15 @@ class CustomFormMobile extends StatelessWidget {
         obscureText: ObscureText,
         keyboardType: TextInputType.phone,
         decoration: InputDecoration(
-            prefixText: "+974-",
-            prefixIconColor: Color.fromRGBO(0, 0, 0, 1),
+            prefixIconColor:
+                appModelTheme.darkTheme ? white : Color.fromRGBO(0, 0, 0, 1),
             filled: true,
+            fillColor: fillColor,
             labelText: "Mobile No.",
+            labelStyle: TextStyle(
+              color: appModelTheme.darkTheme ? white : Colors.black,
+              fontFamily: 'Poppins3',
+            ),
             floatingLabelBehavior: FloatingLabelBehavior.never,
             border: const OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.transparent),
@@ -71,7 +76,10 @@ class CustomFormMobile extends StatelessWidget {
               ),
             ),
             hintText: hintText,
-            hintStyle: TextStyle(fontFamily: 'Poppins3', color: black),
+            hintStyle: TextStyle(
+              fontFamily: 'Poppins3',
+              color: appModelTheme.darkTheme ? white : black,
+            ),
             prefixIconConstraints: BoxConstraints(minWidth: 40),
             suffixIcon: isSuffix
                 ? Icon(

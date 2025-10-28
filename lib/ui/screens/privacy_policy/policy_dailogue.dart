@@ -38,10 +38,9 @@ class PolicyDialog extends StatelessWidget {
             ),
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
             style: TextButton.styleFrom(
-              backgroundColor: logoBlue,
               padding: EdgeInsets.all(0),
+              backgroundColor: logoBlue,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(radius),
@@ -49,6 +48,7 @@ class PolicyDialog extends StatelessWidget {
                 ),
               ),
             ),
+            onPressed: () => Navigator.of(context).pop(),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
@@ -64,6 +64,7 @@ class PolicyDialog extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    backgroundColor: logoBlue,
                     color: Colors.white),
               ),
             ),

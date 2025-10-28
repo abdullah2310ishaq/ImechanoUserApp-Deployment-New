@@ -12,9 +12,4 @@ class PrefKeys {
   static const String CARNAME = 'CARNAME';
 //   static const String STATUS = 'STATUS';
   static const String SCREENSTACK = "screenstack";
-  static const String LANGUAGE_CODE = "language_code";
-  // Account Deletion Management
-  static const String ACCOUNT_DELETION_REQUESTED = 'account_deletion_requested';
-  static const String ACCOUNT_DELETION_DATE = 'account_deletion_date';
-  static const String ACCOUNT_DELETED = 'account_deleted';
 }

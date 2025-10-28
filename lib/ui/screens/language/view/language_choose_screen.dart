@@ -48,24 +48,32 @@ class _LanguageChooseScreenState extends State<LanguageChooseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
+    // var size = MediaQuery.of(context).size; // not used
     final appModel = Provider.of<AppModel>(context);
     appModelTheme = appModel;
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: true,
+      // ignore: deprecated_member_use
+      onPopInvoked: (didPop) async {
+        if (!didPop) {
+          final shouldExit = await _onWillPop();
+          if (shouldExit) {
+            SystemNavigator.pop();
+          }
+        }
+      },
       child: ScreenUtilInit(
         designSize: Size(414, 896),
         builder: (context, child) => Scaffold(
           backgroundColor: appModelTheme.darkTheme ? Color(0xff252525) : white,
           body: Container(
-            // height: size.height * 0.9,
             width: double.infinity,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: 140.h),
                 Container(
-                  height: size.height * 0.1,
+                  height: 80.h,
                   child: Column(
                     children: [
                       Text(
@@ -94,6 +102,9 @@ class _LanguageChooseScreenState extends State<LanguageChooseScreen> {
                       style: TextStyle(
                         fontFamily: "Montserrat2",
                         fontSize: 16.sp,
+                        color: appModel.appLocal == Locale('en')
+                            ? Colors.white
+                            : Colors.black,
                       ),
                     ),
                     width: 0.8,
@@ -119,6 +130,9 @@ class _LanguageChooseScreenState extends State<LanguageChooseScreen> {
                       style: TextStyle(
                         fontFamily: "Montserrat2",
                         fontSize: 20.sp,
+                        color: appModel.appLocal == Locale('ar')
+                            ? Colors.white
+                            : Colors.black,
                       ),
                     ),
                     width: 0.8,
@@ -137,7 +151,7 @@ class _LanguageChooseScreenState extends State<LanguageChooseScreen> {
                 ),
                 SizedBox(height: 213.h),
                 Container(
-                  height: size.height * 0.1,
+                  height: 80.h,
                   child: Column(
                     children: [
                       Text(
@@ -162,6 +176,7 @@ class _LanguageChooseScreenState extends State<LanguageChooseScreen> {
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontFamily: 'Poppins1',
+                        color: Colors.white,
                       ),
                     ),
                     width: 0.8,

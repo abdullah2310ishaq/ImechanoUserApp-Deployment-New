@@ -20,8 +20,8 @@ import 'package:provider/provider.dart';
 import '../../styling/image_enlarge.dart';
 
 class ConfirmPayDetail extends StatefulWidget {
-  ItemData data;
-  int selectedindex;
+  final ItemData data;
+  final int selectedindex;
   ConfirmPayDetail({Key? key, required this.data, required this.selectedindex})
       : super(key: key);
 
@@ -90,7 +90,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                   width: MediaQuery.of(context).size.width - 10,
                   height: MediaQuery.of(context).size.height - 100,
                   padding: EdgeInsets.all(20),
-                  color: Colors.white,
+                  color: appModelTheme.darkTheme ? darkmodeColor : Colors.white,
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,11 +134,13 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
               const EdgeInsets.only(left: 26, right: 20, bottom: 15, top: 15),
           child: Container(
             decoration: BoxDecoration(
-                color: Colors.white,
+                color: appModelTheme.darkTheme ? darkmodeColor : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
+                    color: appModelTheme.darkTheme
+                        ? Colors.black45
+                        : Colors.grey.withOpacity(0.2),
                     spreadRadius: 2,
                     blurRadius: 10,
                     offset: Offset(0, 3), // changes position of shadow
@@ -156,7 +158,8 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                           style: TextStyle(
                             fontSize: 11,
                             fontFamily: 'Poppins1',
-                            color: Colors.grey,
+                            color:
+                                appModelTheme.darkTheme ? white : Colors.black,
                           ),
                         )
                       : Text(
@@ -168,7 +171,8 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                           style: TextStyle(
                             fontSize: 11,
                             fontFamily: 'Poppins1',
-                            color: Colors.grey,
+                            color:
+                                appModelTheme.darkTheme ? white : Colors.black,
                           ),
                         ),
                 ),
@@ -187,7 +191,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                         style: TextStyle(
                           fontSize: 10,
                           fontFamily: 'Poppins1',
-                          color: Colors.grey,
+                          color: appModelTheme.darkTheme ? white : Colors.black,
                         ),
                       ),
                       SizedBox(
@@ -198,7 +202,9 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                         style: TextStyle(
                           fontSize: 10,
                           fontFamily: 'Poppins3',
-                          color: Colors.black38,
+                          color: appModelTheme.darkTheme
+                              ? Colors.white70
+                              : Colors.black,
                         ),
                       ),
                     ],
@@ -212,7 +218,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                     style: TextStyle(
                       fontSize: 9,
                       fontFamily: 'Poppins1',
-                      color: Colors.grey,
+                      color: appModelTheme.darkTheme ? white : Colors.black,
                     ),
                   ),
                 ),
@@ -239,6 +245,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             style: TextStyle(
               fontSize: 10,
               fontFamily: 'Poppins1',
+              color: appModelTheme.darkTheme ? white : Colors.black,
             ),
           ),
           // ========================by jenish==========================
@@ -253,7 +260,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Poppins2',
-              color: Colors.black,
+              color: appModelTheme.darkTheme ? Colors.white : Colors.black,
             ),
           ),
         ],
@@ -268,8 +275,8 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
         right: 20,
       ),
       child: Divider(
-          // color: appModelTheme.darkTheme ? white : Colors.black38,
-          ),
+        color: appModelTheme.darkTheme ? white : Colors.black,
+      ),
     );
   }
 
@@ -286,6 +293,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Poppins1',
+              color: appModelTheme.darkTheme ? white : Colors.black,
             ),
           ),
           Text(
@@ -300,7 +308,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Poppins2',
-              color: black,
+              color: appModelTheme.darkTheme ? Colors.white : black,
             ),
           ),
         ],
@@ -321,8 +329,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
               padding: EdgeInsets.only(right: 6.0),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Colors.lightBlueAccent, // This is what you need!
+                  backgroundColor: Colors.green,
                 ),
                 child: Text(
                   getTranslated('approve', context),
@@ -347,7 +354,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
               padding: EdgeInsets.only(left: 6.0, right: 6.0),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red, // This is what you need!
+                  backgroundColor: Colors.red,
                 ),
                 child: Text(
                   getTranslated("reject", context),
@@ -413,7 +420,9 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
                         Container(
                           // height: double.infinity,
                           decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: appModelTheme.darkTheme
+                                  ? darkmodeColor
+                                  : Colors.white,
                               borderRadius: BorderRadius.only(
                                   topRight: Radius.circular(25.0),
                                   topLeft: Radius.circular(25.0))),
@@ -437,7 +446,9 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
       width: double.infinity,
       margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
       decoration: BoxDecoration(
-          border: Border.all(color: Color(0xffa9d7f7)),
+          border: Border.all(
+              color:
+                  appModelTheme.darkTheme ? Colors.white30 : Color(0xffa9d7f7)),
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -447,7 +458,11 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             padding: const EdgeInsets.only(top: 7, bottom: 7, left: 10),
             child: Text(
               "$label",
-              style: TextStyle(fontFamily: "Poppins1", fontSize: 15),
+              style: TextStyle(
+                fontFamily: "Poppins1",
+                fontSize: 15,
+                color: appModelTheme.darkTheme ? Colors.white : Colors.black,
+              ),
             ),
           ),
           Padding(
@@ -479,7 +494,7 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
       final Map<int, String> values = {
         for (int i = 0; i < split.length; i++) i: split[i]
       };
-      var containers = "";
+      // removed unused variable
 
       return ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -538,19 +553,24 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             margin: EdgeInsets.all(10),
             padding: EdgeInsets.only(top: 10, bottom: 10),
             decoration: BoxDecoration(
-                color: cardgreycolor2,
+                color: appModelTheme.darkTheme ? darkmodeColor : cardgreycolor2,
                 borderRadius: BorderRadius.all(Radius.circular(10))),
             child: ListTile(
               title: Text(
                 getTranslated("pickupcondition", context),
                 style: TextStyle(
-                    color: greycolorfont, fontSize: 9, fontFamily: "Poppins3"),
+                    color:
+                        appModelTheme.darkTheme ? Colors.white : greycolorfont,
+                    fontSize: 9,
+                    fontFamily: "Poppins3"),
               ),
               subtitle: Container(
                 margin: EdgeInsets.only(top: 5),
                 child: Text("$carCondition",
                     style: TextStyle(
-                        color: Colors.black,
+                        color: appModelTheme.darkTheme
+                            ? Colors.white
+                            : Colors.black,
                         fontSize: 11,
                         fontFamily: "Poppins3")),
               ),
@@ -562,19 +582,24 @@ class _ConfirmPayDetailState extends State<ConfirmPayDetail> {
             margin: EdgeInsets.all(10),
             padding: EdgeInsets.only(top: 10, bottom: 10),
             decoration: BoxDecoration(
-                color: cardgreycolor2,
+                color: appModelTheme.darkTheme ? darkmodeColor : cardgreycolor2,
                 borderRadius: BorderRadius.all(Radius.circular(10))),
             child: ListTile(
               title: Text(
                 getTranslated('typeofworkneeded', context),
                 style: TextStyle(
-                    color: greycolorfont, fontSize: 9, fontFamily: "Poppins3"),
+                    color:
+                        appModelTheme.darkTheme ? Colors.white : greycolorfont,
+                    fontSize: 9,
+                    fontFamily: "Poppins3"),
               ),
               subtitle: Container(
                 margin: EdgeInsets.only(top: 5),
                 child: Text("$workNeeded",
                     style: TextStyle(
-                        color: Colors.black,
+                        color: appModelTheme.darkTheme
+                            ? Colors.white
+                            : Colors.black,
                         fontSize: 11,
                         fontFamily: "Poppins3")),
               ),

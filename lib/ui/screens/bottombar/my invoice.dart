@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -71,8 +70,77 @@ class _MyInvoiceState extends State<MyInvoice>
   dynamic appModelTheme;
   TabController? _tabController;
 
+  String formatDateDMY(String? value) {
+    if (value == null || value.isEmpty) return '';
+    try {
+      final dt = DateTime.parse(value);
+      return DateFormat('dd-MM-yyyy').format(dt);
+    } catch (_) {
+      final patterns = [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm:ss',
+        'yyyy/MM/dd',
+        "yyyy-MM-dd'T'HH:mm:ss",
+        'dd-MM-yyyy HH:mm:ss',
+      ];
+      for (final p in patterns) {
+        try {
+          final dt = DateFormat(p).parse(value);
+          return DateFormat('dd-MM-yyyy').format(dt);
+        } catch (_) {}
+      }
+      return value;
+    }
+  }
+
+  String formatDateTime12hDMY(String? value) {
+    if (value == null || value.isEmpty) return '';
+    try {
+      final dt = DateTime.parse(value);
+      return DateFormat('hh:mm a, dd-MM-yyyy').format(dt);
+    } catch (_) {
+      final patterns = [
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm:ss',
+        'yyyy/MM/dd HH:mm',
+        "yyyy-MM-dd'T'HH:mm:ss",
+        'dd-MM-yyyy HH:mm:ss',
+      ];
+      for (final p in patterns) {
+        try {
+          final dt = DateFormat(p).parse(value);
+          return DateFormat('hh:mm a, dd-MM-yyyy').format(dt);
+        } catch (_) {}
+      }
+      return value;
+    }
+  }
+
   bool flag = true;
   Repository repository = Repository();
+
+  String? _profileImageUrl() {
+    // Prefer stored profile path combined with Config.profileurl; fallback to PREF_PROFILE_IMG absolute URL
+    try {
+      final profileJson = PrefObj.preferences!.get(PrefKeys.PROFILE_DATA);
+      if (profileJson != null) {
+        final map = json.decode(profileJson);
+        final String? profile = map['profile']?.toString();
+        if (profile != null &&
+            profile.isNotEmpty &&
+            !profile.contains('null')) {
+          return profile.startsWith('http')
+              ? profile
+              : (Config.profileurl + profile);
+        }
+      }
+    } catch (_) {}
+    if (PrefObj.preferences!.containsKey(PrefKeys.PROFILE_IMG)) {
+      final dynamic val = PrefObj.preferences!.get(PrefKeys.PROFILE_IMG);
+      if (val is String && val.isNotEmpty) return val;
+    }
+    return null;
+  }
 
   @override
   void initState() {
@@ -160,6 +228,7 @@ class _MyInvoiceState extends State<MyInvoice>
             builder: (context, child) => SafeArea(
               child: Column(children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
                       child: Container(
@@ -201,40 +270,42 @@ class _MyInvoiceState extends State<MyInvoice>
                         ),
                       ),
                     ),
-                    Container(
+                    SizedBox(
                       height: screenSize!.height * 0.05,
-                      margin: appModelTheme.appLocal == Locale("en")
-                          ? EdgeInsets.only(right: 10.w)
-                          : EdgeInsets.only(left: 10.w),
-                      padding: EdgeInsets.fromLTRB(1.w, 8.w, 10.w, 8.w),
-                      decoration: BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: GestureDetector(
-                        onTap: () {
-                          showFilter = !showFilter;
-                          // Refresh the UI
-                          setState(() {});
-                        },
-                        child: Container(
-                          margin: EdgeInsets.only(left: 10.w, right: 10.w),
-                          child: Row(
-                            children: [
-                              Icon(
-                                  showFilter
-                                      ? Icons.filter_alt_outlined
-                                      : Icons.filter_alt_off_outlined,
-                                  color: Colors.black,
-                                  size: 20.w),
-                              SizedBox(width: 8.w),
-                              Text(
-                                getTranslated("filter", context),
-                                style: TextStyle(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(10),
+                          onTap: () {
+                            showFilter = !showFilter;
+                            setState(() {});
+                          },
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 10.w),
+                            padding: EdgeInsets.symmetric(horizontal: 12.w),
+                            decoration: BoxDecoration(
+                                color: white,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                    showFilter
+                                        ? Icons.filter_alt_outlined
+                                        : Icons.filter_alt_off_outlined,
                                     color: Colors.black,
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins3'),
-                              )
-                            ],
+                                    size: 20.w),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  getTranslated("filter", context),
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                      fontFamily: 'Poppins3'),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -276,9 +347,9 @@ class _MyInvoiceState extends State<MyInvoice>
 
   Widget _filterwidget() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             flex: 3,
@@ -288,9 +359,8 @@ class _MyInvoiceState extends State<MyInvoice>
                 setState(() {});
               },
               child: Container(
-                margin: EdgeInsets.only(left: 15.w),
                 width: 100.w,
-                height: 30,
+                height: 40,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.white),
@@ -300,9 +370,9 @@ class _MyInvoiceState extends State<MyInvoice>
                   children: [
                     Text(
                       "${formatter.format(fromDate)}",
-                      style: TextStyle(fontSize: 11, fontFamily: 'Poppins3'),
+                      style: TextStyle(fontSize: 12, fontFamily: 'Poppins3'),
                     ),
-                    Icon(Icons.keyboard_arrow_down_outlined, size: 14),
+                    Icon(Icons.keyboard_arrow_down_outlined, size: 18),
                   ],
                 ),
               ),
@@ -314,12 +384,11 @@ class _MyInvoiceState extends State<MyInvoice>
             child: GestureDetector(
               onTap: () async {
                 toDate = await selectToDate(context, toDate, 'fromDate');
-
                 setState(() {});
               },
               child: Container(
                 width: 90.w,
-                height: 30,
+                height: 40,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.white),
@@ -330,17 +399,42 @@ class _MyInvoiceState extends State<MyInvoice>
                     Text(
                       "${formatter.format(toDate)}",
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         fontFamily: 'Poppins3',
                       ),
                     ),
-                    Icon(Icons.keyboard_arrow_down_outlined, size: 14),
+                    Icon(Icons.keyboard_arrow_down_outlined, size: 18),
                   ],
                 ),
               ),
             ),
           ),
           SizedBox(width: 10.w),
+          InkWell(
+            onTap: () {
+              setState(() {
+                fromDate = DateTime(DateTime.now().year - 1,
+                    DateTime.now().month, DateTime.now().day);
+                toDate = DateTime(DateTime.now().year + 1, DateTime.now().month,
+                    DateTime.now().day);
+                bookingInvoicesBloc.bookinginvoicesink(
+                    PrefObj.preferences!.get(PrefKeys.USER_ID),
+                    formatter.format(fromDate),
+                    formatter.format(toDate));
+              });
+            },
+            child: Container(
+                height: 40,
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5)),
+                alignment: Alignment.center,
+                child: Text(
+                  getTranslated('Clear', context),
+                  style: TextStyle(fontSize: 12, fontFamily: 'Poppins3'),
+                )),
+          )
         ],
       ),
     );
@@ -399,32 +493,28 @@ class _MyInvoiceState extends State<MyInvoice>
   }
 
   Widget requestTab() {
-    var size = MediaQuery.of(context).size;
     return Column(
       children: [
         Container(
-          margin: EdgeInsets.only(left: 1, right: 15),
-          height: size.height * 0.05,
+          margin: EdgeInsets.symmetric(horizontal: 10.w),
+          height: 40,
           child: TabBar(
             controller: _tabController,
-            indicator: BoxDecoration(
-              border: Border.all(color: Colors.transparent),
-              borderRadius: BorderRadius.circular(5.0),
-              // color: appModelTheme.darkTheme ? Colors.grey : Colors.white,
-              color: appModelTheme.darkTheme ? logoBlue : Colors.white,
-              // color: Colors.white,
-            ),
+            isScrollable: false,
+            indicatorSize: TabBarIndicatorSize.tab,
+            dividerColor: Colors.transparent,
+            // Keep highlight strictly inside each tab's box
+            indicatorColor: Colors.transparent,
+            indicator: BoxDecoration(color: Colors.transparent),
             labelColor: appModelTheme.darkTheme ? Colors.white : logoBlue,
-            // labelColor: Colors.black,
             labelStyle: TextStyle(
-              color: Colors.red,
               fontSize: 13,
               fontFamily: "Poppins3",
             ),
-            indicatorPadding: EdgeInsets.only(left: 10),
-            labelPadding: EdgeInsets.only(left: 10),
+            indicatorPadding: EdgeInsets.zero,
+            labelPadding: EdgeInsets.zero,
             unselectedLabelColor:
-                appModelTheme.darkTheme ? Colors.white : Colors.grey[100],
+                appModelTheme.darkTheme ? Colors.white70 : Colors.white,
             onTap: (index) {
               selectTab = index;
 
@@ -490,60 +580,92 @@ class _MyInvoiceState extends State<MyInvoice>
             tabs: [
               Tab(
                 child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 5),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.white, width: 1)),
-                  child: Align(
-                    alignment: Alignment.center,
+                    color: selectTab == 0
+                        ? (appModelTheme.darkTheme ? logoBlue : Colors.white)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(6),
+                    border: selectTab == 0
+                        ? Border.all(color: Colors.transparent, width: 0)
+                        : Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  child: Center(
                     child: Text(
                       getTranslated('Booking', context),
-                      style: TextStyle(fontSize: 12),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 11),
                     ),
                   ),
                 ),
               ),
               Tab(
                 child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 5),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.white, width: 1)),
-                  child: Align(
-                    alignment: Alignment.center,
+                    color: selectTab == 1
+                        ? (appModelTheme.darkTheme ? logoBlue : Colors.white)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(6),
+                    border: selectTab == 1
+                        ? Border.all(color: Colors.transparent, width: 0)
+                        : Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  child: Center(
                     child: Text(
                       getTranslated('JobCard', context),
-                      style: TextStyle(fontSize: 12),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 11),
                     ),
                   ),
                 ),
               ),
               Tab(
                 child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 5),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.white, width: 1)),
-                  child: Align(
-                    alignment: Alignment.center,
+                    color: selectTab == 2
+                        ? (appModelTheme.darkTheme ? logoBlue : Colors.white)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(6),
+                    border: selectTab == 2
+                        ? Border.all(color: Colors.transparent, width: 0)
+                        : Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  child: Center(
                     child: Text(
                       getTranslated('DeliveryScheduled', context),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 11),
                     ),
                   ),
                 ),
               ),
               Tab(
                 child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 5),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.white, width: 1)),
-                  child: Align(
-                    alignment: Alignment.center,
+                    color: selectTab == 3
+                        ? (appModelTheme.darkTheme ? logoBlue : Colors.white)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(6),
+                    border: selectTab == 3
+                        ? Border.all(color: Colors.transparent, width: 0)
+                        : Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  child: Center(
                     child: Text(
                       getTranslated('DeliveryConfirmed', context),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 12),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 11),
                     ),
                   ),
                 ),
@@ -692,7 +814,7 @@ class _MyInvoiceState extends State<MyInvoice>
                                     ),
                                   ),
                                   carddivider(getTranslated('date', context),
-                                      '${invoice.updatedAt!.substring(0, 10)}'),
+                                      formatDateDMY(invoice.updatedAt)),
                                 ],
                               ),
                             ),
@@ -701,23 +823,21 @@ class _MyInvoiceState extends State<MyInvoice>
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
                                 children: [
-                                  PrefObj.preferences!
-                                          .containsKey(PrefKeys.PROFILE_IMG)
-                                      ? Center(
-                                          child: CircleAvatar(
-                                            radius: size.width * 0.07,
-                                            backgroundImage: NetworkImage(
-                                                PrefObj.preferences!
-                                                    .get(PrefKeys.PROFILE_IMG)),
-                                          ),
-                                        )
-                                      : Center(
-                                          child: CircleAvatar(
-                                            radius: size.width * 0.07,
-                                            child: Icon(Icons.person,
-                                                size: size.width * 0.1),
-                                          ),
-                                        ),
+                                  Builder(builder: (context) {
+                                    final url = _profileImageUrl();
+                                    return Center(
+                                      child: CircleAvatar(
+                                        radius: size.width * 0.07,
+                                        backgroundImage: url != null
+                                            ? NetworkImage(url)
+                                            : null,
+                                        child: url == null
+                                            ? Icon(Icons.person,
+                                                size: size.width * 0.1)
+                                            : null,
+                                      ),
+                                    );
+                                  }),
                                   Spacer(),
                                   carddivider(getTranslated('Name', context),
                                       profileData['name'].toString()),
@@ -937,7 +1057,7 @@ class _MyInvoiceState extends State<MyInvoice>
                                     ),
                                   ),
                                   carddivider(getTranslated('date', context),
-                                      '${invoice.updatedAt!.substring(0, 10)}'),
+                                      formatDateDMY(invoice.updatedAt)),
                                 ],
                               ),
                             ),
@@ -946,23 +1066,21 @@ class _MyInvoiceState extends State<MyInvoice>
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
                                 children: [
-                                  PrefObj.preferences!
-                                          .containsKey(PrefKeys.PROFILE_IMG)
-                                      ? Center(
-                                          child: CircleAvatar(
-                                            radius: size.width * 0.07,
-                                            backgroundImage: NetworkImage(
-                                                PrefObj.preferences!
-                                                    .get(PrefKeys.PROFILE_IMG)),
-                                          ),
-                                        )
-                                      : Center(
-                                          child: CircleAvatar(
-                                            radius: size.width * 0.07,
-                                            child: Icon(Icons.person,
-                                                size: size.width * 0.1),
-                                          ),
-                                        ),
+                                  Builder(builder: (context) {
+                                    final url = _profileImageUrl();
+                                    return Center(
+                                      child: CircleAvatar(
+                                        radius: size.width * 0.07,
+                                        backgroundImage: url != null
+                                            ? NetworkImage(url)
+                                            : null,
+                                        child: url == null
+                                            ? Icon(Icons.person,
+                                                size: size.width * 0.1)
+                                            : null,
+                                      ),
+                                    );
+                                  }),
                                   Spacer(),
                                   carddivider(getTranslated('Name', context),
                                       profileData['name'].toString()),
@@ -1114,7 +1232,6 @@ class _MyInvoiceState extends State<MyInvoice>
                               ),
                             )
                           : Text(
-                              //TODO
                               getTranslated(
                                   invoiceData
                                       .items![i].itemName!.removeAllWhitespace,
@@ -1160,7 +1277,6 @@ class _MyInvoiceState extends State<MyInvoice>
                           ),
                         )
                       : Text(
-                          //TODO
                           getTranslated(
                               invoiceData
                                   .items![i].itemName!.removeAllWhitespace,
@@ -1198,36 +1314,6 @@ class _MyInvoiceState extends State<MyInvoice>
             color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w600),
       ),
       margin: EdgeInsets.only(left: 10.w),
-    );
-  }
-
-  Widget _infoButton1(ItemData data) {
-    return GestureDetector(
-      onTap: () {
-        onotpAPI(data.bookingId);
-        print('Booking Id =  ${data.bookingId}');
-      },
-      child: Padding(
-        padding: EdgeInsets.only(right: 17.w, bottom: 25),
-        child: Container(
-          height: 32.h,
-          width: 88.w,
-          child: Center(
-            child: Text(
-              'Cancel Order',
-              style: TextStyle(
-                  fontSize: 10.h,
-                  fontFamily: 'Poppins1',
-                  color: appModelTheme.darkTheme ? white : Colors.black26),
-            ),
-          ),
-          decoration: BoxDecoration(
-            border: Border.all(
-                color: appModelTheme.darkTheme ? white : Colors.black38),
-            borderRadius: BorderRadius.circular(5),
-          ),
-        ),
-      ),
     );
   }
 
@@ -1509,8 +1595,6 @@ class _MyInvoiceState extends State<MyInvoice>
                             textColor: Colors.white,
                             fontSize: 16.0);
                       } else if (data.pickupStatus == "3") {
-                        // TODO WORK HERE
-
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -1669,25 +1753,6 @@ class _MyInvoiceState extends State<MyInvoice>
     }
   }
 
-  Widget _RatingStar() {
-    return RatingBar.builder(
-      initialRating: 4,
-      minRating: 1,
-      direction: Axis.horizontal,
-      allowHalfRating: true,
-      itemCount: 5,
-      // itemPadding: EdgeInsets.symmetric(horizontal: 1.0),
-      itemSize: 18.sp,
-      itemBuilder: (context, _) => Icon(
-        Icons.star,
-        color: Color(0xff35C648),
-      ),
-      onRatingUpdate: (rating) {
-        print(rating);
-      },
-    );
-  }
-
   Widget card(String title, bool isselected) {
     return Card(
       elevation: 0,
@@ -1711,24 +1776,6 @@ class _MyInvoiceState extends State<MyInvoice>
               color: isselected ? Colors.black : Colors.white),
         ),
       ),
-    );
-  }
-
-  Widget _body2() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: appModelTheme.darkTheme ? Color(0xff252525) : white,
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(25),
-          topLeft: Radius.circular(25),
-        ),
-      ),
-      child: Center(
-          child: Text(
-        'Data Not Found',
-        style: TextStyle(fontFamily: 'Poppins1', fontSize: 18.sp),
-      )),
     );
   }
 
@@ -1780,11 +1827,12 @@ class _MyInvoiceState extends State<MyInvoice>
         transitionDuration: const Duration(milliseconds: 200),
         pageBuilder: (BuildContext buildContext, Animation animation,
             Animation secondaryAnimation) {
+          final appModelTheme = Provider.of<AppModel>(buildContext);
           return Container(
             width: MediaQuery.of(context).size.width - 10,
             height: MediaQuery.of(context).size.height - 100,
             padding: EdgeInsets.all(20),
-            color: Colors.white,
+            color: appModelTheme.darkTheme ? darkmodeColor : Colors.white,
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1818,16 +1866,19 @@ Widget _cardList(ItemData data) {
     shrinkWrap: true,
     itemCount: data.items?.length,
     itemBuilder: (context, index) {
+      final appModel = Provider.of<AppModel>(context);
       return Padding(
         padding:
             const EdgeInsets.only(left: 26, right: 20, bottom: 15, top: 15),
         child: Container(
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: appModel.darkTheme ? darkmodeColor : Colors.white,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
+                  color: appModel.darkTheme
+                      ? Colors.black45
+                      : Colors.grey.withOpacity(0.2),
                   spreadRadius: 2,
                   blurRadius: 10,
                   offset: Offset(0, 3), // changes position of shadow
@@ -1846,7 +1897,7 @@ Widget _cardList(ItemData data) {
                   style: TextStyle(
                     fontSize: 11.sp,
                     fontFamily: 'Poppins1',
-                    color: Colors.grey,
+                    color: appModel.darkTheme ? white : Colors.black,
                   ),
                 ),
               ),
@@ -1865,7 +1916,7 @@ Widget _cardList(ItemData data) {
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontFamily: 'Poppins1',
-                        color: Colors.grey,
+                        color: appModel.darkTheme ? Colors.grey : Colors.black,
                       ),
                     ),
                     SizedBox(
@@ -1876,7 +1927,8 @@ Widget _cardList(ItemData data) {
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontFamily: 'Poppins3',
-                        color: Colors.black38,
+                        color:
+                            appModel.darkTheme ? Colors.black38 : Colors.black,
                       ),
                     ),
                   ],
@@ -1899,7 +1951,7 @@ Widget _cardList(ItemData data) {
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontFamily: 'Poppins3',
-                        color: Colors.grey,
+                        color: appModel.darkTheme ? Colors.grey : Colors.black,
                       ),
                     ),
                   ],
@@ -1924,7 +1976,7 @@ Widget _cardList(ItemData data) {
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontFamily: 'Poppins3',
-                        color: Colors.grey,
+                        color: appModel.darkTheme ? Colors.grey : Colors.black,
                       ),
                     ),
                   ],
@@ -1950,7 +2002,7 @@ Widget _cardList(ItemData data) {
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontFamily: 'Poppins3',
-                        color: Colors.grey,
+                        color: appModel.darkTheme ? Colors.grey : Colors.black,
                       ),
                     ),
                   ],
@@ -1977,7 +2029,7 @@ Widget _cardList(ItemData data) {
                       style: TextStyle(
                         fontSize: 10.sp,
                         fontFamily: 'Poppins3',
-                        color: Colors.grey,
+                        color: appModel.darkTheme ? Colors.grey : Colors.black,
                       ),
                     ),
                   ],
@@ -1986,12 +2038,12 @@ Widget _cardList(ItemData data) {
               Padding(
                 padding: EdgeInsets.only(left: 17, top: 15.h),
                 child: Text(
-                  DateFormat('hh:mm a dd-MM-yy')
+                  DateFormat('hh:mm a, dd-MM-yyyy')
                       .format(DateTime.parse(data.updatedAt!)),
                   style: TextStyle(
                     fontSize: 9.sp,
                     fontFamily: 'Poppins1',
-                    color: Colors.grey,
+                    color: appModel.darkTheme ? Colors.grey : Colors.black,
                   ),
                 ),
               ),
@@ -2008,6 +2060,7 @@ Widget _cardList(ItemData data) {
 
 Widget _delChange() {
   return Builder(builder: (context) {
+    final appModel = Provider.of<AppModel>(context);
     return Padding(
       padding: const EdgeInsets.only(left: 27, right: 20),
       child: Row(
@@ -2019,6 +2072,7 @@ Widget _delChange() {
             style: TextStyle(
               fontSize: 10.sp,
               fontFamily: 'Poppins1',
+              color: appModel.darkTheme ? white : Colors.black,
             ),
           ),
           // ========================by jenish==========================
@@ -2051,6 +2105,7 @@ Widget _customDivider() {
 
 Widget _delTotal(ItemData data) {
   return Builder(builder: (context) {
+    final appModel = Provider.of<AppModel>(context);
     return Padding(
       // ========================by jenish==========================
       padding: const EdgeInsets.only(left: 27, right: 20),
@@ -2063,6 +2118,7 @@ Widget _delTotal(ItemData data) {
             style: TextStyle(
               fontSize: 13.sp,
               fontFamily: 'Poppins1',
+              color: appModel.darkTheme ? white : Colors.black,
             ),
           ),
           Text(
@@ -2095,8 +2151,7 @@ Widget _acceptRejectBox(
             padding: EdgeInsets.only(right: 6.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Colors.lightBlueAccent, // This is what you need!
+                backgroundColor: Colors.green, // Changed to green color
               ),
               child: Text(
                 'Approve',
@@ -2190,12 +2245,15 @@ Widget dynamicBottomCard() {
                 itemCount: conditionsListsnapshort.data!.data!.length,
                 // reverse: true,
                 itemBuilder: (BuildContext context, int index) {
+                  final appModel = Provider.of<AppModel>(context);
                   return Column(
                     children: [
                       Container(
                         // height: double.infinity,
                         decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: appModel.darkTheme
+                                ? darkmodeColor
+                                : Colors.white,
                             borderRadius: BorderRadius.only(
                                 topRight: Radius.circular(25.0),
                                 topLeft: Radius.circular(25.0))),
@@ -2215,40 +2273,51 @@ Widget dynamicBottomCard() {
 
 Widget Frontbumber(
     String label, String carCondition, String workNeeded, String image) {
-  return Container(
-    width: double.infinity,
-    margin: EdgeInsets.only(left: 10.w, right: 10.w, top: 10.h, bottom: 10.h),
-    decoration: BoxDecoration(
-        border: Border.all(color: Color(0xffa9d7f7)),
-        borderRadius: BorderRadius.all(Radius.circular(10))),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 7, bottom: 7, left: 10),
-          child: Text(
-            "$label",
-            style: TextStyle(fontFamily: "Poppins1", fontSize: 15.sp),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 10),
-          child: Row(
-            children: [
-              carImage(image),
-              // carImage(temp == null ? '' : temp!.path.toString()),
-              // carImage(temp == null ? '' : temp!.path.toString()),
-            ],
-          ),
-        ),
-        Row(
+  return Consumer<AppModel>(
+    builder: (context, appModel, child) {
+      return Container(
+        width: double.infinity,
+        margin:
+            EdgeInsets.only(left: 10.w, right: 10.w, top: 10.h, bottom: 10.h),
+        decoration: BoxDecoration(
+            color: appModel.darkTheme ? darkmodeColor : Colors.white,
+            border: Border.all(
+                color: appModel.darkTheme ? Colors.white30 : Color(0xffa9d7f7)),
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            bottomCard(carCondition, workNeeded),
+            Padding(
+              padding: const EdgeInsets.only(top: 7, bottom: 7, left: 10),
+              child: Text(
+                "$label",
+                style: TextStyle(
+                  fontFamily: "Poppins1",
+                  fontSize: 15.sp,
+                  color: appModel.darkTheme ? white : Colors.black,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Row(
+                children: [
+                  carImage(image),
+                  // carImage(temp == null ? '' : temp!.path.toString()),
+                  // carImage(temp == null ? '' : temp!.path.toString()),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                bottomCard(carCondition, workNeeded),
+              ],
+            )
           ],
-        )
-      ],
-    ),
+        ),
+      );
+    },
   );
 }
 
@@ -2258,7 +2327,6 @@ Widget carImage(String images) {
     final Map<int, String> values = {
       for (int i = 0; i < split.length; i++) i: split[i]
     };
-    var containers = "";
 
     return Row(children: [
       for (int i = 0; i < values.length - 1; i++)
@@ -2295,59 +2363,67 @@ Widget carImage(String images) {
 }
 
 Widget bottomCard(String carCondition, String workNeeded) {
-  return Expanded(
-      child: Column(
-    children: [
-      Material(
-        child: Container(
-          margin: EdgeInsets.all(10.h),
-          padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
-          decoration: BoxDecoration(
-              color: cardgreycolor2,
-              borderRadius: BorderRadius.all(Radius.circular(10))),
-          child: ListTile(
-            title: Text(
-              "Pickup Condition",
-              style: TextStyle(
-                  color: greycolorfont, fontSize: 9.sp, fontFamily: "Poppins3"),
-            ),
-            subtitle: Container(
-              margin: EdgeInsets.only(top: 5.h),
-              child: Text("$carCondition",
+  return Consumer<AppModel>(
+    builder: (context, appModel, child) {
+      return Expanded(
+          child: Column(
+        children: [
+          Material(
+            child: Container(
+              margin: EdgeInsets.all(10.h),
+              padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
+              decoration: BoxDecoration(
+                  color: appModel.darkTheme ? darkmodeColor : cardgreycolor2,
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              child: ListTile(
+                title: Text(
+                  "Pickup Condition",
                   style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 11.sp,
-                      fontFamily: "Poppins3")),
+                      color: appModel.darkTheme ? white : greycolorfont,
+                      fontSize: 9.sp,
+                      fontFamily: "Poppins3"),
+                ),
+                subtitle: Container(
+                  margin: EdgeInsets.only(top: 5.h),
+                  child: Text("$carCondition",
+                      style: TextStyle(
+                          color: appModel.darkTheme ? white : Colors.black,
+                          fontSize: 11.sp,
+                          fontFamily: "Poppins3")),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-      Material(
-        child: Container(
-          margin: EdgeInsets.all(10.h),
-          padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
-          decoration: BoxDecoration(
-              color: cardgreycolor2,
-              borderRadius: BorderRadius.all(Radius.circular(10))),
-          child: ListTile(
-            title: Text(
-              "Type of Work Needed",
-              style: TextStyle(
-                  color: greycolorfont, fontSize: 9.sp, fontFamily: "Poppins3"),
-            ),
-            subtitle: Container(
-              margin: EdgeInsets.only(top: 5.h),
-              child: Text("$workNeeded",
+          Material(
+            child: Container(
+              margin: EdgeInsets.all(10.h),
+              padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
+              decoration: BoxDecoration(
+                  color: appModel.darkTheme ? darkmodeColor : cardgreycolor2,
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              child: ListTile(
+                title: Text(
+                  "Type of Work Needed",
                   style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 11.sp,
-                      fontFamily: "Poppins3")),
+                      color: appModel.darkTheme ? white : greycolorfont,
+                      fontSize: 9.sp,
+                      fontFamily: "Poppins3"),
+                ),
+                subtitle: Container(
+                  margin: EdgeInsets.only(top: 5.h),
+                  child: Text("$workNeeded",
+                      style: TextStyle(
+                          color: appModel.darkTheme ? white : Colors.black,
+                          fontSize: 11.sp,
+                          fontFamily: "Poppins3")),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-    ],
-  ));
+        ],
+      ));
+    },
+  );
 }
 
 Widget cardPoint(String title) {

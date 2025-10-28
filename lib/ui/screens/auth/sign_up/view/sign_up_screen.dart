@@ -10,7 +10,6 @@ import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:imechano/localization/language_constrants.dart';
@@ -25,7 +24,6 @@ import 'package:imechano/ui/share_preferences/pref_key.dart';
 import 'package:imechano/ui/share_preferences/preference.dart';
 import 'package:imechano/ui/shared/widgets/buttons/custom_button.dart';
 import 'package:imechano/ui/shared/widgets/form/custom_form.dart';
-import 'package:imechano/ui/shared/widgets/text_widgets.dart';
 import 'package:imechano/ui/styling/colors.dart';
 import 'package:imechano/ui/styling/global.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -80,7 +78,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   void initState() {
     firebaseCloudMessaging_Listeners();
-    // TODO: implement initState
     super.initState();
     carid = PrefObj.preferences!.containsKey(PrefKeys.CARID) ? true : false;
     timerController = CountdownTimerController(endTime: endTime, onEnd: onEnd);
@@ -110,7 +107,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           return true;
         },
         child: Container(
-          padding: EdgeInsets.only(left: 20.w, right: 20.w),
+          padding: EdgeInsets.only(left: 20, right: 20),
           child: Form(
             key: _formKey,
             child: Column(
@@ -118,55 +115,54 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(height: 50.h),
-                    Image.asset(
-                      "assets/icons/splash/logo.png",
-                      width: 200.w,
+                    SizedBox(height: 50),
+                    Image(
+                      image: AssetImage('assets/icons/splash/logo.png'),
+                      width: 180,
+                      height: 60,
+                      fit: BoxFit.contain,
                     ),
-                    SizedBox(height: 10.h),
+                    SizedBox(height: 10),
                     Text(getTranslated('createanaccount', context),
                         style: TextStyle(
                             fontFamily: "Poppins3",
-                            fontSize: 20.sp,
-                            color: Colors.black)),
-                    SizedBox(height: 10.h),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: appModelTheme.darkTheme
+                                ? white
+                                : Colors.black)),
+                    SizedBox(height: 10),
                   ],
                 ),
                 Expanded(
                   child: Container(
                     child: SingleChildScrollView(
-                      padding: EdgeInsets.only(bottom: 20.h),
                       child: Column(
                         children: [
-                          SizedBox(height: 20.h),
+                          SizedBox(height: 20),
                           emailForm(),
-                          SizedBox(height: 15.h),
+                          SizedBox(height: 20),
                           mobileForm(),
-                          SizedBox(height: 15.h),
+                          SizedBox(height: 20),
                           nameForm(),
-                          SizedBox(height: 15.h),
+                          SizedBox(height: 20),
                           _textfiled(creatpassword,
                               getTranslated('Createpassword', context)),
-                          SizedBox(height: 15.h),
+                          SizedBox(height: 20),
                           _confirmPassfiled(Confirmpassword,
                               getTranslated('confirmPassword', context)),
-                          SizedBox(height: 15.h),
-                          SizedBox(
-                            height: 66.h,
-                            child: CustomButton(
-                              title: Row(
-                                children: [
-                                  Image.asset("assets/images/Location.png",
-                                      scale: 4),
-                                  SizedBox(width: 10.w),
-                                  Regular16Black(
-                                    addressBtn,
-                                    textAlign: TextAlign.start,
-                                  ),
-                                ],
-                              ),
-                              width: 0.9,
-                              callBackFunction: () async {
+                          SizedBox(height: 20),
+                          Container(
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: appModelTheme.darkTheme
+                                  ? darkmodeColor
+                                  : grayE6E6E5,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: TextFormField(
+                              readOnly: true,
+                              onTap: () async {
                                 final result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -189,45 +185,71 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       : addressBtn = addressTxt;
                                 });
                               },
-                              bgColor: grayE6E6E5,
-                              borderColor: buttonGrayE8E8E7Border,
-                            ),
-                          ),
-                          SizedBox(height: 15.h),
-                          SizedBox(
-                            height: 66.h,
-                            child: CustomButton(
-                              title: Row(
-                                children: [
-                                  Image.asset("assets/images/car.png",
-                                      scale: 4),
-                                  SizedBox(width: 10.w),
-                                  Regular16Black(
-                                    getTranslated(
-                                        'Addmycar(optional)', context),
-                                    textAlign: TextAlign.start,
-                                  ),
-                                ],
+                              style: TextStyle(
+                                fontFamily: "Poppins3",
+                                fontSize: 16,
+                                color: appModelTheme.darkTheme ? white : black,
                               ),
-                              width: 0.9,
-                              callBackFunction: () {
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-
-                                Get.toNamed('/select-your-car');
-                              },
-                              bgColor: grayE6E6E5,
-                              borderColor: buttonGrayE8E8E7Border,
+                              decoration: InputDecoration(
+                                fillColor: appModelTheme.darkTheme
+                                    ? darkmodeColor
+                                    : grayE6E6E5,
+                                filled: true,
+                                border: const OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                focusedBorder: const OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                enabledBorder: const OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                errorBorder: const OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                focusedErrorBorder: const OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                prefixIcon: Image.asset(
+                                  'assets/images/Location.png',
+                                  width: 20,
+                                  height: 20,
+                                  color: appModelTheme.darkTheme
+                                      ? Colors.white
+                                      : null,
+                                ),
+                                hintText: addressBtn,
+                                hintStyle: TextStyle(
+                                  fontFamily: "Poppins3",
+                                  fontSize: 16,
+                                  color:
+                                      appModelTheme.darkTheme ? white : black,
+                                ),
+                                prefixIconConstraints:
+                                    BoxConstraints(minWidth: 40),
+                              ),
                             ),
                           ),
-                          SizedBox(height: 25.h),
+                          SizedBox(height: 40),
                           SizedBox(
-                            height: 58.h,
+                            height: 58,
                             child: CustomButton(
                               title: Text(
                                 getTranslated('Signup', context),
                                 style: TextStyle(
-                                    fontSize: 18.sp, fontFamily: "poppins1"),
+                                    fontSize: 18.sp,
+                                    fontFamily: "poppins1",
+                                    color: Colors.white),
                               ),
                               width: 0.9,
                               callBackFunction: () {
@@ -238,19 +260,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     Get.snackbar(
                                         getTranslated('tocmessage', context),
                                         "",
-                                      backgroundColor: Colors.red,
+                                        backgroundColor: Colors.red,
                                         colorText: Colors.white);
                                     return; // Stop execution here so it doesn't call onRegisterAPI()
                                   }
                                   onRegisterAPI();
-                                  // showOtpModelsheet();
                                 }
                               },
                               bgColor: logoBlue,
                               borderColor: logoBlue,
                             ),
                           ),
-                          SizedBox(height: 15.h),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -269,82 +289,69 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   },
                                   child: Text(getTranslated('signin', context),
                                       style: TextStyle(
-                                          fontFamily: 'poppins1',
-                                          fontSize: 15.sp,
-                                          color: appModelTheme.darkTheme
-                                              ? logoBlue
-                                              : red))),
+                                        fontFamily: 'poppins1',
+                                        fontSize: 15.sp,
+                                        color: Colors.red,
+                                      ))),
                             ],
                           ),
                           Padding(
-                            padding: EdgeInsets.only(
-                                left: 5.w, top: 10.h, bottom: 10.h),
+                            padding: const EdgeInsets.only(left: 5),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: RichText(
-                                    textAlign: TextAlign.center,
-                                    text: TextSpan(
-                                      text:
-                                          "${getTranslated("term_condition_message", context)} \n ",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge!
-                                          .copyWith(
-                                            fontSize: 13.sp,
-                                          ),
-                                      children: [
-                                        TextSpan(
-                                          text: getTranslated(
-                                              "terms_and_condition", context),
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: buttonBlue3b5999,
-                                              fontSize: 13.sp),
-                                          recognizer: TapGestureRecognizer()
-                                            ..onTap = () {
-                                              showModal(
-                                                context: context,
-                                                configuration:
-                                                    FadeScaleTransitionConfiguration(),
-                                                builder: (context) {
-                                                  return PolicyDialog(
-                                                    mdFileName: 'toc.md',
-                                                  );
-                                                },
-                                              );
-                                            },
-                                        ),
-                                        TextSpan(
-                                            text:
-                                                "${getTranslated("and", context)} ",
-                                            style: TextStyle(fontSize: 13.sp)),
-                                        TextSpan(
+                                RichText(
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                    text:
+                                        "${getTranslated("term_condition_message", context)} \n ",
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                    children: [
+                                      TextSpan(
+                                        text: getTranslated(
+                                            "terms_and_condition", context),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: buttonBlue3b5999),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            showModal(
+                                              context: context,
+                                              configuration:
+                                                  FadeScaleTransitionConfiguration(),
+                                              builder: (context) {
+                                                return PolicyDialog(
+                                                  mdFileName: 'toc.md',
+                                                );
+                                              },
+                                            );
+                                          },
+                                      ),
+                                      TextSpan(
                                           text:
-                                              "${getTranslated("privacy_policy", context)}!",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: buttonBlue3b5999,
-                                              fontSize: 13.sp),
-                                          recognizer: TapGestureRecognizer()
-                                            ..onTap = () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return PolicyDialog(
-                                                    mdFileName: 'privacy.md',
-                                                  );
-                                                },
-                                              );
-                                            },
-                                        ),
-                                      ],
-                                    ),
+                                              "${getTranslated("and", context)} "),
+                                      TextSpan(
+                                        text:
+                                            "${getTranslated("privacy_policy", context)}!",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: buttonBlue3b5999),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return PolicyDialog(
+                                                  mdFileName: 'privacy.md',
+                                                );
+                                              },
+                                            );
+                                          },
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                SizedBox(width: 5.w),
                                 Checkbox(
                                   value: agreePolicy,
                                   onChanged: (value) {
@@ -352,13 +359,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       agreePolicy = value!;
                                     });
                                   },
-                                  materialTapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  visualDensity: VisualDensity.compact,
-                                ),
+                                ), //
                               ],
                             ),
-                          ),
+                          )
                         ],
                       ),
                     ),
@@ -375,12 +379,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _textfiled(TextEditingController controller, String title) {
     return Container(
       child: TextFormField(
-        style: TextStyle(fontFamily: "Poppins3"),
+        style: TextStyle(
+            fontFamily: "Poppins3",
+            color: appModelTheme.darkTheme ? white : black),
         validator: validatePassword,
         controller: controller,
         obscureText: showPassword,
         decoration: InputDecoration(
-          fillColor: grayE6E6E5,
+          fillColor: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
           filled: true,
           border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent),
@@ -400,7 +406,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           prefixIcon:
               Image.asset('assets/icons/auth/sign_up/create-password.png'),
           hintText: title,
-          hintStyle: TextStyle(fontFamily: "Poppins3", color: black),
+          hintStyle: TextStyle(
+              fontFamily: "Poppins3",
+              color: appModelTheme.darkTheme ? white : black),
           prefixIconConstraints: BoxConstraints(minWidth: 40),
           suffixIcon: IconButton(
             onPressed: () {
@@ -419,12 +427,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _confirmPassfiled(TextEditingController controller, String title) {
     return Container(
       child: TextFormField(
-        style: TextStyle(fontFamily: "Poppins3"),
+        style: TextStyle(
+            fontFamily: "Poppins3",
+            color: appModelTheme.darkTheme ? white : black),
         validator: validateConfirmPassword,
         controller: controller,
         obscureText: showPassword,
         decoration: InputDecoration(
-          fillColor: grayE6E6E5,
+          fillColor: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
           filled: true,
           border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent),
@@ -444,7 +454,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           prefixIcon:
               Image.asset('assets/icons/auth/sign_up/create-password.png'),
           hintText: title,
-          hintStyle: TextStyle(fontFamily: "Poppins3", color: black),
+          hintStyle: TextStyle(
+              fontFamily: "Poppins3",
+              color: appModelTheme.darkTheme ? white : black),
           prefixIconConstraints: BoxConstraints(minWidth: 40),
           suffixIcon: IconButton(
             onPressed: () {
@@ -507,8 +519,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   CustomFormMobile mobileForm() {
     mobileno.addListener(() {
-      if (mobileno.text.length > 8) {
-        mobileno.text = mobileno.text.substring(0, 8);
+      // Normalize input: remove non-digits and any country code, cap at 8 digits
+      String digitsOnly = mobileno.text.replaceAll(RegExp(r'[^0-9]'), '');
+      // If user pasted 974XXXXXXXX, keep last 8 digits
+      if (digitsOnly.startsWith('974') && digitsOnly.length > 8) {
+        digitsOnly = digitsOnly.substring(digitsOnly.length - 8);
+      }
+      if (digitsOnly.length > 8) {
+        digitsOnly = digitsOnly.substring(0, 8);
+      }
+      if (mobileno.text != digitsOnly) {
+        mobileno.text = digitsOnly;
         mobileno.selection = TextSelection.fromPosition(
           TextPosition(offset: mobileno.text.length),
         );
@@ -517,8 +538,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return CustomFormMobile(
       fillColor: appModelTheme.darkTheme ? darkmodeColor : grayE6E6E5,
       validationform: (value) {
-        if (value == null || value.isEmpty || value.length < 8) {
+        if (value == null || value.isEmpty) {
           return getTranslated("PleaseenterFilTheMobileNo", context);
+        }
+        final String digitsOnly = value.replaceAll(RegExp(r'[^0-9]'), '');
+        if (digitsOnly.length != 8) {
+          return 'Please enter 8-digit Qatar mobile number';
+        }
+        // Qatar numbers cannot start with 0,1,4,8,9
+        if (RegExp(r'^[01489]').hasMatch(digitsOnly)) {
+          return 'Mobile number cannot start with 0,1,4,8,9';
         }
         return null;
       },
@@ -557,13 +586,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
       PrefObj.preferences!.put(PrefKeys.CARID, isotp.data!.id);
       Loader().hideLoader(context);
       id = isotp.data!.id.toString();
-      carid
-          ? addCarApiCall()
-          : Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BottomBarPage(2),
-              ));
+      if (carid) {
+        addCarApiCall();
+      } else {
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => BottomBarPage(2)),
+            (Route<dynamic> route) => false);
+      }
       snackBar(getTranslated('RegisterSuccess', context));
       Fluttertoast.showToast(
           msg: isotp.message.toString(),
@@ -656,9 +685,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
     print(creatpassword.text);
     print(fcmToken);
     print(resendOTP);
+    // Normalize mobile number: strip +974/974 and keep 8 digits
+    String normalizedMobile = mobileno.text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (normalizedMobile.startsWith('974') && normalizedMobile.length > 8) {
+      normalizedMobile =
+          normalizedMobile.substring(normalizedMobile.length - 8);
+    }
+    if (normalizedMobile.length > 8) {
+      normalizedMobile = normalizedMobile.substring(0, 8);
+    }
     final RegisterModel isRegister = await _repository.onRegistration(
         email.text,
-        mobileno.text,
+        normalizedMobile,
         name.text,
         latitude,
         longitude,

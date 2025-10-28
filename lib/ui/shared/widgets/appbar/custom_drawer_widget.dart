@@ -48,8 +48,6 @@ class _drawerpageState extends State<drawerpage> {
   bool isSwitch = false;
   var address;
   var dataLoad;
-  bool isEnglish =
-      true; // Track current language (true = English, false = Arabic)
   final GlobalKey<ScaffoldState> _key = GlobalKey();
 
   void getAddress() async {
@@ -94,10 +92,7 @@ class _drawerpageState extends State<drawerpage> {
     FAQsPage(),
     // AccordionPage(),
     PolicyScreen(mdFileName: 'term_privacy.md'),
-    ChooseLanguage(),
-    null, // Dark Theme - handled with switch
-    null, // Delete Account - handled with dialog
-    null // Logout - handled with dialog
+    ChooseLanguage()
   ];
 
   Locale selectedLocale = Locale('en');
@@ -105,18 +100,6 @@ class _drawerpageState extends State<drawerpage> {
   @override
   void initState() {
     super.initState();
-    // Initialize language state from provider
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final appModel = Provider.of<AppModel>(context, listen: false);
-      await appModel.fetchLocale();
-      await appModel.fetchTheme();
-      if (mounted) {
-        setState(() {
-          isEnglish = appModel.appLocal.languageCode == 'en';
-        });
-      }
-    });
-
     userStr =
         PrefObj.preferences!.containsKey(PrefKeys.USER_DATA) ? true : false;
     if (userStr) {
@@ -124,7 +107,17 @@ class _drawerpageState extends State<drawerpage> {
           json.decode(PrefObj.preferences!.get(PrefKeys.PROFILE_DATA));
       profilename = profileData['name'].toString();
       userphoneno = profileData['mobile_number'].toString();
-      profileurl = Config.profileurl + profileData['profile'].toString();
+      // Build profile image URL from stored profile path and cache it for global use
+      final String profilePath = profileData['profile']?.toString() ?? '';
+      if (profilePath.isNotEmpty && !profilePath.contains('null')) {
+        profileurl = profilePath.startsWith('http')
+            ? profilePath
+            : (Config.profileurl + profilePath);
+        // Ensure drawer can show image without needing to open profile screen first
+        PrefObj.preferences!.put(PrefKeys.PROFILE_IMG, profileurl);
+      } else {
+        profileurl = '';
+      }
 
       drawerTitle = [
         "Home",
@@ -139,7 +132,6 @@ class _drawerpageState extends State<drawerpage> {
         "Privacy Policy",
         "Change Language",
         "Dark Theme",
-        "Delete Account",
         "Logout",
       ];
       drawerGuestIcon = [
@@ -155,34 +147,31 @@ class _drawerpageState extends State<drawerpage> {
         "assets/icons/My Account/Chield_check_fill.png",
         "assets/icons/My Account/language.png",
         "assets/icons/My Account/Path 131.png",
-        "assets/icons/My Account/person_black_24dp.png",
         "assets/icons/My Account/Sign_in.png",
       ];
     } else {
+      // Guest mode: Only show Home, FAQs, Privacy Policy, Change Language, Dark Theme
       drawerTitle = [
         "Home",
-        "My Vehicle",
-        "My Bookings",
-        "My Location",
-        "My Invoices",
-        "Notification",
         "FAQs",
         "Privacy Policy",
-        "Change Language",
-        "Dark Theme"
+        "Dark Theme",
       ];
 
       drawerGuestIcon = [
         "assets/icons/My Account/noun_Home_4334361.png",
-        "assets/icons/My Account/Path 8567.png",
-        "assets/icons/My Account/noun_calender_2189968.png",
-        "assets/icons/My Account/location.png",
-        "assets/icons/My Account/file-text.png",
-        "assets/icons/My Account/notifications_black_24dp.png",
         "assets/icons/My Account/Desk_alt_fill.png",
         "assets/icons/My Account/Chield_check_fill.png",
-        "assets/icons/My Account/language.png",
-        "assets/icons/My Account/Path 131.png"
+        "assets/icons/My Account/Path 131.png",
+      ];
+
+      // Align navigation targets with the guest list (last two are switches, no navigation)
+      pageDrawer = [
+        HomeScreen(),
+        FAQsPage(),
+        PolicyScreen(mdFileName: 'term_privacy.md'),
+        null,
+        null,
       ];
     }
   }
@@ -190,429 +179,323 @@ class _drawerpageState extends State<drawerpage> {
   dynamic appModelTheme;
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppModel>(
-      builder: (context, appModel, child) {
-        appModelTheme = appModel;
+    final appModel = Provider.of<AppModel>(context);
+    appModelTheme = appModel;
 
-        return ScreenUtilInit(
-          designSize: Size(414, 896),
-          builder: (context, child) => Drawer(
-            key: _key,
-            backgroundColor: appModelTheme.darkTheme ? Color(0xff252525) : Colors.white,
-            child: Column(
-              children: [
-                userStr
-                    ? Container(
-                        height: 186.h,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: logoBlue,
-                          borderRadius: BorderRadius.only(
-                              bottomRight: Radius.circular(30),
-                              bottomLeft: Radius.circular(30)),
-                        ),
-                        child: Center(
-                          child: Row(
+    return ScreenUtilInit(
+      designSize: Size(414, 896),
+      builder: (context, child) => Drawer(
+        backgroundColor: appModelTheme.darkTheme ? null : Colors.white,
+        key: _key,
+        child: Column(
+          children: [
+            userStr
+                ? Container(
+                    height: 186.h,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: logoBlue,
+                      borderRadius: BorderRadius.only(
+                          bottomRight: Radius.circular(30),
+                          bottomLeft: Radius.circular(30)),
+                    ),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Builder(builder: (context) {
+                            final bool hasPrefImg = PrefObj.preferences!
+                                .containsKey(PrefKeys.PROFILE_IMG);
+                            final String? cachedUrl = hasPrefImg
+                                ? PrefObj.preferences!.get(PrefKeys.PROFILE_IMG)
+                                : null;
+                            final String? derivedUrl =
+                                (profileurl.isNotEmpty) ? profileurl : null;
+                            final String? url = cachedUrl ?? derivedUrl;
+                            return Center(
+                              child: CircleAvatar(
+                                radius: 55.h,
+                                backgroundImage:
+                                    url != null ? NetworkImage(url) : null,
+                                child: url == null
+                                    ? Icon(Icons.person, size: 50.sp)
+                                    : null,
+                              ),
+                            );
+                          }),
+                          SizedBox(
+                            width: 20.w,
+                          ),
+                          Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              PrefObj.preferences!
-                                      .containsKey(PrefKeys.PROFILE_IMG)
-                                  ? Center(
-                                      child: CircleAvatar(
-                                        radius: 55.h,
-                                        backgroundImage: NetworkImage(PrefObj
-                                            .preferences!
-                                            .get(PrefKeys.PROFILE_IMG)),
-                                      ),
-                                    )
-                                  : Center(
-                                      child: CircleAvatar(
-                                        radius: 55.h,
-                                        child: Icon(Icons.person, size: 50.sp),
-                                      ),
-                                    ),
-                              SizedBox(
-                                width: 20.w,
+                              Text(
+                                profilename.toUpperCase(),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: "Montserrat3  ",
+                                    color: Colors.white,
+                                    fontSize: 18.sp),
                               ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    profilename.toUpperCase(),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: "Montserrat3  ",
-                                        color: Colors.white,
-                                        fontSize: 18.sp),
-                                  ),
-                                  Text(
-                                    userphoneno,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 13.sp),
-                                  )
-                                ],
-                              ),
+                              Text(
+                                userphoneno,
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 13.sp),
+                              )
                             ],
                           ),
-                        ),
-                      )
-                    : Container(
-                        height: 186.h,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: logoBlue,
-                          borderRadius: BorderRadius.only(
-                              bottomRight: Radius.circular(30),
-                              bottomLeft: Radius.circular(30)),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image(
-                              image: AssetImage("assets/icons/splash/logo.png"),
-                              height: 50.h,
-                            ),
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.02,
-                            ),
-                            Container(
-                              height: MediaQuery.of(context).size.height * 0.04,
-                              decoration: BoxDecoration(
-                                border: Border.all(),
-                              ),
-                              child: MaterialButton(
-                                child: Text("Login"),
-                                onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(
-                                    builder: (context) {
-                                      return SignInScreen();
-                                    },
-                                  ));
-                                },
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                Expanded(
-                  child: Container(
-                      child:
-                          NotificationListener<OverscrollIndicatorNotification>(
-                    onNotification: (notification) {
-                      notification.disallowIndicator();
-                      return true;
-                    },
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          // //todo drawer if login
-
-                          ListView.separated(
-                              shrinkWrap: true,
-                              padding: EdgeInsets.zero,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    if (userStr) {
-                                      // For authenticated users
-                                      if (index == 10) {
-                                        // Change Language - navigate to language screen
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ChooseLanguage()));
-                                      } else if (index == 11) {
-                                        // Dark Theme toggle - handled by switch
-                                        print("Dark Theme toggle tapped");
-                                      } else if (index == 12) {
-                                        // Delete Account
-                                        _showDeleteAccountDialog();
-                                      } else if (index == 13) {
-                                        // Logout
-                                        logOutDialog();
-                                      } else if (index < pageMyAccount.length) {
-                                        // Navigate to other pages
-                                        if (pageMyAccount[index] != null) {
-                                          if (index == 0) {
-                                            Navigator.of(context)
-                                                .pushAndRemoveUntil(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            pageMyAccount[
-                                                                index]),
-                                                    (Route<dynamic> route) =>
-                                                        false);
-                                          } else {
-                                            Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        pageMyAccount[index]));
-                                          }
-                                        }
-                                      }
-                                    } else {
-                                      // For guest users
-                                      if (index == 8) {
-                                        // Change Language - navigate to language screen
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ChooseLanguage()));
-                                      } else if (index == 9) {
-                                        // Dark Theme toggle for guest
-                                        print("Dark Theme toggle tapped");
-                                      } else if (index < pageDrawer.length) {
-                                        // Navigate to other pages for guest
-                                        if (index == 0) {
-                                          Navigator.of(
-                                                  context)
-                                              .pushAndRemoveUntil(
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          pageDrawer[index]),
-                                                  (Route<dynamic> route) =>
-                                                      false);
-                                        } else {
-                                          Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      pageDrawer[index]));
-                                        }
-                                      }
-                                    }
-                                  },
-                                  child: userStr
-                                      ? (index == 10
-                                          ? ListTile(
-                                              trailing: languageSwitch(),
-                                              contentPadding:
-                                                  EdgeInsets.fromLTRB(
-                                                      30.w, 0, 30.w, 0),
-                                              leading: SizedBox(
-                                                height: 25.h,
-                                                child: Image(
-                                                    image: AssetImage(
-                                                        drawerGuestIcon[
-                                                            index]),
-                                                    color: appModelTheme.darkTheme ? Colors.white : null),
-                                              ),
-                                              title: Text(
-                                                getTranslated(
-                                                    drawerTitle[index]
-                                                        .toString()
-                                                        .removeAllWhitespace
-                                                        .toLowerCase(),
-                                                    context),
-                                                style: TextStyle(
-                                                    fontFamily: "Poppins1",
-                                                    fontSize: 15,
-                                                    color: appModelTheme.darkTheme ? Colors.white : Colors.black),
-                                              ),
-                                            )
-                                          : index == 11
-                                              ? ListTile(
-                                                  trailing: switchButton(),
-                                                  contentPadding:
-                                                      EdgeInsets.fromLTRB(
-                                                          30.w, 0, 30.w, 0),
-                                                  leading: SizedBox(
-                                                    height: 25.h,
-                                                    child: Image(
-                                                        image: AssetImage(
-                                                            drawerGuestIcon[
-                                                                index]),
-                                                        color: appModelTheme.darkTheme ? Colors.white : null),
-                                                  ),
-                                                  title: Text(
-                                                    getTranslated(
-                                                        drawerTitle[index]
-                                                            .toString()
-                                                            .removeAllWhitespace
-                                                            .toLowerCase(),
-                                                        context),
-                                                    style: TextStyle(
-                                                        fontFamily: "Poppins1",
-                                                        fontSize: 15,
-                                                        color: appModelTheme.darkTheme ? Colors.white : Colors.black),
-                                                  ),
-                                                )
-                                              : ListTile(
-                                                  contentPadding:
-                                                      EdgeInsets.fromLTRB(
-                                                          30.w, 0, 30.w, 0),
-                                                  leading: SizedBox(
-                                                    height: 25.h,
-                                                    child: Image(
-                                                        image: AssetImage(
-                                                            drawerGuestIcon[
-                                                                index]),
-                                                        color: appModelTheme.darkTheme ? Colors.white : null),
-                                                  ),
-                                                  title: Text(
-                                                    getTranslated(
-                                                        drawerTitle[index]
-                                                            .toString()
-                                                            .removeAllWhitespace
-                                                            .toLowerCase(),
-                                                        context),
-                                                    style: TextStyle(
-                                                        fontFamily: "Poppins1",
-                                                        fontSize: 15,
-                                                        color: index == 12
-                                                            ? Colors.redAccent
-                                                            : appModelTheme.darkTheme ? Colors.white : Colors.black),
-                                                  ),
-                                                ))
-                                      : (index == 8
-                                          ? ListTile(
-                                              trailing: languageSwitch(),
-                                              contentPadding:
-                                                  EdgeInsets.fromLTRB(
-                                                      30.w, 0, 30.w, 0),
-                                              leading: SizedBox(
-                                                height: 25.h,
-                                                child: Image(
-                                                    image: AssetImage(
-                                                        drawerGuestIcon[
-                                                            index]),
-                                                    color: appModelTheme.darkTheme ? Colors.white : null),
-                                              ),
-                                              title: Text(
-                                                getTranslated(
-                                                    drawerTitle[index]
-                                                        .toString()
-                                                        .removeAllWhitespace
-                                                        .toLowerCase(),
-                                                    context),
-                                                style: TextStyle(
-                                                    fontFamily: "Poppins1",
-                                                    fontSize: 15,
-                                                    color: appModelTheme.darkTheme ? Colors.white : Colors.black),
-                                              ),
-                                            )
-                                          : index == 9
-                                              ? ListTile(
-                                                  trailing: switchButton(),
-                                                  contentPadding:
-                                                      EdgeInsets.fromLTRB(
-                                                          30.w, 0, 30.w, 0),
-                                                  leading: SizedBox(
-                                                    height: 25.h,
-                                                    child: Image(
-                                                        image: AssetImage(
-                                                            drawerGuestIcon[
-                                                                index]),
-                                                        color: appModelTheme.darkTheme ? Colors.white : null),
-                                                  ),
-                                                  title: Text(
-                                                    getTranslated(
-                                                        drawerTitle[index]
-                                                            .toString()
-                                                            .removeAllWhitespace
-                                                            .toLowerCase(),
-                                                        context),
-                                                    style: TextStyle(
-                                                        fontFamily: "Poppins1",
-                                                        fontSize: 15,
-                                                        color: appModelTheme.darkTheme ? Colors.white : Colors.black),
-                                                  ),
-                                                )
-                                              : ListTile(
-                                                  contentPadding:
-                                                      EdgeInsets.fromLTRB(
-                                                          30.w, 0, 30.w, 0),
-                                                  leading: SizedBox(
-                                                    height: 25.h,
-                                                    child: Image(
-                                                        image: AssetImage(
-                                                            drawerGuestIcon[
-                                                                index]),
-                                                        color: appModelTheme.darkTheme ? Colors.white : null),
-                                                  ),
-                                                  title: Text(
-                                                    getTranslated(
-                                                        drawerTitle[index]
-                                                            .toString()
-                                                            .removeAllWhitespace
-                                                            .toLowerCase(),
-                                                        context),
-                                                    style: TextStyle(
-                                                        fontFamily: "Poppins1",
-                                                        fontSize: 15,
-                                                        color: appModelTheme.darkTheme ? Colors.white : Colors.black),
-                                                  ),
-                                                )),
-                                );
-                              },
-                              separatorBuilder: (context, index) {
-                                return Container(
-                                  height: 0, 
-                                  child: Divider(
-                                    color: appModelTheme.darkTheme ? Colors.grey[600] : Colors.grey[300],
-                                  ),
-                                );
-                              },
-                              itemCount: drawerGuestIcon.length),
                         ],
                       ),
                     ),
-                  )),
+                  )
+                : Container(
+                    height: 186.h,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: logoBlue,
+                      borderRadius: BorderRadius.only(
+                          bottomRight: Radius.circular(30),
+                          bottomLeft: Radius.circular(30)),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image(
+                          image: AssetImage("assets/icons/splash/logo.png"),
+                          height: 50.h,
+                        ),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.02,
+                        ),
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.04,
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                          ),
+                          child: MaterialButton(
+                            child: Text("Login"),
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  return SignInScreen();
+                                },
+                              ));
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+            Expanded(
+              child: Container(
+                  child: NotificationListener<OverscrollIndicatorNotification>(
+                onNotification: (notification) {
+                  notification.disallowIndicator();
+                  return true;
+                },
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // //todo drawer if login
+
+                      ListView.separated(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            // Compute actual indices for special rows
+                            final int changeLangIndex =
+                                drawerTitle.indexOf("Change Language");
+                            final int darkThemeIndex =
+                                drawerTitle.indexOf("Dark Theme");
+                            return GestureDetector(
+                              onTap: () {
+                                // Logged-in: handle logout item safely
+                                if (userStr &&
+                                    index == drawerGuestIcon.length - 1) {
+                                  logOutDialog();
+                                  return;
+                                }
+
+                                // Language or Dark Theme rows: no navigation
+                                if (index == changeLangIndex ||
+                                    index == darkThemeIndex) {
+                                  return;
+                                }
+
+                                // Navigate if target exists
+                                final list =
+                                    userStr ? pageMyAccount : pageDrawer;
+                                final target =
+                                    (index >= 0 && index < list.length)
+                                        ? list[index]
+                                        : null;
+                                if (target != null) {
+                                  // Always replace stack with the selected target
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) => target),
+                                      (Route<dynamic> route) => false);
+                                }
+                              },
+                              child: index == changeLangIndex
+                                  ? ListTile(
+                                      tileColor: appModelTheme.darkTheme
+                                          ? null
+                                          : Colors.white,
+                                      trailing: Switch(
+                                        value: langSwitch,
+                                        activeColor: appModelTheme.darkTheme
+                                            ? Colors.black
+                                            : logoBlue,
+                                        inactiveThumbColor:
+                                            appModelTheme.darkTheme
+                                                ? Colors.black
+                                                : logoBlue,
+                                        activeTrackColor:
+                                            appModelTheme.darkTheme
+                                                ? logoBlue
+                                                : Color(0xFF9AF3EE),
+                                        inactiveTrackColor:
+                                            appModelTheme.darkTheme
+                                                ? logoBlue
+                                                : Colors.white10,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            if (langSwitch) {
+                                              changeLocale(
+                                                  profileData['id'], 'en');
+                                              selectedLocale = Locale('en');
+                                              appModel.changeLanguage(
+                                                  selectedLocale);
+
+                                              langSwitch = false;
+                                            } else {
+                                              changeLocale(
+                                                  profileData['id'], 'ar');
+                                              selectedLocale = Locale('ar');
+                                              appModel.changeLanguage(
+                                                  selectedLocale);
+                                              langSwitch = true;
+                                            }
+                                          });
+                                        },
+                                      ),
+                                      contentPadding:
+                                          EdgeInsets.fromLTRB(30.w, 0, 30.w, 0),
+                                      leading: SizedBox(
+                                        height: 25.h,
+                                        child: Image(
+                                            image: AssetImage(
+                                                drawerGuestIcon[index])),
+                                      ),
+                                      title: Text(
+                                        getTranslated(
+                                            drawerTitle[index]
+                                                .toString()
+                                                .removeAllWhitespace
+                                                .toLowerCase(),
+                                            context),
+                                        style: TextStyle(
+                                            fontFamily: "Poppins1",
+                                            fontSize: 15),
+                                      ),
+                                    )
+                                  : ListTile(
+                                      tileColor: appModelTheme.darkTheme
+                                          ? null
+                                          : Colors.white,
+                                      trailing: (index == darkThemeIndex)
+                                          ? switchButton()
+                                          : Text(""),
+                                      contentPadding:
+                                          EdgeInsets.fromLTRB(30.w, 0, 30.w, 0),
+                                      leading: SizedBox(
+                                        height: 25.h,
+                                        child: Image(
+                                            image: AssetImage(
+                                                drawerGuestIcon[index])),
+                                      ),
+                                      title: Text(
+                                        getTranslated(
+                                            drawerTitle[index]
+                                                .toString()
+                                                .removeAllWhitespace
+                                                .toLowerCase(),
+                                            context),
+                                        style: TextStyle(
+                                            fontFamily: "Poppins1",
+                                            fontSize: 15),
+                                      ),
+                                    ),
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return Container(height: 0, child: Divider());
+                          },
+                          itemCount: drawerGuestIcon.length),
+                    ],
+                  ),
                 ),
-              ],
+              )),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 
   Widget languageSwitch() {
     return Switch(
-      value: isEnglish,
+      value: appModelTheme.darkTheme,
+      activeColor: Color(0xFF40E0D0),
+      activeTrackColor: Color(0xFF9AF3EE),
       onChanged: (value) {
         setState(() {
-          isEnglish = value;
+          appModelTheme.darkTheme = !appModelTheme.darkTheme;
+
+          //isSwitch = value;
+          isSwitch
+              ? ThemeData(
+                  brightness: Brightness.dark,
+                  /* light theme settings */
+                )
+              : ThemeData(
+                  brightness: Brightness.light,
+                  /* dark theme settings */
+                );
+          isSwitch = value;
         });
-
-        String newLang = isEnglish ? 'en' : 'ar';
-
-        // Save language preference using both methods for consistency
-        PrefObj.preferences!.put(PrefKeys.LANGUAGE_CODE, newLang);
-
-        // Update locale through provider
-        Locale newLocale = Locale(newLang);
-        Provider.of<AppModel>(context, listen: false).changeLanguage(newLocale);
-
-        // Update selected locale
-        selectedLocale = newLocale;
       },
-      activeColor: Colors.white,
-      activeTrackColor: logoBlue,
-      inactiveThumbColor: appModelTheme.darkTheme ? Colors.grey[400] : Colors.grey[600],
-      inactiveTrackColor: appModelTheme.darkTheme ? Colors.grey[700] : Colors.grey[300],
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 
   Widget switchButton() {
-    return Switch(
+  return Switch(
       value: appModelTheme.darkTheme,
+      activeColor: appModelTheme.darkTheme ? Colors.black : logoBlue,
+      inactiveThumbColor: appModelTheme.darkTheme ? Colors.black : logoBlue,
+      activeTrackColor: appModelTheme.darkTheme ? logoBlue : Color(0xFF9AF3EE),
+      inactiveTrackColor: appModelTheme.darkTheme ? logoBlue : Colors.white10,
       onChanged: (value) {
-        // Use the provider to change theme
-        Provider.of<AppModel>(context, listen: false).darkTheme = value;
+        setState(() {
+          appModelTheme.darkTheme = !appModelTheme.darkTheme;
+
+          //isSwitch = value;
+          isSwitch
+              ? ThemeData(
+                  brightness: Brightness.dark,
+                  /* light theme settings */
+                )
+              : ThemeData(
+                  brightness: Brightness.light,
+                  /* dark theme settings */
+                );
+          isSwitch = value;
+        });
       },
-      activeColor: Colors.white,
-      activeTrackColor: logoBlue,
-      inactiveThumbColor: appModelTheme.darkTheme ? Colors.grey[400] : Colors.grey[600],
-      inactiveTrackColor: appModelTheme.darkTheme ? Colors.grey[700] : Colors.grey[300],
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 
@@ -672,350 +555,25 @@ class _drawerpageState extends State<drawerpage> {
                       Provider.of<NotificationCountProvider>(context,
                               listen: false)
                           .clearNotifications();
-                      changeLocale(PrefKeys.USER_ID, "en");
+                      
+                      // Get user ID before clearing preferences
+                      final userId = PrefObj.preferences?.get(PrefKeys.USER_ID);
+                      
+                      // Clear all preferences
                       PrefObj.preferences?.clear();
+                      
+                      // Set app as started but keep user logged out
                       PrefObj.preferences?.put(PrefKeys.APPSTARTED, true);
+                      
+                      // Change locale if we had a user ID
+                      if (userId != null) {
+                        changeLocale(userId, "en");
+                      }
 
                       Navigator.of(context).pushNamedAndRemoveUntil(
                           '/sign-in-sign-up-landing', (Route route) => false);
                     })
               ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showDeleteAccountDialog() {
-    // Check if account deletion is already requested
-    bool isDeletionRequested =
-        PrefObj.preferences!.containsKey(PrefKeys.ACCOUNT_DELETION_REQUESTED);
-
-    if (isDeletionRequested) {
-      _showDeletionStatusDialog();
-      return;
-    }
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(
-            child: Column(
-              children: [
-                Icon(Icons.warning, color: Colors.red, size: 50),
-                SizedBox(height: 10.h),
-                Text(
-                  "Delete Account",
-                  style: TextStyle(fontFamily: "Poppins2", color: Colors.red),
-                ),
-              ],
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Are you sure you want to delete your account?",
-                style: TextStyle(fontSize: 16.sp, fontFamily: "Poppins1"),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 15.h),
-              Text(
-                "This action will schedule your account for permanent deletion in 7 days.",
-                style: TextStyle(
-                    fontSize: 14.sp, fontFamily: "Poppins1", color: Colors.red),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 15.h),
-              Text(
-                "You can cancel this request anytime within 7 days by logging in again.",
-                style: TextStyle(
-                    fontSize: 12.sp,
-                    fontFamily: "Poppins1",
-                    color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                TextButton(
-                  child: Text(
-                    "Cancel",
-                    style: TextStyle(color: logoBlue, fontFamily: "Poppins1"),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                TextButton(
-                  child: Text(
-                    "Delete Account",
-                    style: TextStyle(
-                        color: Colors.red,
-                        fontFamily: "Poppins1",
-                        fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () {
-                    _confirmAccountDeletion();
-                  },
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _confirmAccountDeletion() {
-    // Close the first dialog
-    Navigator.of(context).pop();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            "Final Confirmation",
-            style: TextStyle(fontFamily: "Poppins2", color: Colors.red),
-          ),
-          content: Text(
-            "Type 'DELETE' to confirm account deletion:",
-            style: TextStyle(fontSize: 14.sp, fontFamily: "Poppins1"),
-          ),
-          actions: <Widget>[
-            TextField(
-              onChanged: (value) {
-                // You can add validation here
-              },
-              decoration: InputDecoration(
-                hintText: "Type DELETE here",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 20.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                TextButton(
-                  child: Text(
-                    "Cancel",
-                    style: TextStyle(color: logoBlue, fontFamily: "Poppins1"),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                TextButton(
-                  child: Text(
-                    "Confirm Delete",
-                    style: TextStyle(
-                        color: Colors.red,
-                        fontFamily: "Poppins1",
-                        fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () {
-                    _processAccountDeletion();
-                  },
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _processAccountDeletion() {
-    // Schedule account for deletion in 7 days
-    DateTime deletionDate = DateTime.now().add(Duration(days: 7));
-
-    PrefObj.preferences!.put(PrefKeys.ACCOUNT_DELETION_REQUESTED, true);
-    PrefObj.preferences!.put(
-        PrefKeys.ACCOUNT_DELETION_DATE, deletionDate.millisecondsSinceEpoch);
-
-    Navigator.of(context).pop(); // Close dialog
-
-    // Show success message
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(
-            child: Column(
-              children: [
-                Icon(Icons.schedule, color: Colors.orange, size: 50),
-                SizedBox(height: 10.h),
-                Text(
-                  "Account Deletion Scheduled",
-                  style: TextStyle(fontFamily: "Poppins2"),
-                ),
-              ],
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Your account will be permanently deleted on ${deletionDate.day}/${deletionDate.month}/${deletionDate.year}.",
-                style: TextStyle(fontSize: 14.sp, fontFamily: "Poppins1"),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 15.h),
-              Text(
-                "You can cancel this request by logging in again before that date.",
-                style: TextStyle(
-                    fontSize: 12.sp,
-                    fontFamily: "Poppins1",
-                    color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            Center(
-              child: TextButton(
-                child: Text(
-                  "OK",
-                  style: TextStyle(color: logoBlue, fontFamily: "Poppins1"),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  // Keep user logged in but with deletion scheduled
-
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/sign-in-sign-up-landing', (Route route) => false);
-                },
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showDeletionStatusDialog() {
-    if (!PrefObj.preferences!.containsKey(PrefKeys.ACCOUNT_DELETION_DATE))
-      return;
-
-    int deletionTimestamp =
-        PrefObj.preferences!.get(PrefKeys.ACCOUNT_DELETION_DATE);
-    DateTime deletionDate =
-        DateTime.fromMillisecondsSinceEpoch(deletionTimestamp);
-    DateTime now = DateTime.now();
-    int daysLeft = deletionDate.difference(now).inDays;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(
-            child: Column(
-              children: [
-                Icon(Icons.schedule, color: Colors.orange, size: 50),
-                SizedBox(height: 10.h),
-                Text(
-                  "Account Deletion Scheduled",
-                  style: TextStyle(fontFamily: "Poppins2"),
-                ),
-              ],
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                daysLeft > 0
-                    ? "Your account will be deleted in $daysLeft days."
-                    : "Your account deletion is overdue and will be processed soon.",
-                style: TextStyle(fontSize: 16.sp, fontFamily: "Poppins1"),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 15.h),
-              Text(
-                "Deletion Date: ${deletionDate.day}/${deletionDate.month}/${deletionDate.year}",
-                style: TextStyle(
-                    fontSize: 14.sp,
-                    fontFamily: "Poppins1",
-                    color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                TextButton(
-                  child: Text(
-                    "Cancel Deletion",
-                    style:
-                        TextStyle(color: Colors.green, fontFamily: "Poppins1"),
-                  ),
-                  onPressed: () {
-                    _cancelAccountDeletion();
-                  },
-                ),
-                TextButton(
-                  child: Text(
-                    "OK",
-                    style: TextStyle(color: logoBlue, fontFamily: "Poppins1"),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _cancelAccountDeletion() {
-    PrefObj.preferences!.delete(PrefKeys.ACCOUNT_DELETION_REQUESTED);
-    PrefObj.preferences!.delete(PrefKeys.ACCOUNT_DELETION_DATE);
-
-    Navigator.of(context).pop();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(
-            child: Column(
-              children: [
-                Icon(Icons.check_circle, color: Colors.green, size: 50),
-                SizedBox(height: 10.h),
-                Text(
-                  "Deletion Cancelled",
-                  style: TextStyle(fontFamily: "Poppins2", color: Colors.green),
-                ),
-              ],
-            ),
-          ),
-          content: Text(
-            "Your account deletion has been cancelled. Your account is safe!",
-            style: TextStyle(fontSize: 14.sp, fontFamily: "Poppins1"),
-            textAlign: TextAlign.center,
-          ),
-          actions: <Widget>[
-            Center(
-              child: TextButton(
-                child: Text(
-                  "OK",
-                  style: TextStyle(color: logoBlue, fontFamily: "Poppins1"),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
             ),
           ],
         );

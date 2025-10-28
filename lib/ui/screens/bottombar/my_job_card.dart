@@ -32,17 +32,30 @@ class _MyJobCardState extends State<MyJobCard>
   dynamic appModelTheme;
   String search = "";
   String fromdate = DateTime.now().toString().split(' ')[0];
-  String fromTime = DateTime.now().toString().split(' ')[1].split('.')[0];
+  String fromTime = DateFormat('hh:mm a').format(DateTime.now());
   int selectTab = 0;
   var userStr;
   bool showFilter = false;
   TabController? _tabController;
   bool flag = false;
-  var formatter = new DateFormat('dd/MM/yyyy');
+  var formatter = new DateFormat('dd-MM-yyyy');
   DateTime fromDate =
       DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   DateTime toDate =
       DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+  // Helpers to format server timestamps consistently (local device time)
+  DateTime _toLocal(String raw) {
+    try {
+      final base = raw.contains('.') ? raw.split('.')[0] : raw;
+      return DateTime.parse(base).toLocal();
+    } catch (_) {
+      return DateTime.now();
+    }
+  }
+
+  String _fmtDate(String raw) => DateFormat('dd-MM-yyyy').format(_toLocal(raw));
+  String _fmtTime(String raw) => DateFormat('hh:mm a').format(_toLocal(raw));
 
   Future<DateTime> selectDate(
       BuildContext context, DateTime _date, String type) async {
@@ -197,6 +210,7 @@ class _MyJobCardState extends State<MyJobCard>
           appBar: WidgetAppBar(
             title: getTranslated("jobcarddetails", context),
             menuItem: 'assets/svg/Menu.svg',
+            imageicon: 'assets/svg/Arrow_alt_left.svg',
             // action: 'assets/svg/shopping-cart.svg',
             action2: 'assets/svg/ball.svg',
           ),
@@ -249,39 +263,46 @@ class _MyJobCardState extends State<MyJobCard>
                     ),
                     Container(
                       height: screenSize!.height * 0.05,
-                      margin: appModelTheme.appLocal == Locale("en")
-                          ? EdgeInsets.only(right: 10.w)
-                          : EdgeInsets.only(left: 10.w),
-                      padding: EdgeInsets.fromLTRB(1.w, 8.w, 10.w, 8.w),
-                      decoration: BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: GestureDetector(
-                        onTap: () {
+                      margin:
+                          EdgeInsetsDirectional.only(end: 10.w, start: 10.w),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.all<Color>(white),
+                            surfaceTintColor:
+                                WidgetStateProperty.all<Color>(Colors.white),
+                            overlayColor: WidgetStateProperty.resolveWith(
+                                (states) => Colors.transparent),
+                            shadowColor: WidgetStateProperty.all<Color>(
+                                Colors.transparent),
+                            elevation: WidgetStateProperty.all<double>(0),
+                            shape:
+                                WidgetStateProperty.all<RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)))),
+                        onPressed: () {
                           showFilter = !showFilter;
-                          // Refresh the UI
                           setState(() {});
                         },
-                        child: Container(
-                          margin: EdgeInsets.only(left: 10.w, right: 10.w),
-                          child: Row(
-                            children: [
-                              Icon(
-                                  showFilter
-                                      ? Icons.filter_alt_outlined
-                                      : Icons.filter_alt_off_outlined,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                                showFilter
+                                    ? Icons.filter_alt_outlined
+                                    : Icons.filter_alt_off_outlined,
+                                color: Colors.black,
+                                size: 20.w),
+                            SizedBox(width: 8.w),
+                            Text(
+                              getTranslated("filter", context),
+                              style: TextStyle(
                                   color: Colors.black,
-                                  size: 20.w),
-                              SizedBox(width: 8.w),
-                              Text(
-                                getTranslated("filter", context),
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins3'),
-                              )
-                            ],
-                          ),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins3'),
+                            )
+                          ],
                         ),
                       ),
                     ),
@@ -322,9 +343,9 @@ class _MyJobCardState extends State<MyJobCard>
 
   Widget _filterwidget() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             flex: 3,
@@ -334,9 +355,8 @@ class _MyJobCardState extends State<MyJobCard>
                 setState(() {});
               },
               child: Container(
-                margin: EdgeInsets.only(left: 15.w),
                 width: 100.w,
-                height: 30,
+                height: 40, // align with TabBar height
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.white),
@@ -346,9 +366,9 @@ class _MyJobCardState extends State<MyJobCard>
                   children: [
                     Text(
                       "${formatter.format(fromDate)}",
-                      style: TextStyle(fontSize: 11, fontFamily: 'Poppins3'),
+                      style: TextStyle(fontSize: 12, fontFamily: 'Poppins3'),
                     ),
-                    Icon(Icons.keyboard_arrow_down_outlined, size: 14),
+                    Icon(Icons.keyboard_arrow_down_outlined, size: 18),
                   ],
                 ),
               ),
@@ -365,7 +385,7 @@ class _MyJobCardState extends State<MyJobCard>
               },
               child: Container(
                 width: 90.w,
-                height: 30,
+                height: 40, // align with TabBar height
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.white),
@@ -376,17 +396,49 @@ class _MyJobCardState extends State<MyJobCard>
                     Text(
                       "${formatter.format(toDate)}",
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         fontFamily: 'Poppins3',
                       ),
                     ),
-                    Icon(Icons.keyboard_arrow_down_outlined, size: 14),
+                    Icon(Icons.keyboard_arrow_down_outlined, size: 18),
                   ],
                 ),
               ),
             ),
           ),
           SizedBox(width: 10.w),
+          InkWell(
+            onTap: () {
+              setState(() {
+                fromDate = DateTime(DateTime.now().year, DateTime.now().month,
+                    DateTime.now().day);
+                toDate = DateTime(DateTime.now().year, DateTime.now().month,
+                    DateTime.now().day);
+
+                if (PrefObj.preferences!.containsKey(PrefKeys.USER_ID)) {
+                  final userId = PrefObj.preferences!.get(PrefKeys.USER_ID);
+                  jobcardsListbloc
+                      .jobcardslistsink(userId, currentJobcardTab.toString())
+                      .then((value) {
+                    flag = false;
+                    showFilter = false;
+                    setState(() {});
+                  });
+                }
+              });
+            },
+            child: Container(
+                height: 40,
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5)),
+                alignment: Alignment.center,
+                child: Text(
+                  "Clear",
+                  style: TextStyle(fontSize: 12, fontFamily: 'Poppins3'),
+                )),
+          )
         ],
       ),
     );
@@ -398,28 +450,25 @@ class _MyJobCardState extends State<MyJobCard>
       child: Column(
         children: [
           Container(
-            margin: EdgeInsets.only(right: 10.w),
-            height: 35,
+            margin: EdgeInsets.symmetric(horizontal: 10.w),
+            height: 40,
             child: TabBar(
               controller: _tabController,
-              indicator: BoxDecoration(
-                border: Border.all(color: Colors.transparent),
-                borderRadius: BorderRadius.circular(5.0),
-                // color: appModelTheme.darkTheme ? Colors.grey : Colors.white,
-                color: appModelTheme.darkTheme ? logoBlue : Colors.white,
-                // color: Colors.white,
-              ),
+              isScrollable: false,
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              // Keep the highlight strictly inside each tab's rectangle
+              indicatorColor: Colors.transparent,
+              indicator: BoxDecoration(color: Colors.transparent),
               labelColor: appModelTheme.darkTheme ? Colors.white : logoBlue,
-              // labelColor: Colors.black,
               labelStyle: TextStyle(
-                color: Colors.red,
                 fontSize: 13,
                 fontFamily: "Poppins3",
               ),
-              indicatorPadding: EdgeInsets.only(left: 10),
-              labelPadding: EdgeInsets.only(left: 10),
+              indicatorPadding: EdgeInsets.zero,
+              labelPadding: EdgeInsets.zero,
               unselectedLabelColor:
-                  appModelTheme.darkTheme ? Colors.white : Colors.grey[100],
+                  appModelTheme.darkTheme ? Colors.white70 : Colors.white,
               onTap: (index) {
                 selectTab = index;
                 flag = true;
@@ -480,58 +529,92 @@ class _MyJobCardState extends State<MyJobCard>
               tabs: [
                 Tab(
                   child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                            color: Colors.white,
-                            width: selectTab == 0 ? 0 : 1)),
-                    child: Align(
-                      alignment: Alignment.center,
+                      color: selectTab == 0
+                          ? (appModelTheme.darkTheme ? logoBlue : Colors.white)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(6),
+                      border: selectTab == 0
+                          ? Border.all(color: Colors.transparent, width: 0)
+                          : Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
                       child: Text(
                         getTranslated("Pending", context),
-                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                   ),
                 ),
                 Tab(
                   child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.white, width: 1)),
-                    child: Align(
-                      alignment: Alignment.center,
+                      color: selectTab == 1
+                          ? (appModelTheme.darkTheme ? logoBlue : Colors.white)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(6),
+                      border: selectTab == 1
+                          ? Border.all(color: Colors.transparent, width: 0)
+                          : Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
                       child: Text(
                         getTranslated("Completed", context),
-                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                   ),
                 ),
                 Tab(
                   child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.white, width: 1)),
-                    child: Align(
-                      alignment: Alignment.center,
+                      color: selectTab == 2
+                          ? (appModelTheme.darkTheme ? logoBlue : Colors.white)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(6),
+                      border: selectTab == 2
+                          ? Border.all(color: Colors.transparent, width: 0)
+                          : Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
                       child: Text(
                         getTranslated("Canceled", context),
-                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                   ),
                 ),
                 Tab(
                   child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.white, width: 1)),
-                    child: Align(
-                      alignment: Alignment.center,
+                      color: selectTab == 3
+                          ? (appModelTheme.darkTheme ? logoBlue : Colors.white)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(6),
+                      border: selectTab == 3
+                          ? Border.all(color: Colors.transparent, width: 0)
+                          : Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
                       child: Text(
                         getTranslated("Approved", context),
-                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                   ),
@@ -660,19 +743,14 @@ class _MyJobCardState extends State<MyJobCard>
                                                           .data![index]
                                                           .jobDate !=
                                                       null
-                                                  ? jobcardslistsnapshot.data!
-                                                      .data![index].jobDate
-                                                      .toString()
-                                                      .substring(
-                                                          0,
-                                                          jobcardslistsnapshot
-                                                                  .data!
-                                                                  .data![index]
-                                                                  .jobDate
-                                                                  .toString()
-                                                                  .length -
-                                                              16)
-                                                  : fromdate),
+                                                  ? _fmtDate(
+                                                      jobcardslistsnapshot
+                                                          .data!
+                                                          .data![index]
+                                                          .jobDate!)
+                                                  : DateFormat('dd-MM-yyyy')
+                                                      .format(DateTime.parse(
+                                                          fromdate))),
                                           Spacer(),
                                           carddivider(
                                               getTranslated('time', context),
@@ -681,18 +759,10 @@ class _MyJobCardState extends State<MyJobCard>
                                                           .data![index]
                                                           .dateTime !=
                                                       null
-                                                  ? jobcardslistsnapshot.data!
-                                                      .data![index].dateTime
-                                                      .toString()
-                                                      .substring(
-                                                          10,
-                                                          jobcardslistsnapshot
-                                                                  .data!
-                                                                  .data![index]
-                                                                  .jobDate
-                                                                  .toString()
-                                                                  .length -
-                                                              7)
+                                                  ? _fmtTime(
+                                                      jobcardslistsnapshot.data!
+                                                          .data![index].dateTime
+                                                          .toString())
                                                   : fromTime),
                                           SizedBox(width: 10.w),
                                         ],
@@ -1008,5 +1078,28 @@ class _MyJobCardState extends State<MyJobCard>
 
   void onDetached() {
     print("~~~~~~~ onDetached");
+  }
+
+  // Helper function to convert 24-hour time to 12-hour format
+  String convertTo12HourFormat(String time24) {
+    try {
+      // Extract time part (HH:MM:SS or HH:MM)
+      String timePart = time24.length > 8 ? time24.substring(0, 8) : time24;
+      if (timePart.length == 5) {
+        timePart += ':00'; // Add seconds if missing
+      }
+
+      // Parse the time
+      List<String> parts = timePart.split(':');
+      int hour = int.parse(parts[0]);
+      int minute = int.parse(parts[1]);
+
+      String period = hour >= 12 ? 'PM' : 'AM';
+      int hour12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+
+      return '${hour12.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $period';
+    } catch (e) {
+      return time24; // Return original if parsing fails
+    }
   }
 }

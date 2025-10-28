@@ -16,7 +16,7 @@ class TermsOfUse extends StatelessWidget {
         textAlign: TextAlign.center,
         text: TextSpan(
           text: "${getTranslated("term_condition_message", context)} \n ",
-          style: Theme.of(context).textTheme.bodyLarge,
+          style: Theme.of(context).textTheme.bodyMedium,
           children: [
             TextSpan(
               text: getTranslated("terms_and_condition", context),

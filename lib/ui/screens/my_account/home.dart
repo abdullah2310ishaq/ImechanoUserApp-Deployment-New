@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -5,13 +6,14 @@ import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:imechano/api/notification_api.dart';
+
 import 'package:imechano/localization/language_constrants.dart';
 import 'package:imechano/ui/bloc/categories_bloc.dart';
 import 'package:imechano/ui/bloc/item_list_bloc.dart';
@@ -19,7 +21,7 @@ import 'package:imechano/ui/bloc/oil%20change%20bloc.dart';
 import 'package:imechano/ui/common/globals.dart' as globals;
 import 'package:imechano/ui/modal/categoriesModelClass.dart';
 import 'package:imechano/ui/modal/item_list_model.dart';
-import 'package:imechano/ui/modal/notification_count_model.dart';
+
 import 'package:imechano/ui/modal/oilchange_model.dart';
 import 'package:imechano/ui/provider/notification_count_provider.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
@@ -60,6 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool checkExpansionTile = false;
   bool isCarAdded = false;
   var profileData;
+  Timer? _notificationTimer;
 
   testfunc() async {
     var prefs = await SharedPreferences.getInstance();
@@ -79,6 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // ignore: unused_field
   List<Marker> _markers = <Marker>[];
 
   String? enteredKeyword = "";
@@ -111,10 +115,31 @@ class _HomeScreenState extends State<HomeScreen> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(Duration(seconds: 2), () {
-        showNotificationPermissionDialog(context);
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Initialize notification count provider early
+      try {
+        Provider.of<NotificationCountProvider>(context, listen: false)
+            .setNotifications();
+      } catch (e) {
+        log('Failed to initialize notification count in home: $e');
+      }
+
+      // Avoid double prompts on iOS: request directly via FirebaseMessaging
+      if (Platform.isIOS) {
+        await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+          announcement: false,
+          criticalAlert: false,
+          provisional: false,
+          carPlay: false,
+        );
+      } else {
+        Future.delayed(Duration(seconds: 2), () {
+          showNotificationPermissionDialog(context);
+        });
+      }
     });
 
     getAddress();
@@ -124,11 +149,43 @@ class _HomeScreenState extends State<HomeScreen> {
         PrefObj.preferences!.containsKey(PrefKeys.CARNAME) ? true : false;
     categoriesListBloc.categoriesSinck("null");
     oilchnageListBloc.oilChnageSinck('1');
+
+    // Ensure real-time updates via local timer on Home as a backup
+    _startNotificationTimer();
+  }
+
+  void _startNotificationTimer() {
+    _notificationTimer?.cancel();
+    _notificationTimer = Timer.periodic(Duration(seconds: 5), (timer) {
+      if (mounted && userStr == true) {
+        try {
+          Provider.of<NotificationCountProvider>(context, listen: false)
+              .setNotifications();
+        } catch (e) {
+          log('Failed to refresh notification count: $e');
+        }
+      }
+    });
+  }
+
+  void refreshCarStatus() {
+    setState(() {
+      isCarAdded =
+          PrefObj.preferences!.containsKey(PrefKeys.CARNAME) ? true : false;
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh car status when screen comes back into focus
+    refreshCarStatus();
   }
 
   @override
   void dispose() {
     print("disposing");
+    _notificationTimer?.cancel();
     super.dispose();
   }
 
@@ -266,7 +323,8 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: appModelTheme.darkTheme ? black : Color(0xff70bdf1),
       body: ScreenUtilInit(
         designSize: Size(414, 896),
-        child: NotificationListener<OverscrollIndicatorNotification>(
+        builder: (context, child) =>
+            NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (notification) {
             notification.disallowIndicator();
             return true;
@@ -299,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           children: [
                             Container(
-                              padding: EdgeInsets.only(top: 4.h, bottom: 25.h),
+                              padding: EdgeInsets.only(top: 4.h, bottom: 10.h),
                               decoration: BoxDecoration(
                                   color: appModelTheme.darkTheme
                                       ? Color(0xff252525)
@@ -336,14 +394,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       child: Container(
                                                         margin: EdgeInsets.only(
                                                             bottom: 7.sp),
-                                                        height:
-                                                            selectedindex == 0
-                                                                ? 230.h
-                                                                : 220.h,
-                                                        width:
-                                                            selectedindex == 0
-                                                                ? 167.w
-                                                                : 155.w,
+                                                        height: 220.h,
+                                                        width: 155.w,
                                                         child: card(
                                                             getTranslated(
                                                                 'Emergency',
@@ -378,6 +430,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       height: 5.h,
                                                       width: 1.w,
                                                     ),
+                                              SizedBox(width: 10.w),
                                               checkup.contains(
                                                           enteredKeyword!) ||
                                                       enteredKeyword == ""
@@ -392,14 +445,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       child: Container(
                                                         margin: EdgeInsets.only(
                                                             bottom: 7.sp),
-                                                        height:
-                                                            selectedindex == 1
-                                                                ? 230.h
-                                                                : 220.h,
-                                                        width:
-                                                            selectedindex == 1
-                                                                ? 167.w
-                                                                : 155.w,
+                                                        height: 220.h,
+                                                        width: 155.w,
                                                         child: card(
                                                             getTranslated(
                                                                 'Dontknowwhat',
@@ -448,14 +495,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       child: Container(
                                                         margin: EdgeInsets.only(
                                                             bottom: 7.sp),
-                                                        height:
-                                                            selectedindex == 2
-                                                                ? 230.h
-                                                                : 220.h,
-                                                        width:
-                                                            selectedindex == 2
-                                                                ? 167.w
-                                                                : 155.w,
+                                                        height: 220.h,
+                                                        width: 155.w,
                                                         child: card(
                                                             getTranslated(
                                                                 "Quickservice",
@@ -501,14 +542,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       child: Container(
                                                         margin: EdgeInsets.only(
                                                             bottom: 7.sp),
-                                                        height:
-                                                            selectedindex == 3
-                                                                ? 230.h
-                                                                : 220.h,
-                                                        width:
-                                                            selectedindex == 3
-                                                                ? 167.w
-                                                                : 155.w,
+                                                        height: 220.h,
+                                                        width: 155.w,
                                                         child: card(
                                                             getTranslated(
                                                                 "upholstery",
@@ -554,7 +589,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           "No Booking Found")),
                                                 )
                                               ],
-                                              SizedBox(width: 10),
+                                              SizedBox(width: 10.w),
                                             ],
                                           ),
                                         ),
@@ -570,8 +605,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       //     child: Text("Checkout")),
                                       Container(
                                         margin: EdgeInsets.only(
-                                            left: 25.sp,
-                                            top: 7.sp,
+                                            left: 17.w,
+                                            top: 2.sp,
                                             right: 25.sp),
                                         child: Text(
                                           getTranslated('OurServices', context),
@@ -580,7 +615,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               fontSize: 15.sp),
                                         ),
                                       ),
-                                      SizedBox(height: 10.h),
+                                      SizedBox(height: 2.h),
                                       StreamBuilder<CategoriesModelClass>(
                                           stream: categoriesListBloc
                                               .CategoryListStream,
@@ -704,11 +739,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 18.w,
                     )),
               ),
-              Expanded(
+              // Shorter search field with fixed max width for consistent feel
+              Flexible(
                 child: Container(
-                  height: (screenSize?.height ??
-                          MediaQuery.of(context).size.height) *
-                      0.045,
+                  height: 40.h,
+                  constraints: BoxConstraints(maxWidth: 0.72.sw),
                   margin: appModelTheme.appLocal == Locale("en")
                       ? EdgeInsets.only(left: 15.w, right: 2.w)
                       : EdgeInsets.only(left: 2.w, right: 15.w),
@@ -735,7 +770,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       hintText: getTranslated('Searchservice', context),
                       hintStyle: TextStyle(
-                          fontSize: 11,
+                          fontSize: 12,
                           fontFamily: 'Poppins3',
                           color: appModelTheme.darkTheme
                               ? Color(0xff252525)
@@ -748,67 +783,72 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       filled: true,
-                      contentPadding: EdgeInsets.only(top: 5, bottom: 5),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                     ),
                   ),
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) {
-                      return NotificationScreen();
-                    },
-                  ));
-                },
-                child: Consumer<NotificationCountProvider>(
-                    builder: (context, value, child) {
-                  return value.notifications == 0
-                      ? Container(
-                          padding: appModelTheme.appLocal == Locale("en")
-                              ? EdgeInsets.only(
-                                  top: 20, bottom: 20, right: 1.w, left: 15.w)
-                              : EdgeInsets.only(
-                                  top: 20, bottom: 20, left: 1.w, right: 15.w),
-                          child: SvgPicture.asset("assets/svg/ball.svg",
-                              height: 20.h, width: 20.w))
-                      : badges.Badge(
-                          // toAnimate: false,
-                          badgeContent: Text(
-                            value.notifications > 99
-                                ? '99+'
-                                : '${value.notifications}',
-                            style: TextStyle(color: Colors.white),
+              // Bell icon aligned and consistent with shared app bar
+              GestureDetector(
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) {
+                        return NotificationScreen();
+                      },
+                    ));
+                  },
+                  child: Selector<NotificationCountProvider, int>(
+                      selector: (context, provider) => provider.notifications,
+                      builder: (context, count, child) {
+                        final hasNotifications = count > 0;
+                        return Container(
+                          width: 50.w,
+                          height: 50.h,
+                          alignment: Alignment.center,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Align(
+                                alignment: Alignment.center,
+                                child: SvgPicture.asset(
+                                  "assets/svg/ball.svg",
+                                  width: 24.w,
+                                  height: 24.h,
+                                ),
+                              ),
+                              if (hasNotifications)
+                                PositionedDirectional(
+                                  top: 6,
+                                  end: 8,
+                                  child: badges.Badge(
+                                    position: badges.BadgePosition.topEnd(
+                                        top: 0, end: 0),
+                                    badgeStyle: badges.BadgeStyle(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 2),
+                                      elevation: 0,
+                                    ),
+                                    badgeContent: Text(
+                                      count > 99 ? '99+' : '$count',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 9),
+                                    ),
+                                    child: SizedBox(width: 0, height: 0),
+                                  ),
+                                ),
+                            ],
                           ),
-                          position:
-                              badges.BadgePosition.topEnd(top: 5, end: -8),
-                          badgeStyle: badges.BadgeStyle(
-                            padding: EdgeInsets.all(4),
-                          ),
-                          child: Container(
-                              padding: appModelTheme.appLocal == Locale("en")
-                                  ? EdgeInsets.only(
-                                      top: 20,
-                                      bottom: 20,
-                                      right: 1.w,
-                                      left: 15.w)
-                                  : EdgeInsets.only(
-                                      top: 20,
-                                      bottom: 20,
-                                      left: 1.w,
-                                      right: 15.w),
-                              child: SvgPicture.asset("assets/svg/ball.svg",
-                                  height: 20.h, width: 20.w)),
                         );
-                }),
-              ),
+                      })),
             ],
           ),
+          SizedBox(height: 10.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                margin: EdgeInsets.fromLTRB(5.w, 0, 5.w, 0),
+                margin: EdgeInsets.fromLTRB(15.w, 0, 5.w, 0),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
@@ -919,16 +959,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .toString()
                                     .length >
                                 1
-                        ? Text(
-                            '${PrefObj.preferences!.get(PrefKeys.CARNAME)}',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "Poppins1",
-                                fontSize: 13.sp),
+                        ? Center(
+                            child: Text(
+                              '${PrefObj.preferences!.get(PrefKeys.CARNAME)}',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Poppins1",
+                                  fontSize: 13.sp),
+                            ),
                           )
                         : Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Container(
                                 height: 40.h,
@@ -937,17 +981,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Icon(
                                   Icons.add,
                                   color: Colors.white,
+                                  size: 16.sp,
                                 ),
                               ),
-                              SizedBox(width: 5.w),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(0, 4, 0, 0),
-                                child: Text(
-                                  getTranslated('AddCar', context),
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: "Poppins1",
-                                      fontSize: 13.sp),
+                              SizedBox(width: 3.w),
+                              Flexible(
+                                child: Container(
+                                  margin: EdgeInsets.fromLTRB(0, 4, 0, 0),
+                                  child: Text(
+                                    getTranslated('AddCar', context),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: "Poppins1",
+                                        fontSize: 12.sp),
+                                  ),
                                 ),
                               ),
                             ],
@@ -970,20 +1019,24 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(20),
         ),
         shadowColor: Colors.black45,
-        elevation: isselected ? 6 : 0,
+        elevation: 2,
         color: color,
         child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 8.w),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircleAvatar(
                   radius: 33.sp,
+                  backgroundColor: Colors.white,
                   foregroundColor: Colors.transparent,
-                  child: ClipOval(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
                     child: Image(
-                      height: 150.h,
                       image: AssetImage(imageUrl),
+                      height: imageUrl.contains('upholstery') ? 36.sp : 42.sp,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
@@ -991,32 +1044,37 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 5.h,
                 ),
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-                            child: Text(
-                              txt,
-                              style: TextStyle(
-                                  fontFamily: "Poppins1",
-                                  color: colorr,
-                                  fontSize: 13.sp),
-                            ),
+                        Expanded(
+                          child: Text(
+                            txt,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontFamily: "Poppins1",
+                                color: colorr,
+                                fontSize: 13.sp),
                           ),
                         ),
                       ],
                     ),
                     Center(
-                      child: Text(
-                        sub,
-                        style: TextStyle(
-                            color: subcolor,
-                            fontSize: 10.sp,
-                            fontFamily: "poppins3"),
+                      child: Container(
+                        width: double.infinity,
+                        child: Text(
+                          sub,
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                          style: TextStyle(
+                              color: subcolor,
+                              fontSize: 10.sp,
+                              fontFamily: "poppins3"),
+                        ),
                       ),
                     ),
                   ],
@@ -1029,21 +1087,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 129.w,
                   child: ElevatedButton(
                     style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all<Color>(
+                        backgroundColor: MaterialStateProperty.all<Color>(
                             appModelTheme.darkTheme
                                 ? Color(0xff3e9ee0)
                                 : buttoncolor),
-                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
+                        alignment: Alignment.center,
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(13.0),
                         ))),
                     // textColor: Colors.white,
-                    child: Text(
-                      button,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 10.8.sp,
-                          color: appModelTheme.darkTheme ? white : colors),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        button,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 10.8.sp,
+                            color: appModelTheme.darkTheme ? white : colors),
+                      ),
                     ),
                     // color:
                     //     appModelTheme.darkTheme ? Color(0xff3e9ee0) : buttoncolor,
@@ -1270,9 +1336,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               BoxDecoration(
                                                             color: appModelTheme
                                                                     .darkTheme
-                                                                ? darkmodeColor
+                                                                ? Color(
+                                                                    0xff373737)
                                                                 : Color(
                                                                     0xfff4f5f7),
+                                                            border: Border.all(
+                                                              color: appModelTheme
+                                                                      .darkTheme
+                                                                  ? Color(
+                                                                      0xff373737)
+                                                                  : Color(
+                                                                      0xfff4f5f7),
+                                                              width: 1,
+                                                            ),
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
@@ -1340,7 +1416,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                   color: appModelTheme.darkTheme
-                                                      ? darkmodeColor
+                                                      ? Color(0xff373737)
                                                       : Color(0xfff4f5f7),
                                                 ),
                                               ),
@@ -1484,7 +1560,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: EdgeInsets.zero,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
-            childAspectRatio: (118.w / 130.h),
+            childAspectRatio: (118.w / 118.h),
             crossAxisSpacing: 14.w,
             mainAxisSpacing: 14.h),
         itemCount: categoriesSnapshot.data!.data!.length - 2,
@@ -1499,47 +1575,52 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: appModelTheme.darkTheme
-                          ? darkmodeColor
+                          ? Color(0xff373737)
                           : Color(0xfff4f5f7),
                       borderRadius: BorderRadius.all(
                         Radius.circular(16),
                       ),
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         SizedBox(
                           height: 8.h,
                         ),
-                        Flexible(
-                          child: Text(
-                            getTranslated(
-                                categoriesSnapshot.data!.data![index + 2]
-                                    .categoryName!.removeAllWhitespace
-                                    .toLowerCase(),
-                                context),
-                            style: TextStyle(
-                                fontSize: 11.sp, fontFamily: 'Poppins1'),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                        Text(
+                          (() {
+                            final String catKey = categoriesSnapshot
+                                .data!
+                                .data![index + 2]
+                                .categoryName!
+                                .removeAllWhitespace
+                                .toLowerCase();
+                            final String localized =
+                                getTranslated(catKey, context);
+                            if (catKey == 'checkbytestdrive') {
+                              final parts = localized.split(' ');
+                              if (parts.length > 2) {
+                                final firstLine = parts.sublist(0, 2).join(' ');
+                                final secondLine = parts.sublist(2).join(' ');
+                                return '$firstLine\n$secondLine';
+                              }
+                              return localized.replaceFirst(' ', '\n');
+                            }
+                            return localized;
+                          })(),
+                          style: TextStyle(
+                              fontSize: 12.sp, fontFamily: 'Poppins1'),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(
                           height: 6.h,
                         ),
-                        Flexible(
-                          flex: 2,
-                          child: Image(
-                            fit: BoxFit.contain,
-                            image: NetworkImage(
-                                "${categoriesSnapshot.data!.data![index + 2].icon}"),
-                            height: 50.h,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 8.h,
+                        Image(
+                          // fit: BoxFit.contain,
+                          image: NetworkImage(
+                              "${categoriesSnapshot.data!.data![index + 2].icon}"),
+                          height: 50.h,
                         ),
                       ],
                     ),
@@ -1663,6 +1744,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                     0xff373737)
                                                                 : Color(
                                                                     0xfff4f5f7),
+                                                            border: Border.all(
+                                                              color: appModelTheme
+                                                                      .darkTheme
+                                                                  ? Color(
+                                                                      0xff373737)
+                                                                  : Color(
+                                                                      0xfff4f5f7),
+                                                              width: 1,
+                                                            ),
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
@@ -1693,14 +1783,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                     .arrow_forward_ios_outlined,
                                                                 size: 16),
                                                             title: Text(
-                                                                getTranslated(
+                                                              (() {
+                                                                final raw =
                                                                     listSnapshot
                                                                         .data!
                                                                         .data![
                                                                             i]
-                                                                        .name!
-                                                                        .removeAllWhitespace,
-                                                                    context)),
+                                                                        .name!;
+                                                                final key = raw
+                                                                    .trim()
+                                                                    .replaceAll(
+                                                                        ' ', '')
+                                                                    .toLowerCase();
+                                                                final localized =
+                                                                    getTranslated(
+                                                                        key,
+                                                                        context);
+                                                                // If translation returns the key back, show backend text
+                                                                return (localized ==
+                                                                        key)
+                                                                    ? raw.replaceAll(
+                                                                        'BookaTestDrive',
+                                                                        'Book a Test Drive')
+                                                                    : localized;
+                                                              })(),
+                                                            ),
                                                           )),
                                                     );
                                                   },
@@ -1782,7 +1889,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: appModelTheme.darkTheme
-                          ? darkmodeColor
+                          ? Color(0xff373737)
                           : Color(0xfff4f5f7),
                       // color: colorOne[index],
                       borderRadius: BorderRadius.all(
@@ -1917,6 +2024,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                     0xff373737)
                                                                 : Color(
                                                                     0xfff4f5f7),
+                                                            border: Border.all(
+                                                              color: appModelTheme
+                                                                      .darkTheme
+                                                                  ? Color(
+                                                                      0xff373737)
+                                                                  : Color(
+                                                                      0xfff4f5f7),
+                                                              width: 1,
+                                                            ),
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
@@ -2033,18 +2149,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.white, fontSize: 10.sp, fontFamily: "Poppins3"),
             ),
           ),
-          Container(
-            margin: EdgeInsets.only(left: 20.w, top: 6.h),
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.white),
-                color: Color(0xff1840db),
-                borderRadius: BorderRadius.all(Radius.circular(5))),
-            height: 20.h,
+          Align(
+            alignment: Alignment.centerLeft,
             child: Container(
-              margin: EdgeInsets.only(top: 2.5.h, left: 5.w, right: 5.w),
-              child: Text(
-                "Get 30% OFF",
-                style: TextStyle(color: Colors.white, fontSize: 12.sp),
+              margin: EdgeInsets.only(left: 20.w, top: 6.h),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Color(0xff1840db)),
+                      padding: MaterialStateProperty.all<EdgeInsets>(
+                          EdgeInsets.symmetric(
+                              horizontal: 12.w, vertical: 4.h)),
+                      minimumSize: MaterialStateProperty.all<Size>(Size(0, 0)),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity:
+                          VisualDensity(horizontal: -4, vertical: -4),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              side: BorderSide(color: Colors.white)))),
+                  onPressed: () {},
+                  child: Text(
+                    "Get 30% OFF",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontSize: 12.sp),
+                  ),
+                ),
               ),
             ),
           )
@@ -2145,15 +2278,49 @@ class _HomeScreenState extends State<HomeScreen> {
   void showSelectCarDialog() {
     showDialog(
       builder: (_) => AlertDialog(
-        title: Text(getTranslated("Nocarselected!", context)),
-        content: Text(getTranslated('Pleaseselectacartoproceed', context)),
+        backgroundColor: appModelTheme.darkTheme
+            ? Color(0xff252525)
+            : Colors.white, // Dark/White background
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15), // Rectangular borders
+        ),
+        title: Text(
+          getTranslated("Nocarselected!", context),
+          style: TextStyle(
+              color: appModelTheme.darkTheme
+                  ? Colors.white
+                  : Colors.black), // White/Black text
+        ),
+        content: Text(
+          getTranslated('Pleaseselectacartoproceed', context),
+          style: TextStyle(
+              color: appModelTheme.darkTheme
+                  ? Colors.white
+                  : Colors.black), // White/Black text
+        ),
         actions: [
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  Color(0xff70bdf1), // Light blue button background
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8), // Rectangular borders
+              ),
+            ),
             onPressed: () => Navigator.of(_).pop(false),
-            //return false when click on "NO"
-            child: Text(getTranslated('close', context)),
+            child: Text(
+              getTranslated('close', context),
+              style: TextStyle(color: Colors.white), // White text
+            ),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  Color(0xff70bdf1), // Light blue button background
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8), // Rectangular borders
+              ),
+            ),
             onPressed: () {
               Navigator.push(
                   context,
@@ -2163,8 +2330,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     //     type: AddCarType.home)
                   ));
             },
-            //return true when click on "Yes"
-            child: Text(getTranslated('Select', context)),
+            child: Text(
+              getTranslated('Select', context),
+              style: TextStyle(color: Colors.white), // White text
+            ),
           ),
         ],
       ),
@@ -2256,18 +2425,18 @@ Future<void> requestNotificationPermission() async {
       );
     }
   } else if (Platform.isIOS) {
-    // Request permissions for iOS
-    final plugin = FlutterLocalNotificationsPlugin();
-    bool? granted = await plugin
-        .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
-        ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
-
-    if (granted == false) {
+    // Use Firebase Messaging on iOS to avoid duplicate prompts
+    NotificationSettings settings =
+        await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+      announcement: false,
+      criticalAlert: false,
+      provisional: false,
+      carPlay: false,
+    );
+    if (settings.authorizationStatus == AuthorizationStatus.denied) {
       Get.snackbar(
         'Warning!',
         'Notification permissions are denied on iOS.',
@@ -2275,6 +2444,14 @@ Future<void> requestNotificationPermission() async {
         colorText: Colors.white,
       );
       await openAppSettings();
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
+      Get.snackbar(
+        'Info',
+        'Notifications enabled provisionally on iOS.',
+        backgroundColor: Colors.blue,
+        colorText: Colors.white,
+      );
     } else {
       Get.snackbar(
         'Success!',
