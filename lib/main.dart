@@ -94,6 +94,116 @@ Future<void> main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   print('🔔 [MAIN] Background handler registered');
 
+  // ✅ Set up iOS notification method channel handler EARLY (before runApp)
+  print('🔔🔔🔔 [MAIN] === ABOUT TO CHECK PLATFORM ===');
+  print('🔔🔔🔔 [MAIN] Checking platform: ${Platform.operatingSystem}');
+  print('🔔🔔🔔 [MAIN] Platform.isIOS: ${Platform.isIOS}');
+  print('🔔🔔🔔 [MAIN] Platform.isAndroid: ${Platform.isAndroid}');
+  
+  print('🔔🔔🔔 [MAIN] Platform check complete - about to check if iOS...');
+  
+  if (Platform.isIOS) {
+    log("🔔🔔🔔 [MAIN] ✅✅✅ YES - PLATFORM IS iOS - SETTING UP HANDLER");
+    print("🔔🔔🔔 [MAIN] ✅✅✅ YES - PLATFORM IS iOS - SETTING UP HANDLER");
+    notificationChannel.setMethodCallHandler((call) async {
+      print("🔔 [IOS METHOD CHANNEL - MAIN] ================================================");
+      print("🔔 [IOS METHOD CHANNEL - MAIN] Method called: ${call.method}");
+      print("🔔 [IOS METHOD CHANNEL - MAIN] Call arguments: ${call.arguments}");
+      log("🔔 [IOS METHOD CHANNEL - MAIN] ================================================");
+      log("🔔 [IOS METHOD CHANNEL - MAIN] Method called: ${call.method}");
+      
+      if (call.method == 'notification_tap') {
+        print("🔔 [IOS METHOD CHANNEL - MAIN] Notification tap received from iOS!");
+        log("🔔 [IOS METHOD CHANNEL - MAIN] Notification tap received from iOS!");
+        log("🔔 [IOS METHOD CHANNEL - MAIN] Arguments: ${call.arguments}");
+        
+        try {
+          print("🔔 [IOS METHOD CHANNEL - MAIN] About to parse data...");
+          // Safely convert iOS data to Map<String, dynamic>
+          final rawData = call.arguments as Map;
+          final data = Map<String, dynamic>.from(
+            rawData.map((key, value) => MapEntry(key.toString(), value))
+          );
+          print("🔔 [IOS METHOD CHANNEL - MAIN] Data parsed successfully: $data");
+          log("🔔 [IOS METHOD CHANNEL - MAIN] Data parsed: $data");
+          
+          print("🔔 [IOS METHOD CHANNEL - MAIN] Extracting fields...");
+          final title = data['title']?.toString() ?? '';
+          final body = data['body']?.toString() ?? '';
+          final type = data['type']?.toString() ?? '';
+          final jobNo = (data['job_number'] ?? data['jobNo'] ?? data['jobno'])?.toString();
+          
+          print("🔔 [IOS METHOD CHANNEL - MAIN] Extracted - Title: $title");
+          log("🔔 [IOS METHOD CHANNEL - MAIN] Extracted - Title: $title");
+          print("🔔 [IOS METHOD CHANNEL - MAIN] Extracted - Body: $body");
+          log("🔔 [IOS METHOD CHANNEL - MAIN] Extracted - Body: $body");
+          print("🔔 [IOS METHOD CHANNEL - MAIN] Extracted - Type: $type");
+          log("🔔 [IOS METHOD CHANNEL - MAIN] Extracted - Type: $type");
+          print("🔔 [IOS METHOD CHANNEL - MAIN] Extracted - JobNo: $jobNo");
+          log("🔔 [IOS METHOD CHANNEL - MAIN] Extracted - JobNo: $jobNo");
+          
+          print("🔔 [IOS METHOD CHANNEL - MAIN] Creating RemoteMessage...");
+          // Create a fake RemoteMessage with the data
+          final fakeMessage = RemoteMessage(data: data);
+          print("🔔 [IOS METHOD CHANNEL - MAIN] RemoteMessage created successfully");
+          
+          print("🔔 [IOS METHOD CHANNEL - MAIN] Waiting 500ms for context...");
+          // Wait for context to be available
+          await Future.delayed(Duration(milliseconds: 500));
+          
+          print("🔔 [IOS METHOD CHANNEL - MAIN] Checking for context...");
+          final ctx = appNavigatorKey.currentContext;
+          print("🔔 [IOS METHOD CHANNEL - MAIN] Context available: ${ctx != null ? 'YES' : 'NO'}");
+          if (ctx != null) {
+            print("🔔 [IOS METHOD CHANNEL - MAIN] Context available, calling navigation...");
+            print("🔔 [IOS METHOD CHANNEL - MAIN] ====== CALLING Utils.handleNotificationNavigation ======");
+            print("🔔 [IOS METHOD CHANNEL - MAIN] Parameters - Title: '$title', JobNo: '$jobNo'");
+            print("🔔 [IOS METHOD CHANNEL - MAIN] Message data: ${fakeMessage.data}");
+            log("🔔 [IOS METHOD CHANNEL - MAIN] Context available, calling navigation...");
+            Utils.handleNotificationNavigation(ctx, fakeMessage, title, jobNo);
+            print("🔔 [IOS METHOD CHANNEL - MAIN] ====== Utils.handleNotificationNavigation RETURNED ======");
+            print("🔔 [IOS METHOD CHANNEL - MAIN] Navigation called successfully");
+            log("🔔 [IOS METHOD CHANNEL - MAIN] Navigation called successfully");
+            
+            // Update notification count
+            try {
+              Provider.of<NotificationCountProvider>(ctx, listen: false).setNotifications();
+              log("🔔 [IOS METHOD CHANNEL - MAIN] Notification count updated");
+            } catch (e) {
+              log("🔔 [IOS METHOD CHANNEL - MAIN] Failed to update notification count: $e");
+            }
+          } else {
+            log("🔔 [IOS METHOD CHANNEL - MAIN] ⚠️ Context not available yet, will retry...");
+            // Retry after app is fully loaded
+            Future.delayed(Duration(seconds: 1), () async {
+              final retryCtx = appNavigatorKey.currentContext;
+              if (retryCtx != null) {
+                log("🔔 [IOS METHOD CHANNEL - MAIN] Retry: Context available, calling navigation...");
+                Utils.handleNotificationNavigation(retryCtx, fakeMessage, title, jobNo);
+              } else {
+                log("🔔 [IOS METHOD CHANNEL - MAIN] Retry: Still no context available");
+              }
+            });
+          }
+        } catch (e, stackTrace) {
+          print("🔔 [IOS METHOD CHANNEL - MAIN] ❌❌❌ ERROR CAUGHT: $e");
+          print("🔔 [IOS METHOD CHANNEL - MAIN] ❌❌❌ Stack trace: $stackTrace");
+          log("🔔 [IOS METHOD CHANNEL - MAIN] Error handling notification tap: $e");
+          log("🔔 [IOS METHOD CHANNEL - MAIN] Stack trace: $stackTrace");
+        }
+      }
+      
+      log("🔔 [IOS METHOD CHANNEL - MAIN] ================================================");
+      print("🔔 [IOS METHOD CHANNEL - MAIN] ================================================");
+    });
+    log("🔔🔔🔔 [MAIN] iOS notification handler setup complete ✅✅✅");
+    print("🔔🔔🔔 [MAIN] iOS notification handler setup complete ✅✅✅");
+  } else {
+    print("🔔🔔🔔 [MAIN] ❌❌❌ NOT iOS - Platform is: ${Platform.operatingSystem}");
+  }
+  
+  print("🔔🔔🔔 [MAIN] === PLATFORM SETUP COMPLETE - CONTINUING TO APP INIT ===");
+
   // Initialize local notifications plugin
   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -393,62 +503,9 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
     log("🔔🔔🔔 [INIT STATE] _IMechanoAppState initState() called!");
     log("🔔🔔🔔 [INIT STATE] About to setup notifications...");
 
-    // Set up iOS notification method channel handler
-    if (Platform.isIOS) {
-      log("🔔 [IOS METHOD CHANNEL] Setting up notification_channel handler");
-      notificationChannel.setMethodCallHandler((call) async {
-        log("🔔 [IOS METHOD CHANNEL] ================================================");
-        log("🔔 [IOS METHOD CHANNEL] Method called: ${call.method}");
-        
-        if (call.method == 'notification_tap') {
-          log("🔔 [IOS METHOD CHANNEL] Notification tap received from iOS!");
-          log("🔔 [IOS METHOD CHANNEL] Arguments: ${call.arguments}");
-          
-          try {
-            final data = Map<String, dynamic>.from(call.arguments as Map);
-            log("🔔 [IOS METHOD CHANNEL] Data parsed: $data");
-            
-            final title = data['title']?.toString() ?? '';
-            final body = data['body']?.toString() ?? '';
-            final type = data['type']?.toString() ?? '';
-            final jobNo = (data['job_number'] ?? data['jobNo'] ?? data['jobno'])?.toString();
-            
-            log("🔔 [IOS METHOD CHANNEL] Extracted - Title: $title");
-            log("🔔 [IOS METHOD CHANNEL] Extracted - Body: $body");
-            log("🔔 [IOS METHOD CHANNEL] Extracted - Type: $type");
-            log("🔔 [IOS METHOD CHANNEL] Extracted - JobNo: $jobNo");
-            
-            // Create a fake RemoteMessage with the data
-            final fakeMessage = RemoteMessage(data: data);
-            
-            // Wait for context to be available
-            await Future.delayed(Duration(milliseconds: 100));
-            
-            final ctx = appNavigatorKey.currentContext;
-            if (ctx != null) {
-              log("🔔 [IOS METHOD CHANNEL] Context available, calling navigation...");
-              Utils.handleNotificationNavigation(ctx, fakeMessage, title, jobNo);
-              log("🔔 [IOS METHOD CHANNEL] Navigation called successfully");
-              
-              // Update notification count
-              try {
-                Provider.of<NotificationCountProvider>(ctx, listen: false).setNotifications();
-                log("🔔 [IOS METHOD CHANNEL] Notification count updated");
-              } catch (e) {
-                log("🔔 [IOS METHOD CHANNEL] Failed to update notification count: $e");
-              }
-            } else {
-              log("🔔 [IOS METHOD CHANNEL] ⚠️ Context not available yet");
-            }
-          } catch (e) {
-            log("🔔 [IOS METHOD CHANNEL] Error handling notification tap: $e");
-          }
-        }
-        
-        log("🔔 [IOS METHOD CHANNEL] ================================================");
-      });
-      log("🔔 [IOS METHOD CHANNEL] Handler setup complete");
-    }
+    // ✅ iOS notification method channel handler is already set up in main()
+    // No need to set it up again here to avoid conflicts
+    log("🔔 [INIT STATE] iOS notification handler already set up in main() function");
 
     try {
       print("========== ABOUT TO PRINT TOKEN ==========");
