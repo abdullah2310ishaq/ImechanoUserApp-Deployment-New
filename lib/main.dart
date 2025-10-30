@@ -20,7 +20,6 @@ import 'package:imechano/ui/provider/notification_count_provider.dart';
 import 'package:imechano/ui/provider/theme_provider.dart';
 import 'package:imechano/ui/services/notification_service.dart';
 import 'package:imechano/ui/screens/bottombar/bottom_bar.dart';
-import 'package:imechano/ui/screens/my_account/home.dart';
 import 'package:imechano/ui/screens/select_car/view/edit_details_screen.dart';
 import 'package:imechano/ui/share_preferences/pref_key.dart';
 import 'package:imechano/ui/share_preferences/preference.dart';
@@ -33,6 +32,7 @@ import 'package:imechano/ui/bloc/customer_job_cards_list_bloc.dart';
 import 'package:imechano/ui/bloc/pickup_condition_list_bloc.dart';
 import 'package:imechano/ui/common/globals.dart' as globals;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../ui/screens/auth/landing/view/sign_in_sign_up_landing_screen.dart';
 import '../ui/screens/auth/sign_in/view/sign_in_screen.dart';
@@ -50,11 +50,15 @@ const MethodChannel notificationChannel = MethodChannel('notification_channel');
 /// call.
 ///
 /// To verify things are working, check out the native platform logs.
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  log('Handling a background message ${message.messageId}');
+  print('🔔 [BACKGROUND] Handling a background message ${message.messageId}');
+  print('🔔 [BACKGROUND] Title: ${message.notification?.title}');
+  print('🔔 [BACKGROUND] Body: ${message.notification?.body}');
+  print('🔔 [BACKGROUND] Data: ${message.data}');
 }
 
 // /// Create a [AndroidNotificationChannel] for heads up notifications
@@ -77,7 +81,18 @@ Future<void> main() async {
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark));
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  
+  // ✅ Initialize Firebase with options (REQUIRED for Android FCM)
+  print('🔔 [MAIN] Initializing Firebase...');
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  print('🔔 [MAIN] Firebase initialized successfully');
+
+  // ✅ Register background message handler (MUST be called in main, before runApp)
+  print('🔔 [MAIN] Registering background message handler...');
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  print('🔔 [MAIN] Background handler registered');
 
   // Initialize local notifications plugin
   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -120,9 +135,9 @@ class IMechanoApp extends StatefulWidget {
   IMechanoApp({required this.prefs, required this.appLanguage});
   final Box prefs;
   final String appLanguage;
-  Widget build(BuildContext context) {
-    return MaterialApp(home: HomeScreen());
-  }
+  
+  // NOTE: StatefulWidget should NOT have a build method!
+  // The build method belongs to the State class (_IMechanoAppState)
 
   @override
   _IMechanoAppState createState() => _IMechanoAppState(prefs: prefs);
@@ -140,6 +155,37 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
     log("🔔 [NOTIFICATION PERMISSION] ================================================");
     log("🔔 [NOTIFICATION PERMISSION] Requesting notification permissions...");
     log("🔔 [NOTIFICATION PERMISSION] Platform: ${Platform.isIOS ? 'iOS' : 'Android'}");
+
+    // For Android 13+ (API 33+), explicitly request POST_NOTIFICATIONS permission
+    if (Platform.isAndroid) {
+      log("🔔 [NOTIFICATION PERMISSION] Android detected - checking notification permission");
+      
+      // Check current permission status first
+      final currentStatus = await Permission.notification.status;
+      log("🔔 [NOTIFICATION PERMISSION] Current Android notification status: $currentStatus");
+      
+      if (!currentStatus.isGranted) {
+        log("🔔 [NOTIFICATION PERMISSION] Permission not granted - requesting POST_NOTIFICATIONS permission");
+        final status = await Permission.notification.request();
+        log("🔔 [NOTIFICATION PERMISSION] Android POST_NOTIFICATIONS request result: $status");
+        
+        if (status.isDenied) {
+          log('🔔 [NOTIFICATION PERMISSION] Android: User denied POST_NOTIFICATIONS permission');
+        } else if (status.isGranted) {
+          log('🔔 [NOTIFICATION PERMISSION] Android: User granted POST_NOTIFICATIONS permission');
+        } else if (status.isPermanentlyDenied) {
+          log('🔔 [NOTIFICATION PERMISSION] Android: POST_NOTIFICATIONS permanently denied - open settings');
+          // Optionally, guide user to app settings
+          // await openAppSettings();
+        } else if (status.isRestricted) {
+          log('🔔 [NOTIFICATION PERMISSION] Android: POST_NOTIFICATIONS is restricted');
+        } else if (status.isLimited) {
+          log('🔔 [NOTIFICATION PERMISSION] Android: POST_NOTIFICATIONS is limited');
+        }
+      } else {
+        log("🔔 [NOTIFICATION PERMISSION] Android: POST_NOTIFICATIONS already granted");
+      }
+    }
 
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
@@ -176,13 +222,14 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
       log('🔔 [NOTIFICATION PERMISSION] User granted provisional notification permission');
     }
 
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    // ✅ Background handler already registered in main() - no need to register again
+    print('🔔 [NOTIFICATION] Setup complete - background handler already registered in main()');
   }
 
   // Initialize local notifications for iOS
   Future<void> _initializeLocalNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/launcher_icon');
 
     const DarwinInitializationSettings initializationSettingsIOS =
         DarwinInitializationSettings(
@@ -337,9 +384,14 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
 
   @override
   void initState() {
+    print("========== INIT STATE CALLED ==========");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initAppTheme();
+    
+    print("========== AFTER INIT THEME ==========");
+    log("🔔🔔🔔 [INIT STATE] _IMechanoAppState initState() called!");
+    log("🔔🔔🔔 [INIT STATE] About to setup notifications...");
 
     // Set up iOS notification method channel handler
     if (Platform.isIOS) {
@@ -398,9 +450,22 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
       log("🔔 [IOS METHOD CHANNEL] Handler setup complete");
     }
 
-    log("Printing TOKEN");
-    _firebaseMessaging.getToken().then((value) => log(value.toString()));
-    notification();
+    try {
+      print("========== ABOUT TO PRINT TOKEN ==========");
+      log("Printing TOKEN");
+      _firebaseMessaging.getToken().then((value) {
+        print("========== FCM TOKEN: $value ==========");
+        log(value.toString());
+      }).catchError((error) {
+        print("========== ERROR GETTING TOKEN: $error ==========");
+      });
+      print("========== CALLING notification() ==========");
+      notification();
+      print("========== notification() CALLED SUCCESSFULLY ==========");
+    } catch (e, stackTrace) {
+      print("========== CRITICAL ERROR IN INIT STATE: $e ==========");
+      print("========== STACK TRACE: $stackTrace ==========");
+    }
 
     // Initialize notification count on app startup
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -512,33 +577,9 @@ class _IMechanoAppState extends State<IMechanoApp> with WidgetsBindingObserver {
         log('🔔 [ON MESSAGE] Failed to refresh domain data: $e');
       }
 
-      // Auto-open using combined title/body and jobNo, then refresh with new tab
-      try {
-        log("🔔 [ON MESSAGE] Extracting notification meta...");
-        final meta = _extractNotificationMeta(message);
-        final title = meta['title'];
-        final jobNo = meta['jobNo'];
-        log("🔔 [ON MESSAGE] Extracted Title: $title");
-        log("🔔 [ON MESSAGE] Extracted JobNo: $jobNo");
-
-        final navCtx = appNavigatorKey.currentContext ?? context;
-        log("🔔 [ON MESSAGE] Navigation context available: YES");
-        log("🔔 [ON MESSAGE] Calling Utils.handleNotificationNavigation with message...");
-        Utils.handleNotificationNavigation(navCtx, message, title, jobNo);
-        log("🔔 [ON MESSAGE] Utils.handleNotificationNavigation completed");
-
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          try {
-            log("🔔 [ON MESSAGE] Post-frame callback: Refreshing domain data...");
-            _refreshDomainData(message);
-            log("🔔 [ON MESSAGE] Post-frame callback: Domain data refreshed");
-          } catch (e) {
-            log('🔔 [ON MESSAGE] Post-navigation refresh failed: $e');
-          }
-        });
-      } catch (e) {
-        log('🔔 [ON MESSAGE] Auto-open navigation failed: $e');
-      }
+      // ✅ DO NOT auto-navigate when notification is received in foreground
+      // Only navigate when user taps the notification (handled by onMessageOpenedApp and local notification tap)
+      log("🔔 [ON MESSAGE] Foreground notification handling complete - waiting for user tap");
     });
 
     // replacement for onResume: When the app is in the background and opened directly from the push notification.

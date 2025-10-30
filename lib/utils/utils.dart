@@ -49,6 +49,8 @@ class Utils {
 
         case 'delivery_request':
         case 'progress_update':
+        case 'delivery_rejected':
+        case 'reject_delivery':
           if (_openProgress(extractedJob)) return;
           break;
 
@@ -110,7 +112,9 @@ class Utils {
 
     if (str.contains('Delivery') ||
         str.contains('Task Completed') ||
-        str.contains("طلب توصيل")) {
+        str.contains('Reject') ||
+        str.contains("طلب توصيل") ||
+        str.contains("رفض")) {
       _openProgress(extractedJob);
       return;
     }

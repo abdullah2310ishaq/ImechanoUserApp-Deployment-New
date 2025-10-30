@@ -17,7 +17,7 @@
 	<key>PROJECT_ID</key>
 	<string>imechano-userapp</string>
 	<key>STORAGE_BUCKET</key>
-	<string>imechano-userapp.appspot.com</string>
+	<string>imechano-userapp.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:559230683480:ios:654d591fe60e5b9101bd2d</string>
+	<string>1:559230683480:ios:04c4015c966529e701bd2d</string>
 </dict>
 </plist>

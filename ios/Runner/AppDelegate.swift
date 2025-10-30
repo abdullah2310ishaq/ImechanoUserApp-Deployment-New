@@ -63,17 +63,58 @@ import GoogleMaps
       }
       return appStoreReceiptURL.lastPathComponent == "sandboxReceipt"
   }
+  
+  // MARK: - APNs Token Registration (for debugging)
+  override func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
+    let token = tokenParts.joined()
+    print("🍎 [APNs] Device Token registered successfully!")
+    print("🍎 [APNs] Token: \(token)")
+    print("🍎 [APNs] Token length: \(token.count) characters")
+    
+    // Pass to Firebase Messaging
+    Messaging.messaging().apnsToken = deviceToken
+    print("🍎 [APNs] Token passed to Firebase Messaging")
+  }
+  
+  override func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+    print("❌ [APNs] Failed to register for remote notifications!")
+    print("❌ [APNs] Error: \(error.localizedDescription)")
+    print("❌ [APNs] Full error: \(error)")
+  }
 }
 
 // MARK: - MessagingDelegate
 extension AppDelegate: MessagingDelegate {
   func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-    print("🔑 Firebase registration token: \(String(describing: fcmToken))")
+    print("🔑 [FCM] ================================================")
+    print("🔑 [FCM] Firebase registration token received!")
+    print("🔑 [FCM] Token: \(fcmToken ?? "nil")")
+    
+    if let token = fcmToken {
+        print("🔑 [FCM] Token length: \(token.count) characters")
+        print("🔑 [FCM] First 20 chars: \(String(token.prefix(20)))...")
+    } else {
+        print("⚠️ [FCM] WARNING: Token is nil!")
+    }
     
     // TestFlight specific logging
     if isTestFlight() {
-        print("📱 TestFlight FCM Token: \(fcmToken ?? "nil")")
+        print("📱 [FCM] Running in TestFlight environment")
     }
+    
+    // Check APNs token
+    if let apnsToken = Messaging.messaging().apnsToken {
+        print("✅ [FCM] APNs token is set in Firebase Messaging")
+        let tokenParts = apnsToken.map { data in String(format: "%02.2hhx", data) }
+        let token = tokenParts.joined()
+        print("✅ [FCM] APNs Token: \(token)")
+    } else {
+        print("⚠️ [FCM] WARNING: APNs token is NOT set in Firebase Messaging!")
+        print("⚠️ [FCM] This may prevent push notifications from working")
+    }
+    
+    print("🔑 [FCM] ================================================")
     
     let dataDict:[String: String] = ["token": fcmToken ?? ""]
     NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
